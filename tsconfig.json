@@ -1,0 +1,10 @@
+{
+  "extends": "@tsconfig/node14/tsconfig.json",
+  "compileOnSave": true,
+  "compilerOptions": {
+    "outDir": "build",
+    "lib": ["ES2020"]
+  },
+  "include": ["src/**/*.ts"],
+  "exclude": ["node_modules"]
+}

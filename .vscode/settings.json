@@ -1,0 +1,6 @@
+{
+  "editor.formatOnSave": true,
+  "eslint.validate": ["typescript"],
+  "eslint.alwaysShowStatus": true,
+  "files.eol": "\n"
+}
