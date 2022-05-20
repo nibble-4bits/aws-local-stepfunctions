@@ -6,6 +6,7 @@ interface BasePassState extends BaseState {
   Type: 'Pass';
   InputPath?: string;
   OutputPath?: string;
+  Result?: unknown;
   ResultPath?: string;
   Parameters?: Record<string, unknown>;
 }
