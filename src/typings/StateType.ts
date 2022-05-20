@@ -1,1 +1,1 @@
-export type StateType = 'Task' | 'Parallel' | 'Map' | 'Pass' | 'Wait' | 'Choice' | 'Succeed' | 'Fail';
+export type StateType = 'Task' | 'Map' | 'Pass' | 'Wait' | 'Choice' | 'Succeed' | 'Fail';
