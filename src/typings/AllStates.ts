@@ -6,12 +6,4 @@ import { SucceedState } from './SucceedState';
 import { TaskState } from './TaskState';
 import { WaitState } from './WaitState';
 
-type AllStates = TaskState | MapState | PassState | WaitState | ChoiceState | SucceedState | FailState;
-
-export interface StateMachine {
-  States: Record<string, AllStates>;
-  StartAt: string;
-  Comment?: string;
-  Version?: string;
-  TimeoutSeconds?: number;
-}
+export type AllStates = TaskState | MapState | PassState | WaitState | ChoiceState | SucceedState | FailState;
