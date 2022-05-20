@@ -4,6 +4,7 @@ import { TerminalState } from './TerminalState';
 
 interface BaseTaskState extends BaseState {
   Type: 'Task';
+  Resource: string;
   InputPath?: string;
   OutputPath?: string;
   ResultPath?: string;
