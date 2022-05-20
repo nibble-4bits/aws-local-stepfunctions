@@ -7,4 +7,4 @@ interface NextableState extends BaseState {
   End: never;
 }
 
-export type IntermediateState = BaseState | NextableState;
+export type IntermediateState = NextableState;

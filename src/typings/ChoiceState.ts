@@ -1,5 +1,4 @@
 import { BaseState } from './BaseState';
-import { IntermediateState } from './IntermediateState';
 
 interface BaseChoiceState extends BaseState {
   Type: 'Choice';
@@ -7,4 +6,4 @@ interface BaseChoiceState extends BaseState {
   OutputPath?: string;
 }
 
-export type ChoiceState = IntermediateState & BaseChoiceState;
+export type ChoiceState = BaseChoiceState;
