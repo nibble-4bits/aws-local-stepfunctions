@@ -1,9 +1,8 @@
 import { BaseState } from './BaseState';
+import { CanHaveInputPath, CanHaveOutputPath } from './InputOutputProcessing';
 
-interface BaseChoiceState extends BaseState {
+interface BaseChoiceState extends BaseState, CanHaveInputPath, CanHaveOutputPath {
   Type: 'Choice';
-  InputPath?: string;
-  OutputPath?: string;
 }
 
 export type ChoiceState = BaseChoiceState;

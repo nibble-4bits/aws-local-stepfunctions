@@ -1,14 +1,22 @@
 import { BaseState } from './BaseState';
+import {
+  CanHaveInputPath,
+  CanHaveOutputPath,
+  CanHaveParameters,
+  CanHaveResultPath,
+  CanHaveResultSelector,
+} from './InputOutputProcessing';
 import { IntermediateState } from './IntermediateState';
 import { TerminalState } from './TerminalState';
 
-interface BaseMapState extends BaseState {
+interface BaseMapState
+  extends BaseState,
+    CanHaveInputPath,
+    CanHaveParameters,
+    CanHaveResultSelector,
+    CanHaveResultPath,
+    CanHaveOutputPath {
   Type: 'Map';
-  InputPath?: string;
-  OutputPath?: string;
-  ResultPath?: string;
-  Parameters?: Record<string, unknown>;
-  ResultSelector?: string;
 }
 
 export type MapState = (IntermediateState | TerminalState) & BaseMapState;
