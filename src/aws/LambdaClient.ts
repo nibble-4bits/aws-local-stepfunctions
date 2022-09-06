@@ -1,5 +1,6 @@
 import { LambdaClient as AWSLambdaClient, InvokeCommand } from '@aws-sdk/client-lambda';
 import { Credentials } from '@aws-sdk/types/dist-types/credentials';
+import { LambdaExecutionError } from '../error/LambdaExecutionError';
 
 interface LambdaClientConfig {
   region: string;
@@ -23,9 +24,14 @@ export class LambdaClient {
 
     const invocationResult = await this.client.send(invokeCommand);
 
-    let resultValue;
+    let resultValue = null;
     if (invocationResult.Payload) {
       resultValue = Buffer.from(invocationResult.Payload).toString();
+      resultValue = JSON.parse(resultValue);
+    }
+
+    if (invocationResult.FunctionError) {
+      throw new LambdaExecutionError(resultValue, funcNameOrArn);
     }
 
     return resultValue;

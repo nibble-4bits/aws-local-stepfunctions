@@ -1,3 +1,4 @@
+import { exit } from 'process';
 import set from 'lodash/set';
 import cloneDeep from 'lodash/cloneDeep';
 import { JSONPath as jp } from 'jsonpath-plus';
@@ -7,6 +8,7 @@ import { StateType } from './typings/StateType';
 import { isPlainObj } from './util';
 import { LambdaClient } from './aws/LambdaClient';
 import { TaskState } from './typings/TaskState';
+import { LambdaExecutionError } from './error/LambdaExecutionError';
 
 type StateHandler = {
   [T in StateType]: () => Promise<void>;
@@ -142,11 +144,20 @@ export class StateMachine {
 
   private async handleTaskState() {
     const state = this.currState as TaskState;
-
     const lambdaClient = new LambdaClient();
-    const result = await lambdaClient.invokeFunction(state.Resource, this.currInput);
 
-    this.currResult = result;
+    try {
+      const result = await lambdaClient.invokeFunction(state.Resource, this.currInput);
+      this.currResult = result;
+    } catch (error) {
+      if (error instanceof LambdaExecutionError) {
+        console.error(error.toString());
+      } else {
+        console.error(error);
+      }
+
+      exit(1);
+    }
   }
 
   private jsonQuery(pathExpression: string, json: Record<string, unknown>) {
