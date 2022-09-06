@@ -5,6 +5,8 @@ import { AllStates } from './typings/AllStates';
 import { StateMachineDefinition } from './typings/StateMachineDefinition';
 import { StateType } from './typings/StateType';
 import { isPlainObj } from './util';
+import { LambdaClient } from './aws/LambdaClient';
+import { TaskState } from './typings/TaskState';
 
 type StateHandler = {
   [T in StateType]: () => Promise<void>;
@@ -139,7 +141,12 @@ export class StateMachine {
   }
 
   private async handleTaskState() {
-    // TODO: Implement task state handler
+    const state = this.currState as TaskState;
+
+    const lambdaClient = new LambdaClient();
+    const result = await lambdaClient.invokeFunction(state.Resource, this.currInput);
+
+    this.currResult = result;
   }
 
   private jsonQuery(pathExpression: string, json: Record<string, unknown>) {
