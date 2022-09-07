@@ -6,6 +6,9 @@ interface LambdaErrorResult {
   trace: string[];
 }
 
+/**
+ * Represents the failure of a Lambda function execution.
+ */
 export class LambdaExecutionError extends CustomError {
   wrappedError: Error;
 

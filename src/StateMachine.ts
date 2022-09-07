@@ -9,21 +9,58 @@ import { isPlainObj } from './util';
 import { LambdaClient } from './aws/LambdaClient';
 import { TaskState } from './typings/TaskState';
 import { LambdaExecutionError } from './error/LambdaExecutionError';
+import { PayloadTemplate } from './typings/InputOutputProcessing';
 
 type StateHandler = {
   [T in StateType]: () => Promise<void>;
 };
 
 export class StateMachine {
+  /**
+   * The name of the state currently being executed.
+   */
   private currStateName: string;
+
+  /**
+   * The current state being executed.
+   */
   private currState: AllStates;
+
+  /**
+   * The unmodified input to the current state.
+   */
   private rawInput: Record<string, unknown>;
+
+  /**
+   * The input that can be modified according to the `InputPath` and `Parameters` fields of the current state.
+   */
   private currInput: Record<string, unknown>;
+
+  /**
+   * The result that can be modified according to the `ResultSelector`, `ResultPath` and `OutputPath` fields of the current state.
+   */
   private currResult: unknown;
+
+  /**
+   * The context object of the state machine.
+   */
   private context: Record<string, unknown>;
+
+  /**
+   * A map of all states defined in the state machine.
+   */
   private readonly states: Record<string, AllStates>;
+
+  /**
+   * A map of functions to handle each type of state.
+   */
   private readonly stateHandlers: StateHandler;
 
+  /**
+   * Constructs a new state machine.
+   * @param definition The state machine definition declared using the Amazon States Language (https://states-language.net/spec.html).
+   * @param input The input to the state machine.
+   */
   constructor(definition: StateMachineDefinition, input: Record<string, unknown>) {
     this.states = definition.States;
     this.currStateName = definition.StartAt;
@@ -43,6 +80,9 @@ export class StateMachine {
     };
   }
 
+  /**
+   * Executes the state machine, running through the states specified in the definiton.
+   */
   async run() {
     let isEndState = false;
 
@@ -65,6 +105,13 @@ export class StateMachine {
     } while (!isEndState);
   }
 
+  /**
+   * Process the current input according to the path defined in the `InputPath` field, if specified in the current state.
+   * @returns
+   * * If `InputPath` is not specified, returns the current input unmodified.
+   * * If `InputPath` is `null`, returns an empty object (`{}`).
+   * * If `InputPath` is a string, it's considered a JSONPath and the selected portion of the current input is returned.
+   */
   private processInputPath() {
     if ('InputPath' in this.currState) {
       if (this.currState.InputPath === null) {
@@ -77,15 +124,23 @@ export class StateMachine {
     return this.currInput;
   }
 
-  private processPayloadTemplate(payloadTemplate: Record<string, unknown>, json: Record<string, unknown>) {
+  /**
+   * Recursively process a payload template to resolve the properties that are JSONPaths.
+   * @param payloadTemplate The payload template to process.
+   * @param json The object to evaluate with JSONPath.
+   * @returns The processed payload template.
+   */
+  private processPayloadTemplate(payloadTemplate: PayloadTemplate, json: Record<string, unknown>) {
     const resolvedProperties = Object.entries(payloadTemplate).map(([key, value]) => {
       let sanitizedKey = key;
       let resolvedValue = value;
 
+      // Recursively process child object
       if (isPlainObj(value)) {
         resolvedValue = this.processPayloadTemplate(value as Record<string, unknown>, json);
       }
 
+      // Only resolve value if key ends with `.$` and value is a string
       if (key.endsWith('.$') && typeof value === 'string') {
         sanitizedKey = key.replace('.$', '');
         resolvedValue = this.jsonQuery(value, json);
@@ -97,6 +152,9 @@ export class StateMachine {
     return Object.fromEntries(resolvedProperties);
   }
 
+  /**
+   * Process the current input according to the `InputPath` and `Parameters` fields.
+   */
   private processInput() {
     this.currInput = this.processInputPath();
     if ('Parameters' in this.currState) {
@@ -104,6 +162,14 @@ export class StateMachine {
     }
   }
 
+  /**
+   * Process the current result according to the path defined in the `ResultPath` field, if specified in the current state.
+   * @returns
+   * * If `ResultPath` is not specified, returns the current result unmodified.
+   * * If `ResultPath` is `null`, returns the raw input (i.e. the input passed to current state).
+   * * If `ResultPath` is a string, it's considered a JSONPath and returns a combination of the raw input with the current result,
+   * by placing the current result in the specified path.
+   */
   private processResultPath() {
     if ('ResultPath' in this.currState) {
       if (this.currState.ResultPath === null) {
@@ -117,6 +183,13 @@ export class StateMachine {
     return this.currResult;
   }
 
+  /**
+   * Process the current result according to the path defined in the `OutputPath` field, if specified in the current state.
+   * @returns
+   * * If `OutputPath` is not specified, returns the current result unmodified.
+   * * If `OutputPath` is `null`, returns an empty object (`{}`).
+   * * If `OutputPath` is a string, it's considered a JSONPath and the selected portion of the current result is returned.
+   */
   private processOutputPath() {
     if ('OutputPath' in this.currState) {
       if (this.currState.OutputPath === null) {
@@ -129,6 +202,9 @@ export class StateMachine {
     return this.currResult;
   }
 
+  /**
+   * Process the current result according to the `ResultSelector`, `ResultPath` and `OutputPath` fields.
+   */
   private processResult() {
     if ('ResultSelector' in this.currState) {
       this.currResult = this.processPayloadTemplate(
@@ -142,6 +218,12 @@ export class StateMachine {
     this.currResult = this.processOutputPath();
   }
 
+  /**
+   * Handler for task states.
+   *
+   * Invokes the Lambda function specified in the `Resource` field
+   * and sets the current result of the state machine to the value returned by the Lambda.
+   */
   private async handleTaskState() {
     const state = this.currState as TaskState;
     const lambdaClient = new LambdaClient();
@@ -160,7 +242,14 @@ export class StateMachine {
     }
   }
 
+  /**
+   * Queries for a property in an object using a JSONPath expression.
+   * @param pathExpression The JSONPath expression to query for.
+   * @param json The object to evaluate.
+   * @returns The value of the property that was queried for, if found. Otherwise returns `undefined`.
+   */
   private jsonQuery(pathExpression: string, json: Record<string, unknown>) {
+    // If the expression starts with double `$$`, evaluate the path in the context object.
     if (pathExpression.startsWith('$$')) {
       return jp({ path: pathExpression.slice(1), json: this.context, wrap: false });
     }

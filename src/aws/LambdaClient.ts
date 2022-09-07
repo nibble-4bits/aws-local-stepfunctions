@@ -7,6 +7,9 @@ interface LambdaClientConfig {
   credentials: Credentials;
 }
 
+/**
+ * Wrapper class around the Lambda AWS SDK client
+ */
 export class LambdaClient {
   private client: AWSLambdaClient;
 
