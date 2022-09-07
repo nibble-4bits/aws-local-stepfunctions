@@ -1,4 +1,4 @@
-type PayloadTemplate = Record<string, unknown>;
+export type PayloadTemplate = object;
 
 export interface CanHaveInputPath {
   InputPath?: string | null;
