@@ -6,3 +6,13 @@
 export function isPlainObj(value: any): boolean {
   return !!value && Object.getPrototypeOf(value) === Object.prototype;
 }
+
+/**
+ * Pauses the execution of the program for a certain number of milliseconds.
+ * @param ms Number of milliseconds to sleep.
+ */
+export function sleep(ms: number) {
+  return new Promise((resolve) => {
+    setTimeout(resolve, ms);
+  });
+}
