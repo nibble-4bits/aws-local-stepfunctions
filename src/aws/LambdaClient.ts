@@ -1,6 +1,7 @@
 import { LambdaClient as AWSLambdaClient, InvokeCommand } from '@aws-sdk/client-lambda';
 import { Credentials } from '@aws-sdk/types/dist-types/credentials';
 import { LambdaExecutionError } from '../error/LambdaExecutionError';
+import { JSONValue } from '../typings/JSONValue';
 
 interface LambdaClientConfig {
   region: string;
@@ -17,7 +18,7 @@ export class LambdaClient {
     this.client = new AWSLambdaClient(config ?? {});
   }
 
-  async invokeFunction(funcNameOrArn: string, payload: Record<string, unknown>) {
+  async invokeFunction(funcNameOrArn: string, payload: JSONValue) {
     const payloadBuffer = Buffer.from(JSON.stringify(payload));
 
     const invokeCommand = new InvokeCommand({

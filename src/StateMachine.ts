@@ -10,6 +10,7 @@ import { LambdaClient } from './aws/LambdaClient';
 import { TaskState } from './typings/TaskState';
 import { LambdaExecutionError } from './error/LambdaExecutionError';
 import { PayloadTemplate } from './typings/InputOutputProcessing';
+import { JSONValue } from './typings/JSONValue';
 
 type StateHandler = {
   [T in StateType]: () => Promise<void>;
@@ -29,22 +30,22 @@ export class StateMachine {
   /**
    * The unmodified input to the current state.
    */
-  private rawInput: Record<string, unknown>;
+  private rawInput: JSONValue;
 
   /**
    * The input that can be modified according to the `InputPath` and `Parameters` fields of the current state.
    */
-  private currInput: Record<string, unknown>;
+  private currInput: JSONValue;
 
   /**
    * The result that can be modified according to the `ResultSelector`, `ResultPath` and `OutputPath` fields of the current state.
    */
-  private currResult: unknown;
+  private currResult: JSONValue;
 
   /**
    * The context object of the state machine.
    */
-  private context: Record<string, unknown>;
+  private context: object;
 
   /**
    * A map of all states defined in the state machine.
@@ -61,7 +62,7 @@ export class StateMachine {
    * @param definition The state machine definition declared using the Amazon States Language (https://states-language.net/spec.html).
    * @param input The input to the state machine.
    */
-  constructor(definition: StateMachineDefinition, input: Record<string, unknown>) {
+  constructor(definition: StateMachineDefinition, input: JSONValue) {
     this.states = definition.States;
     this.currStateName = definition.StartAt;
     this.currState = this.states[this.currStateName];
@@ -127,17 +128,17 @@ export class StateMachine {
   /**
    * Recursively process a payload template to resolve the properties that are JSONPaths.
    * @param payloadTemplate The payload template to process.
-   * @param json The object to evaluate with JSONPath.
+   * @param json The object to evaluate with JSONPath (whether of null, boolean, number, string, object, or array type).
    * @returns The processed payload template.
    */
-  private processPayloadTemplate(payloadTemplate: PayloadTemplate, json: Record<string, unknown>) {
+  private processPayloadTemplate(payloadTemplate: PayloadTemplate, json: JSONValue) {
     const resolvedProperties = Object.entries(payloadTemplate).map(([key, value]) => {
       let sanitizedKey = key;
       let resolvedValue = value;
 
       // Recursively process child object
       if (isPlainObj(value)) {
-        resolvedValue = this.processPayloadTemplate(value as Record<string, unknown>, json);
+        resolvedValue = this.processPayloadTemplate(value, json);
       }
 
       // Only resolve value if key ends with `.$` and value is a string
@@ -177,7 +178,12 @@ export class StateMachine {
       }
 
       const sanitizedPath = this.currState.ResultPath!.replace('$.', '');
-      return set(cloneDeep(this.rawInput), sanitizedPath, this.currResult);
+      if (isPlainObj(this.rawInput)) {
+        const clonedRawInput = cloneDeep(this.rawInput) as object;
+        return set(clonedRawInput, sanitizedPath, this.currResult);
+      } else {
+        // TODO: throw exception since rawInput is not an object, thus ResultPath won't work.
+      }
     }
 
     return this.currResult;
@@ -196,7 +202,7 @@ export class StateMachine {
         return {};
       }
 
-      return this.jsonQuery(this.currState.OutputPath!, this.currResult as Record<string, unknown>);
+      return this.jsonQuery(this.currState.OutputPath!, this.currResult);
     }
 
     return this.currResult;
@@ -207,10 +213,7 @@ export class StateMachine {
    */
   private processResult() {
     if ('ResultSelector' in this.currState) {
-      this.currResult = this.processPayloadTemplate(
-        this.currState.ResultSelector!,
-        this.currResult as Record<string, unknown>
-      );
+      this.currResult = this.processPayloadTemplate(this.currState.ResultSelector!, this.currResult);
     }
 
     this.currResult = this.processResultPath();
@@ -245,10 +248,10 @@ export class StateMachine {
   /**
    * Queries for a property in an object using a JSONPath expression.
    * @param pathExpression The JSONPath expression to query for.
-   * @param json The object to evaluate.
+   * @param json The object to evaluate (whether of null, boolean, number, string, object, or array type).
    * @returns The value of the property that was queried for, if found. Otherwise returns `undefined`.
    */
-  private jsonQuery(pathExpression: string, json: Record<string, unknown>) {
+  private jsonQuery(pathExpression: string, json: JSONValue) {
     // If the expression starts with double `$$`, evaluate the path in the context object.
     if (pathExpression.startsWith('$$')) {
       return jp({ path: pathExpression.slice(1), json: this.context, wrap: false });
