@@ -11,6 +11,7 @@ import { TaskState } from './typings/TaskState';
 import { LambdaExecutionError } from './error/LambdaExecutionError';
 import { PayloadTemplate } from './typings/InputOutputProcessing';
 import { JSONValue } from './typings/JSONValue';
+import { PassState } from './typings/PassState';
 
 type StateHandler = {
   [T in StateType]: () => Promise<void>;
@@ -73,7 +74,7 @@ export class StateMachine {
     this.stateHandlers = {
       Task: this.handleTaskState.bind(this),
       Map: () => Promise.resolve(),
-      Pass: () => Promise.resolve(),
+      Pass: this.handlePassState.bind(this),
       Wait: () => Promise.resolve(),
       Choice: () => Promise.resolve(),
       Succeed: () => Promise.resolve(),
@@ -245,6 +246,22 @@ export class StateMachine {
       }
 
       exit(1);
+    }
+  }
+
+  /**
+   * Handler for pass states.
+   *
+   * If the `Result` field is specified, copies `Result` into the current result.
+   * Else, copies the current input into the current result.
+   */
+  private async handlePassState() {
+    const state = this.currState as PassState;
+
+    if (state.Result) {
+      this.currResult = state.Result;
+    } else {
+      this.currResult = this.currInput;
     }
   }
 
