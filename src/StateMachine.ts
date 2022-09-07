@@ -96,6 +96,9 @@ export class StateMachine {
 
       this.processResult();
 
+      this.rawInput = this.currResult;
+      this.currInput = this.currResult;
+
       if ('Next' in this.currState) {
         this.currStateName = this.currState.Next;
       }
