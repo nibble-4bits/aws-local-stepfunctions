@@ -5,13 +5,14 @@ import { JSONPath as jp } from 'jsonpath-plus';
 import { AllStates } from './typings/AllStates';
 import { StateMachineDefinition } from './typings/StateMachineDefinition';
 import { StateType } from './typings/StateType';
-import { isPlainObj } from './util';
+import { isPlainObj, sleep } from './util';
 import { LambdaClient } from './aws/LambdaClient';
 import { TaskState } from './typings/TaskState';
 import { LambdaExecutionError } from './error/LambdaExecutionError';
 import { PayloadTemplate } from './typings/InputOutputProcessing';
 import { JSONValue } from './typings/JSONValue';
 import { PassState } from './typings/PassState';
+import { WaitState } from './typings/WaitState';
 
 type StateHandler = {
   [T in StateType]: () => Promise<void>;
@@ -75,7 +76,7 @@ export class StateMachine {
       Task: this.handleTaskState.bind(this),
       Map: () => Promise.resolve(),
       Pass: this.handlePassState.bind(this),
-      Wait: () => Promise.resolve(),
+      Wait: this.handleWaitState.bind(this),
       Choice: () => Promise.resolve(),
       Succeed: () => Promise.resolve(),
       Fail: () => Promise.resolve(),
@@ -262,6 +263,36 @@ export class StateMachine {
       this.currResult = state.Result;
     } else {
       this.currResult = this.currInput;
+    }
+  }
+
+  /**
+   * Handler for wait states.
+   *
+   * Pauses the state machine execution for a certain amount of time
+   * based on one of the `Seconds`, `Timestamp`, `SecondsPath` or `TimestampPath` fields.
+   */
+  private async handleWaitState() {
+    const state = this.currState as WaitState;
+
+    if (state.Seconds) {
+      await sleep(state.Seconds * 1000);
+    } else if (state.Timestamp) {
+      const dateTimestamp = new Date(state.Timestamp);
+      const currentTime = Date.now();
+      const timeDiff = dateTimestamp.getTime() - currentTime;
+
+      await sleep(timeDiff);
+    } else if (state.SecondsPath) {
+      const seconds = this.jsonQuery(state.SecondsPath, this.currInput);
+      await sleep(seconds * 1000);
+    } else if (state.TimestampPath) {
+      const timestamp = this.jsonQuery(state.TimestampPath, this.currInput);
+      const dateTimestamp = new Date(timestamp);
+      const currentTime = Date.now();
+      const timeDiff = dateTimestamp.getTime() - currentTime;
+
+      await sleep(timeDiff);
     }
   }
 
