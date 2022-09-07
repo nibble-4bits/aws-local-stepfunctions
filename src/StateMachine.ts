@@ -79,7 +79,7 @@ export class StateMachine {
       Wait: this.handleWaitState.bind(this),
       Choice: () => Promise.resolve(),
       Succeed: this.handleSucceedState.bind(this),
-      Fail: () => Promise.resolve(),
+      Fail: this.handleFailState.bind(this),
     };
   }
 
@@ -302,6 +302,15 @@ export class StateMachine {
    * Ends the state machine execution successfully.
    */
   private async handleSucceedState() {
+    // noop
+  }
+
+  /**
+   * Handler for fail states.
+   *
+   * Ends the state machine execution and marks it as a failure.
+   */
+  private async handleFailState() {
     // noop
   }
 
