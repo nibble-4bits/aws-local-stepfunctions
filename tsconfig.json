@@ -1,9 +1,10 @@
 {
-  "extends": "@tsconfig/node14/tsconfig.json",
-  "compileOnSave": true,
+  "extends": "@tsconfig/node16-strictest/tsconfig.json",
   "compilerOptions": {
     "outDir": "build",
-    "lib": ["ES2020"]
+    "target": "ES6",
+    "declaration": true,
+    "noUncheckedIndexedAccess": false
   },
   "include": ["src/**/*.ts"],
   "exclude": ["node_modules"]
