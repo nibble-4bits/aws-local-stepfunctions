@@ -13,6 +13,7 @@ import { PayloadTemplate } from './typings/InputOutputProcessing';
 import { JSONValue } from './typings/JSONValue';
 import { PassState } from './typings/PassState';
 import { WaitState } from './typings/WaitState';
+import { MapState } from './typings/MapState';
 
 type StateHandler = {
   [T in StateType]: () => Promise<void>;
@@ -47,7 +48,7 @@ export class StateMachine {
   /**
    * The context object of the state machine.
    */
-  private context: object;
+  private context: Record<string, unknown>;
 
   /**
    * A map of all states defined in the state machine.
@@ -74,7 +75,7 @@ export class StateMachine {
     this.context = {};
     this.stateHandlers = {
       Task: this.handleTaskState.bind(this),
-      Map: () => Promise.resolve(),
+      Map: this.handleMapState.bind(this),
       Pass: this.handlePassState.bind(this),
       Wait: this.handleWaitState.bind(this),
       Choice: () => Promise.resolve(),
@@ -163,7 +164,9 @@ export class StateMachine {
    */
   private processInput() {
     this.currInput = this.processInputPath();
-    if ('Parameters' in this.currState) {
+    if ('Parameters' in this.currState && this.currState.Type !== 'Map') {
+      // `Parameters` field is handled differently in the `Map` state,
+      // hence why we omit processing it here.
       this.currInput = this.processPayloadTemplate(this.currState.Parameters!, this.currInput);
     }
   }
@@ -248,6 +251,54 @@ export class StateMachine {
 
       exit(1);
     }
+  }
+
+  /**
+   * Handler for map states.
+   *
+   * Iterates over the current input items or the items of an array specified
+   * by the `ItemsPath` field, and then processes each item by passing it
+   * as the input to the state machine specified in the `Iterator` field.
+   */
+  private async handleMapState() {
+    const state = this.currState as MapState;
+
+    let items = this.currInput;
+    if (state.ItemsPath) {
+      items = this.jsonQuery(state.ItemsPath, this.currInput);
+    }
+
+    if (!Array.isArray(items)) {
+      // TODO: throw error instead of returning, because current input is not an array.
+      return;
+    }
+
+    const result = new Array(items.length);
+    let paramValue;
+    for (let i = 0; i < items.length; i++) {
+      const item = items[i];
+
+      this.context.Map = {
+        Item: {
+          Index: i,
+          Value: item,
+        },
+      };
+
+      // Handle `Parameters` field if specified
+      if (state.Parameters) {
+        paramValue = this.processPayloadTemplate(state.Parameters, this.currInput);
+      }
+
+      // Pass the current parameter value if defined, otherwise pass the current item being iterated
+      const mapStateMachine = new StateMachine(state.Iterator, paramValue ?? item);
+      await mapStateMachine.run();
+
+      result[i] = mapStateMachine.currResult;
+    }
+
+    delete this.context.Map;
+    this.currResult = result;
   }
 
   /**
