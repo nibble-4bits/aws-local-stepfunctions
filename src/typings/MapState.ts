@@ -7,6 +7,7 @@ import {
   CanHaveResultSelector,
 } from './InputOutputProcessing';
 import { IntermediateState } from './IntermediateState';
+import { StateMachineDefinition } from './StateMachineDefinition';
 import { TerminalState } from './TerminalState';
 
 interface BaseMapState
@@ -17,6 +18,9 @@ interface BaseMapState
     CanHaveResultPath,
     CanHaveOutputPath {
   Type: 'Map';
+  Iterator: Omit<StateMachineDefinition, 'Version' | 'TimeoutSeconds'>;
+  ItemsPath?: string;
+  MaxConcurrency?: number;
 }
 
 export type MapState = (IntermediateState | TerminalState) & BaseMapState;
