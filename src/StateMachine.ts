@@ -14,6 +14,8 @@ import { JSONValue } from './typings/JSONValue';
 import { PassState } from './typings/PassState';
 import { WaitState } from './typings/WaitState';
 import { MapState } from './typings/MapState';
+import { ChoiceState } from './typings/ChoiceState';
+import { testChoiceRule } from './ChoiceHelper';
 
 type StateHandler = {
   [T in StateType]: () => Promise<void>;
@@ -78,7 +80,7 @@ export class StateMachine {
       Map: this.handleMapState.bind(this),
       Pass: this.handlePassState.bind(this),
       Wait: this.handleWaitState.bind(this),
-      Choice: () => Promise.resolve(),
+      Choice: this.handleChoiceState.bind(this),
       Succeed: this.handleSucceedState.bind(this),
       Fail: this.handleFailState.bind(this),
     };
@@ -345,6 +347,39 @@ export class StateMachine {
 
       await sleep(timeDiff);
     }
+  }
+
+  /**
+   * Handler for choice states.
+   *
+   * Evaluates each choice rule specified in the `Choices` field.
+   *
+   * If one of the rules matches, then the state machine transitions to the
+   * state specified in the `Next` field for that choice rule.
+   *
+   * If no rule matches but the `Default` field is specified,
+   * then the next state will be the state specified in said field.
+   *
+   * If no rule matches and the `Default` field is not specified, throws a
+   * States.NoChoiceMatched error.
+   */
+  private async handleChoiceState() {
+    const state = this.currState as ChoiceState;
+
+    for (const choice of state.Choices) {
+      const choiceIsMatch = testChoiceRule(choice, this.currInput, this.jsonQuery);
+      if (choiceIsMatch) {
+        this.currStateName = choice.Next;
+        return;
+      }
+    }
+
+    if (state.Default) {
+      this.currStateName = state.Default;
+      return;
+    }
+
+    // TODO: Throw States.NoChoiceMatched error here because all choices failed to match and no `Default` field was specified.
   }
 
   /**
