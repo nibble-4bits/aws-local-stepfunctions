@@ -89,7 +89,7 @@ export class StateMachine {
   /**
    * Executes the state machine, running through the states specified in the definiton.
    */
-  async run() {
+  async run(): Promise<JSONValue> {
     let isEndState = false;
 
     do {
@@ -112,6 +112,8 @@ export class StateMachine {
         isEndState = true;
       }
     } while (!isEndState);
+
+    return this.currResult;
   }
 
   /**
