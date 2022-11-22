@@ -64,7 +64,7 @@ export class StateMachine {
 
   /**
    * Constructs a new state machine.
-   * @param definition The state machine definition declared using the Amazon States Language (https://states-language.net/spec.html).
+   * @param definition The state machine definition defined using the Amazon States Language (https://states-language.net/spec.html).
    * @param input The input to the state machine.
    */
   constructor(definition: StateMachineDefinition, input: JSONValue) {
@@ -89,7 +89,7 @@ export class StateMachine {
   /**
    * Executes the state machine, running through the states specified in the definiton.
    */
-  async run() {
+  async run(): Promise<JSONValue> {
     let isEndState = false;
 
     do {
@@ -112,6 +112,8 @@ export class StateMachine {
         isEndState = true;
       }
     } while (!isEndState);
+
+    return this.currResult;
   }
 
   /**
