@@ -1,6 +1,6 @@
 import type { ChoiceRuleWithoutNext } from './typings/ChoiceState';
 import type { JSONValue } from './typings/JSONValue';
-import picoMatch from 'picomatch';
+import wcmatch from 'wildcard-match';
 
 export function testChoiceRule(
   choiceRule: ChoiceRuleWithoutNext,
@@ -76,7 +76,7 @@ export function testChoiceRule(
 
   if ('StringMatches' in choiceRule) {
     const varValue = jsonQuery(choiceRule.Variable, currInput) as string;
-    const isMatch = picoMatch(choiceRule.StringMatches!);
+    const isMatch = wcmatch(choiceRule.StringMatches!, { separator: false });
     return isMatch(varValue);
   }
 
