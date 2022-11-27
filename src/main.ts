@@ -1,1 +1,1 @@
-console.log("It's working!");
+export { StateMachine as default } from './StateMachine';
