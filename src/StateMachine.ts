@@ -8,7 +8,6 @@ import type { PassState } from './typings/PassState';
 import type { WaitState } from './typings/WaitState';
 import type { MapState } from './typings/MapState';
 import type { ChoiceState } from './typings/ChoiceState';
-import { exit } from 'process';
 import set from 'lodash/set';
 import cloneDeep from 'lodash/cloneDeep';
 import { JSONPath as jp } from 'jsonpath-plus';
@@ -253,7 +252,7 @@ export class StateMachine {
         console.error(error);
       }
 
-      exit(1);
+      throw error;
     }
   }
 
