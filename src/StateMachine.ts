@@ -1,20 +1,20 @@
+import type { AllStates } from './typings/AllStates';
+import type { StateMachineDefinition } from './typings/StateMachineDefinition';
+import type { StateType } from './typings/StateType';
+import type { TaskState } from './typings/TaskState';
+import type { PayloadTemplate } from './typings/InputOutputProcessing';
+import type { JSONValue } from './typings/JSONValue';
+import type { PassState } from './typings/PassState';
+import type { WaitState } from './typings/WaitState';
+import type { MapState } from './typings/MapState';
+import type { ChoiceState } from './typings/ChoiceState';
 import { exit } from 'process';
 import set from 'lodash/set';
 import cloneDeep from 'lodash/cloneDeep';
 import { JSONPath as jp } from 'jsonpath-plus';
-import { AllStates } from './typings/AllStates';
-import { StateMachineDefinition } from './typings/StateMachineDefinition';
-import { StateType } from './typings/StateType';
 import { isPlainObj, sleep } from './util';
 import { LambdaClient } from './aws/LambdaClient';
-import { TaskState } from './typings/TaskState';
 import { LambdaExecutionError } from './error/LambdaExecutionError';
-import { PayloadTemplate } from './typings/InputOutputProcessing';
-import { JSONValue } from './typings/JSONValue';
-import { PassState } from './typings/PassState';
-import { WaitState } from './typings/WaitState';
-import { MapState } from './typings/MapState';
-import { ChoiceState } from './typings/ChoiceState';
 import { testChoiceRule } from './ChoiceHelper';
 
 type StateHandler = {
@@ -282,7 +282,7 @@ export class StateMachine {
     for (let i = 0; i < items.length; i++) {
       const item = items[i];
 
-      this.context.Map = {
+      this.context['Map'] = {
         Item: {
           Index: i,
           Value: item,
@@ -301,7 +301,7 @@ export class StateMachine {
       result[i] = mapStateMachine.currResult;
     }
 
-    delete this.context.Map;
+    delete this.context['Map'];
     this.currResult = result;
   }
 

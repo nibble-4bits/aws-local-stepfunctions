@@ -1,5 +1,5 @@
-import { BaseState } from './BaseState';
-import { TerminalState } from './TerminalState';
+import type { BaseState } from './BaseState';
+import type { TerminalState } from './TerminalState';
 
 interface BaseFailState extends BaseState {
   Type: 'Fail';

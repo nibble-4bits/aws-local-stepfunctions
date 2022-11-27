@@ -1,5 +1,5 @@
-import { BaseState } from './BaseState';
-import { StateType } from './StateType';
+import type { BaseState } from './BaseState';
+import type { StateType } from './StateType';
 
 interface EndableState extends BaseState {
   Type: Exclude<StateType, 'Choice' | 'Succeed' | 'Fail'>;

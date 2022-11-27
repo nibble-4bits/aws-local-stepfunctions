@@ -1,6 +1,6 @@
+import type { ChoiceRuleWithoutNext } from './typings/ChoiceState';
+import type { JSONValue } from './typings/JSONValue';
 import picoMatch from 'picomatch';
-import { ChoiceRuleWithoutNext } from './typings/ChoiceState';
-import { JSONValue } from './typings/JSONValue';
 
 export function testChoiceRule(
   choiceRule: ChoiceRuleWithoutNext,

@@ -1,5 +1,5 @@
-import { BaseState } from './BaseState';
-import { CanHaveInputPath, CanHaveOutputPath } from './InputOutputProcessing';
+import type { BaseState } from './BaseState';
+import type { CanHaveInputPath, CanHaveOutputPath } from './InputOutputProcessing';
 
 type StringOperatorNames =
   | 'StringEquals'
