@@ -8,13 +8,13 @@ import type { PassState } from './typings/PassState';
 import type { WaitState } from './typings/WaitState';
 import type { MapState } from './typings/MapState';
 import type { ChoiceState } from './typings/ChoiceState';
-import set from 'lodash/set';
-import cloneDeep from 'lodash/cloneDeep';
 import { JSONPath as jp } from 'jsonpath-plus';
 import { isPlainObj, sleep } from './util';
 import { LambdaClient } from './aws/LambdaClient';
 import { LambdaExecutionError } from './error/LambdaExecutionError';
 import { testChoiceRule } from './ChoiceHelper';
+import set from 'lodash/set.js';
+import cloneDeep from 'lodash/cloneDeep.js';
 
 type StateHandler = {
   [T in StateType]: () => Promise<void>;
