@@ -1,7 +1,29 @@
 {
   "name": "aws-local-stepfunctions",
   "version": "0.1.0",
-  "description": "",
+  "description": "Execute an AWS Step Function locally",
+  "keywords": [
+    "aws",
+    "local",
+    "stepfunctions",
+    "asl",
+    "amazon states language",
+    "state machine"
+  ],
+  "author": {
+    "name": "Luis De Anda",
+    "email": "ldeandac16@gmail.com",
+    "url": "https://github.com/nibble-4bits"
+  },
+  "homepage": "https://github.com/nibble-4bits/aws-local-stepfunctions",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/nibble-4bits/aws-local-stepfunctions.git"
+  },
+  "license": "MIT",
+  "files": [
+    "build"
+  ],
   "type": "module",
   "main": "build/main.cjs",
   "types": "build/main.d.ts",
@@ -17,9 +39,6 @@
     "lint": "eslint src/**/*.ts",
     "lint:fix": "eslint src/**/*.ts --fix"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
   "devDependencies": {
     "@tsconfig/node16-strictest": "^1.0.4",
     "@types/lodash": "^4.14.184",
