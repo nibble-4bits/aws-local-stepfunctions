@@ -1,9 +1,9 @@
-import { ChoiceState } from './ChoiceState';
-import { FailState } from './FailState';
-import { MapState } from './MapState';
-import { PassState } from './PassState';
-import { SucceedState } from './SucceedState';
-import { TaskState } from './TaskState';
-import { WaitState } from './WaitState';
+import type { ChoiceState } from './ChoiceState';
+import type { FailState } from './FailState';
+import type { MapState } from './MapState';
+import type { PassState } from './PassState';
+import type { SucceedState } from './SucceedState';
+import type { TaskState } from './TaskState';
+import type { WaitState } from './WaitState';
 
 export type AllStates = TaskState | MapState | PassState | WaitState | ChoiceState | SucceedState | FailState;

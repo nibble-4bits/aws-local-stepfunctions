@@ -1,4 +1,4 @@
-import { StateType } from './StateType';
+import type { StateType } from './StateType';
 
 export interface BaseState {
   Type: StateType;

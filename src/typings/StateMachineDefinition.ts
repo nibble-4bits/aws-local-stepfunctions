@@ -1,4 +1,4 @@
-import { AllStates } from './AllStates';
+import type { AllStates } from './AllStates';
 
 export interface StateMachineDefinition {
   States: Record<string, AllStates>;

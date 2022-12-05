@@ -1,13 +1,13 @@
-import { BaseState } from './BaseState';
-import {
+import type { BaseState } from './BaseState';
+import type {
   CanHaveInputPath,
   CanHaveOutputPath,
   CanHaveParameters,
   CanHaveResultPath,
   CanHaveResultSelector,
 } from './InputOutputProcessing';
-import { IntermediateState } from './IntermediateState';
-import { TerminalState } from './TerminalState';
+import type { IntermediateState } from './IntermediateState';
+import type { TerminalState } from './TerminalState';
 
 interface BaseTaskState
   extends BaseState,

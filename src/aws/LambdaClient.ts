@@ -1,7 +1,7 @@
+import type { Credentials } from '@aws-sdk/types/dist-types/credentials';
+import type { JSONValue } from '../typings/JSONValue';
 import { LambdaClient as AWSLambdaClient, InvokeCommand } from '@aws-sdk/client-lambda';
-import { Credentials } from '@aws-sdk/types/dist-types/credentials';
 import { LambdaExecutionError } from '../error/LambdaExecutionError';
-import { JSONValue } from '../typings/JSONValue';
 
 interface LambdaClientConfig {
   region: string;
