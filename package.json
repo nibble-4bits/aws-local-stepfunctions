@@ -32,7 +32,7 @@
     "default": "./build/main.esm.js"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "jest",
     "start": "npm run build && node build/main.js",
     "build": "bunchee src/main.ts",
     "prettier": "prettier --write src/**/*.ts",
