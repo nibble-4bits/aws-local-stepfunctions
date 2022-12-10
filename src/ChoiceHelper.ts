@@ -149,13 +149,13 @@ export function testChoiceRule(
   if ('TimestampEquals' in choiceRule) {
     const varValue = new Date(jsonQuery(choiceRule.Variable, currInput) as string);
     const timestampValue = new Date(choiceRule.TimestampEquals!);
-    return varValue === timestampValue;
+    return varValue.getTime() === timestampValue.getTime();
   }
 
   if ('TimestampEqualsPath' in choiceRule) {
     const varValue = new Date(jsonQuery(choiceRule.Variable, currInput) as string);
     const timestampValue = new Date(jsonQuery(choiceRule.TimestampEqualsPath!, currInput) as string);
-    return varValue === timestampValue;
+    return varValue.getTime() === timestampValue.getTime();
   }
 
   if ('TimestampLessThan' in choiceRule) {
