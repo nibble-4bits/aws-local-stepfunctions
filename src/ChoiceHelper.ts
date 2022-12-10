@@ -239,7 +239,7 @@ export function testChoiceRule(
   if ('IsTimestamp' in choiceRule) {
     const varValue = jsonQuery(choiceRule.Variable, currInput) as string;
     const IsTimestampTrue = choiceRule.IsTimestamp!;
-    return IsTimestampTrue && /\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z/.test(varValue);
+    return IsTimestampTrue && /\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(Z|(\+|-)\d{2}:\d{2})/.test(varValue);
   }
 
   return false;
