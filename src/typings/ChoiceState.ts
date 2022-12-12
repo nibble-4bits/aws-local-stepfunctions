@@ -83,7 +83,7 @@ type TimestampPathComparisonOperator = {
 };
 
 type TypeTestComparisonOperator = {
-  [P in TypeTestOperatorNames]?: boolean;
+  [P in TypeTestOperatorNames]?: true;
 };
 
 type ComparisonOperator =
