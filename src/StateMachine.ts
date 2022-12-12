@@ -13,6 +13,7 @@ import { isPlainObj, sleep } from './util';
 import { LambdaClient } from './aws/LambdaClient';
 import { LambdaExecutionError } from './error/LambdaExecutionError';
 import { testChoiceRule } from './ChoiceHelper';
+import aslValidator from 'asl-validator';
 import set from 'lodash/set.js';
 import cloneDeep from 'lodash/cloneDeep.js';
 
@@ -67,6 +68,12 @@ export class StateMachine {
    * @param input The input to the state machine.
    */
   constructor(definition: StateMachineDefinition, input: JSONValue) {
+    const { isValid, errorsText } = aslValidator(definition);
+
+    if (!isValid) {
+      throw new Error(`State machine definition is invalid, see error(s) below:\n ${errorsText('\n')}`);
+    }
+
     this.states = definition.States;
     this.currStateName = definition.StartAt;
     this.currState = this.states[this.currStateName];
