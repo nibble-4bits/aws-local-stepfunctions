@@ -29,11 +29,12 @@
   "types": "build/main.d.ts",
   "exports": {
     "require": "./build/main.cjs",
+    "import": "./build/main.esm.js",
     "default": "./build/main.esm.js"
   },
   "scripts": {
     "test": "jest",
-    "build": "bunchee src/main.ts",
+    "build": "bunchee --target es2015 --minify src/main.ts",
     "prettier": "prettier --write src/**/*.ts",
     "lint": "eslint src/**/*.ts",
     "lint:fix": "eslint src/**/*.ts --fix"
