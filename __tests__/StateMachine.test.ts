@@ -325,7 +325,7 @@ describe('State Machine', () => {
         const input = {};
 
         const processPayloadTemplateSpy = jest.spyOn(StateMachine.prototype as any, 'processPayloadTemplate');
-        const stateMachine = new StateMachine(definition, input);
+        const stateMachine = new StateMachine(definition, input, { checkArn: false });
         await stateMachine.run();
 
         expect(processPayloadTemplateSpy).toHaveReturnedWith({
@@ -379,7 +379,7 @@ describe('State Machine', () => {
 
         const processPayloadTemplateSpy = jest.spyOn(StateMachine.prototype as any, 'processPayloadTemplate');
         mockInvokeFunction.mockReturnValue({ result1: 'hello', result2: { values: ['a', 'b', 'c'] } });
-        const stateMachine = new StateMachine(definition, input);
+        const stateMachine = new StateMachine(definition, input, { checkArn: false });
         await stateMachine.run();
 
         expect(processPayloadTemplateSpy).toHaveReturnedWith({
@@ -432,7 +432,7 @@ describe('State Machine', () => {
         };
 
         const processPayloadTemplateSpy = jest.spyOn(StateMachine.prototype as any, 'processPayloadTemplate');
-        const stateMachine = new StateMachine(definition, input);
+        const stateMachine = new StateMachine(definition, input, { checkArn: false });
         await stateMachine.run();
 
         expect(processPayloadTemplateSpy).toHaveReturnedWith({
@@ -808,7 +808,7 @@ describe('State Machine', () => {
       };
       const input = { input1: 'input string', input2: 10 };
 
-      const stateMachine = new StateMachine(definition, input);
+      const stateMachine = new StateMachine(definition, input, { checkArn: false });
       await stateMachine.run();
 
       expect(mockInvokeFunction).toHaveBeenCalledWith('mock-arn', { input1: 'input string', input2: 10 });
@@ -828,7 +828,7 @@ describe('State Machine', () => {
       const input = { num1: 5, num2: 3 };
 
       mockInvokeFunction.mockReturnValue(input.num1 + input.num2);
-      const stateMachine = new StateMachine(definition, input);
+      const stateMachine = new StateMachine(definition, input, { checkArn: false });
       const result = await stateMachine.run();
 
       expect(mockInvokeFunction).toHaveBeenCalledWith('mock-arn', { num1: 5, num2: 3 });
