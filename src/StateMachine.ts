@@ -68,11 +68,17 @@ export class StateMachine {
   private readonly stateHandlers: StateHandler;
 
   /**
+   * Options to control whether to apply certain validations to the state machine definition.
+   */
+  private readonly validationOptions: ValidationOptions | undefined;
+
+  /**
    * Constructs a new state machine.
    * @param definition The state machine definition defined using the Amazon States Language (https://states-language.net/spec.html).
-   * @param input The input to the state machine.
+   * @param validationOptions Options to control whether to apply certain validations to the definition.
+   * These options also apply to state machines defined in  the `Iterator` field of `Map` states.
    */
-  constructor(definition: StateMachineDefinition, input: JSONValue, validationOptions?: ValidationOptions) {
+  constructor(definition: StateMachineDefinition, validationOptions?: ValidationOptions) {
     const { isValid, errorsText } = aslValidator(definition, {
       checkArn: true,
       checkPaths: true,
@@ -86,8 +92,8 @@ export class StateMachine {
     this.states = definition.States;
     this.currStateName = definition.StartAt;
     this.currState = this.states[this.currStateName];
-    this.rawInput = input;
-    this.currInput = this.rawInput;
+    this.rawInput = {};
+    this.currInput = {};
     this.currResult = null;
     this.context = {};
     this.stateHandlers = {
@@ -99,14 +105,18 @@ export class StateMachine {
       Succeed: this.handleSucceedState.bind(this),
       Fail: this.handleFailState.bind(this),
     };
+    this.validationOptions = validationOptions;
   }
 
   /**
    * Executes the state machine, running through the states specified in the definiton.
+   * @param input The input to pass to this state machine execution.
    */
-  async run(): Promise<JSONValue> {
-    let isEndState = false;
+  async run(input: JSONValue): Promise<JSONValue> {
+    this.rawInput = input;
+    this.currInput = input;
 
+    let isEndState = false;
     do {
       this.currState = this.states[this.currStateName];
 
@@ -310,8 +320,8 @@ export class StateMachine {
       }
 
       // Pass the current parameter value if defined, otherwise pass the current item being iterated
-      const mapStateMachine = new StateMachine(state.Iterator, paramValue ?? item);
-      result[i] = await mapStateMachine.run();
+      const mapStateMachine = new StateMachine(state.Iterator, this.validationOptions);
+      result[i] = await mapStateMachine.run(paramValue ?? item);
     }
 
     delete this.context['Map'];
