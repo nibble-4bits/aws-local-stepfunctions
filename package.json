@@ -33,7 +33,6 @@
   },
   "scripts": {
     "test": "jest",
-    "start": "npm run build && node build/main.js",
     "build": "bunchee src/main.ts",
     "prettier": "prettier --write src/**/*.ts",
     "lint": "eslint src/**/*.ts",
