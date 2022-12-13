@@ -40,8 +40,8 @@ describe('State Machine', () => {
         };
 
         const processInputPathSpy = jest.spyOn(StateMachine.prototype as any, 'processInputPath');
-        const stateMachine = new StateMachine(definition, input);
-        await stateMachine.run();
+        const stateMachine = new StateMachine(definition);
+        await stateMachine.run(input);
 
         expect(processInputPathSpy).toHaveReturnedWith({
           movies: [
@@ -92,8 +92,8 @@ describe('State Machine', () => {
         };
 
         const processInputPathSpy = jest.spyOn(StateMachine.prototype as any, 'processInputPath');
-        const stateMachine = new StateMachine(definition, input);
-        await stateMachine.run();
+        const stateMachine = new StateMachine(definition);
+        await stateMachine.run(input);
 
         expect(processInputPathSpy).toHaveReturnedWith([
           {
@@ -139,8 +139,8 @@ describe('State Machine', () => {
         };
 
         const processInputPathSpy = jest.spyOn(StateMachine.prototype as any, 'processInputPath');
-        const stateMachine = new StateMachine(definition, input);
-        await stateMachine.run();
+        const stateMachine = new StateMachine(definition);
+        await stateMachine.run(input);
 
         expect(processInputPathSpy).toHaveReturnedWith({});
       });
@@ -169,8 +169,8 @@ describe('State Machine', () => {
         const input = {};
 
         const processPayloadTemplateSpy = jest.spyOn(StateMachine.prototype as any, 'processPayloadTemplate');
-        const stateMachine = new StateMachine(definition, input);
-        await stateMachine.run();
+        const stateMachine = new StateMachine(definition);
+        await stateMachine.run(input);
 
         expect(processPayloadTemplateSpy).toHaveReturnedWith({
           field1: 50,
@@ -221,8 +221,8 @@ describe('State Machine', () => {
         };
 
         const processPayloadTemplateSpy = jest.spyOn(StateMachine.prototype as any, 'processPayloadTemplate');
-        const stateMachine = new StateMachine(definition, input);
-        await stateMachine.run();
+        const stateMachine = new StateMachine(definition);
+        await stateMachine.run(input);
 
         expect(processPayloadTemplateSpy).toHaveReturnedWith({
           field1: 50,
@@ -275,8 +275,8 @@ describe('State Machine', () => {
         };
 
         const processPayloadTemplateSpy = jest.spyOn(StateMachine.prototype as any, 'processPayloadTemplate');
-        const stateMachine = new StateMachine(definition, input);
-        await stateMachine.run();
+        const stateMachine = new StateMachine(definition);
+        await stateMachine.run(input);
 
         expect(processPayloadTemplateSpy).toHaveReturnedWith({
           field1: 50,
@@ -325,8 +325,8 @@ describe('State Machine', () => {
         const input = {};
 
         const processPayloadTemplateSpy = jest.spyOn(StateMachine.prototype as any, 'processPayloadTemplate');
-        const stateMachine = new StateMachine(definition, input);
-        await stateMachine.run();
+        const stateMachine = new StateMachine(definition, { checkArn: false });
+        await stateMachine.run(input);
 
         expect(processPayloadTemplateSpy).toHaveReturnedWith({
           field1: 50,
@@ -379,8 +379,8 @@ describe('State Machine', () => {
 
         const processPayloadTemplateSpy = jest.spyOn(StateMachine.prototype as any, 'processPayloadTemplate');
         mockInvokeFunction.mockReturnValue({ result1: 'hello', result2: { values: ['a', 'b', 'c'] } });
-        const stateMachine = new StateMachine(definition, input);
-        await stateMachine.run();
+        const stateMachine = new StateMachine(definition, { checkArn: false });
+        await stateMachine.run(input);
 
         expect(processPayloadTemplateSpy).toHaveReturnedWith({
           field1: 50,
@@ -432,8 +432,8 @@ describe('State Machine', () => {
         };
 
         const processPayloadTemplateSpy = jest.spyOn(StateMachine.prototype as any, 'processPayloadTemplate');
-        const stateMachine = new StateMachine(definition, input);
-        await stateMachine.run();
+        const stateMachine = new StateMachine(definition, { checkArn: false });
+        await stateMachine.run(input);
 
         expect(processPayloadTemplateSpy).toHaveReturnedWith({
           field1: 50,
@@ -480,8 +480,8 @@ describe('State Machine', () => {
         };
 
         const processResultPathSpy = jest.spyOn(StateMachine.prototype as any, 'processResultPath');
-        const stateMachine = new StateMachine(definition, input);
-        await stateMachine.run();
+        const stateMachine = new StateMachine(definition);
+        await stateMachine.run(input);
 
         expect(processResultPathSpy).toHaveReturnedWith({
           movies: [
@@ -533,8 +533,8 @@ describe('State Machine', () => {
         };
 
         const processResultPathSpy = jest.spyOn(StateMachine.prototype as any, 'processResultPath');
-        const stateMachine = new StateMachine(definition, input);
-        await stateMachine.run();
+        const stateMachine = new StateMachine(definition);
+        await stateMachine.run(input);
 
         expect(processResultPathSpy).toHaveReturnedWith({
           movies: [
@@ -587,8 +587,8 @@ describe('State Machine', () => {
         };
 
         const processResultPathSpy = jest.spyOn(StateMachine.prototype as any, 'processResultPath');
-        const stateMachine = new StateMachine(definition, input);
-        await stateMachine.run();
+        const stateMachine = new StateMachine(definition);
+        await stateMachine.run(input);
 
         expect(processResultPathSpy).toHaveReturnedWith({
           movies: 10,
@@ -628,8 +628,8 @@ describe('State Machine', () => {
         };
 
         const processResultPathSpy = jest.spyOn(StateMachine.prototype as any, 'processResultPath');
-        const stateMachine = new StateMachine(definition, input);
-        await stateMachine.run();
+        const stateMachine = new StateMachine(definition);
+        await stateMachine.run(input);
 
         expect(processResultPathSpy).toHaveReturnedWith({
           movies: [
@@ -681,8 +681,8 @@ describe('State Machine', () => {
         };
 
         const processOutputPathSpy = jest.spyOn(StateMachine.prototype as any, 'processOutputPath');
-        const stateMachine = new StateMachine(definition, input);
-        await stateMachine.run();
+        const stateMachine = new StateMachine(definition);
+        await stateMachine.run(input);
 
         expect(processOutputPathSpy).toHaveReturnedWith({
           movies: [
@@ -733,8 +733,8 @@ describe('State Machine', () => {
         };
 
         const processOutputPathSpy = jest.spyOn(StateMachine.prototype as any, 'processOutputPath');
-        const stateMachine = new StateMachine(definition, input);
-        await stateMachine.run();
+        const stateMachine = new StateMachine(definition);
+        await stateMachine.run(input);
 
         expect(processOutputPathSpy).toHaveReturnedWith([
           {
@@ -780,8 +780,8 @@ describe('State Machine', () => {
         };
 
         const processOutputPathSpy = jest.spyOn(StateMachine.prototype as any, 'processOutputPath');
-        const stateMachine = new StateMachine(definition, input);
-        await stateMachine.run();
+        const stateMachine = new StateMachine(definition);
+        await stateMachine.run(input);
 
         expect(processOutputPathSpy).toHaveReturnedWith({});
       });
@@ -808,8 +808,8 @@ describe('State Machine', () => {
       };
       const input = { input1: 'input string', input2: 10 };
 
-      const stateMachine = new StateMachine(definition, input);
-      await stateMachine.run();
+      const stateMachine = new StateMachine(definition, { checkArn: false });
+      await stateMachine.run(input);
 
       expect(mockInvokeFunction).toHaveBeenCalledWith('mock-arn', { input1: 'input string', input2: 10 });
     });
@@ -828,8 +828,8 @@ describe('State Machine', () => {
       const input = { num1: 5, num2: 3 };
 
       mockInvokeFunction.mockReturnValue(input.num1 + input.num2);
-      const stateMachine = new StateMachine(definition, input);
-      const result = await stateMachine.run();
+      const stateMachine = new StateMachine(definition, { checkArn: false });
+      const result = await stateMachine.run(input);
 
       expect(mockInvokeFunction).toHaveBeenCalledWith('mock-arn', { num1: 5, num2: 3 });
       expect(result).toBe(8);
@@ -865,8 +865,8 @@ describe('State Machine', () => {
       };
 
       const jsonQuerySpy = jest.spyOn(StateMachine.prototype as any, 'jsonQuery');
-      const stateMachine = new StateMachine(definition, input);
-      const result = await stateMachine.run();
+      const stateMachine = new StateMachine(definition);
+      const result = await stateMachine.run(input);
 
       expect(jsonQuerySpy).toHaveBeenCalledWith('$.items', {
         items: [
@@ -908,8 +908,8 @@ describe('State Machine', () => {
       ];
 
       const jsonQuerySpy = jest.spyOn(StateMachine.prototype as any, 'jsonQuery');
-      const stateMachine = new StateMachine(definition, input);
-      const result = await stateMachine.run();
+      const stateMachine = new StateMachine(definition);
+      const result = await stateMachine.run(input);
 
       expect(jsonQuerySpy).not.toHaveBeenCalled();
       expect(result).toHaveLength(3);
@@ -947,8 +947,8 @@ describe('State Machine', () => {
       };
 
       const processPayloadTemplateSpy = jest.spyOn(StateMachine.prototype as any, 'processPayloadTemplate');
-      const stateMachine = new StateMachine(stateMachineDefinition, input);
-      const result = await stateMachine.run();
+      const stateMachine = new StateMachine(stateMachineDefinition);
+      const result = await stateMachine.run(input);
 
       expect(processPayloadTemplateSpy).toHaveBeenCalledWith(
         { 'pair.$': '$$.Map.Item.Value', 'index.$': '$$.Map.Item.Index' },
@@ -993,8 +993,8 @@ describe('State Machine', () => {
         prop2: 12345,
       };
 
-      const stateMachine = new StateMachine(definition, input);
-      const result = await stateMachine.run();
+      const stateMachine = new StateMachine(definition);
+      const result = await stateMachine.run(input);
 
       expect(result).toEqual({
         prop1: 'test',
@@ -1021,8 +1021,8 @@ describe('State Machine', () => {
         prop2: 12345,
       };
 
-      const stateMachine = new StateMachine(definition, input);
-      const result = await stateMachine.run();
+      const stateMachine = new StateMachine(definition);
+      const result = await stateMachine.run(input);
 
       expect(result).toEqual({
         result1: 'result1',
@@ -1046,8 +1046,8 @@ describe('State Machine', () => {
         prop2: 12345,
       };
 
-      const stateMachine = new StateMachine(definition, input);
-      const result = await stateMachine.run();
+      const stateMachine = new StateMachine(definition);
+      const result = await stateMachine.run(input);
 
       expect(result).toEqual({
         prop1: 'test',
@@ -1079,8 +1079,8 @@ describe('State Machine', () => {
         prop2: 12345,
       };
 
-      const stateMachine = new StateMachine(definition, input);
-      const result = await stateMachine.run();
+      const stateMachine = new StateMachine(definition);
+      const result = await stateMachine.run(input);
 
       expect(result).toEqual({
         prop1: 'test',
@@ -1115,8 +1115,8 @@ describe('State Machine', () => {
       };
       const input = {};
 
-      const stateMachine = new StateMachine(definition, input);
-      await stateMachine.run();
+      const stateMachine = new StateMachine(definition);
+      await stateMachine.run(input);
 
       expect(mockSleepFunction).toHaveBeenCalledWith(10000);
     });
@@ -1134,8 +1134,8 @@ describe('State Machine', () => {
       };
       const input = {};
 
-      const stateMachine = new StateMachine(definition, input);
-      await stateMachine.run();
+      const stateMachine = new StateMachine(definition);
+      await stateMachine.run(input);
 
       expect(mockSleepFunction).toHaveBeenCalledWith(20700000);
     });
@@ -1158,8 +1158,8 @@ describe('State Machine', () => {
       };
       const input = {};
 
-      const stateMachine = new StateMachine(definition, input);
-      await stateMachine.run();
+      const stateMachine = new StateMachine(definition);
+      await stateMachine.run(input);
 
       expect(mockSleepFunction).toHaveBeenCalledWith(10000);
     });
@@ -1182,8 +1182,8 @@ describe('State Machine', () => {
       };
       const input = {};
 
-      const stateMachine = new StateMachine(definition, input);
-      await stateMachine.run();
+      const stateMachine = new StateMachine(definition);
+      await stateMachine.run(input);
 
       expect(mockSleepFunction).toHaveBeenCalledWith(20700000);
     });
@@ -1230,8 +1230,8 @@ describe('State Machine', () => {
       const input = { testNumberValue: 50, testStringValue: 'test', testBooleanValue: true };
 
       const testChoiceRuleSpy = jest.spyOn(ChoiceHelperModule, 'testChoiceRule');
-      const stateMachine = new StateMachine(definition, input);
-      const result = await stateMachine.run();
+      const stateMachine = new StateMachine(definition);
+      const result = await stateMachine.run(input);
 
       expect(testChoiceRuleSpy).toHaveBeenCalledTimes(2);
       expect(result).toEqual({
@@ -1274,8 +1274,8 @@ describe('State Machine', () => {
       const input = { testNumberValue: 50, testStringValue: 'test' };
 
       const testChoiceRuleSpy = jest.spyOn(ChoiceHelperModule, 'testChoiceRule');
-      const stateMachine = new StateMachine(definition, input);
-      const result = await stateMachine.run();
+      const stateMachine = new StateMachine(definition);
+      const result = await stateMachine.run(input);
 
       expect(testChoiceRuleSpy).toHaveBeenCalledTimes(2);
       expect(result).toEqual({
