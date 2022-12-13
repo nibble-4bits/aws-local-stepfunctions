@@ -1,1 +1,1 @@
-export { StateMachine as default } from './StateMachine';
+export { StateMachine } from './StateMachine';
