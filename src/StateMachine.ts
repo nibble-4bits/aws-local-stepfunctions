@@ -302,9 +302,7 @@ export class StateMachine {
 
       // Pass the current parameter value if defined, otherwise pass the current item being iterated
       const mapStateMachine = new StateMachine(state.Iterator, paramValue ?? item);
-      await mapStateMachine.run();
-
-      result[i] = mapStateMachine.currResult;
+      result[i] = await mapStateMachine.run();
     }
 
     delete this.context['Map'];
