@@ -407,7 +407,7 @@ export class StateMachine {
    * Ends the state machine execution and marks it as a failure.
    */
   private async handleFailState() {
-    // noop
+    // TODO: Implement behavior of Fail state
   }
 
   /**
