@@ -21,6 +21,11 @@ type StateHandler = {
   [T in StateType]: () => Promise<void>;
 };
 
+interface ValidationOptions {
+  readonly checkPaths?: boolean;
+  readonly checkArn?: boolean;
+}
+
 export class StateMachine {
   /**
    * The name of the state currently being executed.
@@ -67,8 +72,12 @@ export class StateMachine {
    * @param definition The state machine definition defined using the Amazon States Language (https://states-language.net/spec.html).
    * @param input The input to the state machine.
    */
-  constructor(definition: StateMachineDefinition, input: JSONValue) {
-    const { isValid, errorsText } = aslValidator(definition);
+  constructor(definition: StateMachineDefinition, input: JSONValue, validationOptions?: ValidationOptions) {
+    const { isValid, errorsText } = aslValidator(definition, {
+      checkArn: true,
+      checkPaths: true,
+      ...validationOptions,
+    });
 
     if (!isValid) {
       throw new Error(`State machine definition is invalid, see error(s) below:\n ${errorsText('\n')}`);
