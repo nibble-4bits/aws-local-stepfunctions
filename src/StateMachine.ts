@@ -353,6 +353,8 @@ export class StateMachine {
 
       await sleep(timeDiff);
     }
+
+    this.currResult = this.currInput;
   }
 
   /**
@@ -376,12 +378,14 @@ export class StateMachine {
       const choiceIsMatch = testChoiceRule(choice, this.currInput, this.jsonQuery);
       if (choiceIsMatch) {
         this.currStateName = choice.Next;
+        this.currResult = this.currInput;
         return;
       }
     }
 
     if (state.Default) {
       this.currStateName = state.Default;
+      this.currResult = this.currInput;
       return;
     }
 
@@ -394,7 +398,7 @@ export class StateMachine {
    * Ends the state machine execution successfully.
    */
   private async handleSucceedState() {
-    // noop
+    this.currResult = this.currInput;
   }
 
   /**
