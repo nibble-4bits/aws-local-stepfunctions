@@ -138,7 +138,7 @@ export class StateMachine {
    * * If `InputPath` is `null`, returns an empty object (`{}`).
    * * If `InputPath` is a string, it's considered a JSONPath and the selected portion of the current input is returned.
    */
-  private processInputPath() {
+  private processInputPath(): JSONValue {
     if ('InputPath' in this.currState) {
       if (this.currState.InputPath === null) {
         return {};
@@ -156,7 +156,7 @@ export class StateMachine {
    * @param json The object to evaluate with JSONPath (whether of null, boolean, number, string, object, or array type).
    * @returns The processed payload template.
    */
-  private processPayloadTemplate(payloadTemplate: PayloadTemplate, json: JSONValue) {
+  private processPayloadTemplate(payloadTemplate: PayloadTemplate, json: JSONValue): PayloadTemplate {
     const resolvedProperties = Object.entries(payloadTemplate).map(([key, value]) => {
       let sanitizedKey = key;
       let resolvedValue = value;
@@ -181,7 +181,7 @@ export class StateMachine {
   /**
    * Process the current input according to the `InputPath` and `Parameters` fields.
    */
-  private processInput() {
+  private processInput(): void {
     this.currInput = this.processInputPath();
     if ('Parameters' in this.currState && this.currState.Type !== 'Map') {
       // `Parameters` field is handled differently in the `Map` state,
@@ -198,7 +198,7 @@ export class StateMachine {
    * * If `ResultPath` is a string, it's considered a JSONPath and returns a combination of the raw input with the current result,
    * by placing the current result in the specified path.
    */
-  private processResultPath() {
+  private processResultPath(): JSONValue {
     if ('ResultPath' in this.currState) {
       if (this.currState.ResultPath === null) {
         return this.rawInput;
@@ -223,7 +223,7 @@ export class StateMachine {
    * * If `OutputPath` is `null`, returns an empty object (`{}`).
    * * If `OutputPath` is a string, it's considered a JSONPath and the selected portion of the current result is returned.
    */
-  private processOutputPath() {
+  private processOutputPath(): JSONValue {
     if ('OutputPath' in this.currState) {
       if (this.currState.OutputPath === null) {
         return {};
@@ -238,7 +238,7 @@ export class StateMachine {
   /**
    * Process the current result according to the `ResultSelector`, `ResultPath` and `OutputPath` fields.
    */
-  private processResult() {
+  private processResult(): void {
     if ('ResultSelector' in this.currState) {
       this.currResult = this.processPayloadTemplate(this.currState.ResultSelector!, this.currResult);
     }
@@ -254,7 +254,7 @@ export class StateMachine {
    * Invokes the Lambda function specified in the `Resource` field
    * and sets the current result of the state machine to the value returned by the Lambda.
    */
-  private async handleTaskState() {
+  private async handleTaskState(): Promise<void> {
     const state = this.currState as TaskState;
     const lambdaClient = new LambdaClient();
 
@@ -279,7 +279,7 @@ export class StateMachine {
    * by the `ItemsPath` field, and then processes each item by passing it
    * as the input to the state machine specified in the `Iterator` field.
    */
-  private async handleMapState() {
+  private async handleMapState(): Promise<void> {
     const state = this.currState as MapState;
 
     let items = this.currInput;
@@ -324,7 +324,7 @@ export class StateMachine {
    * If the `Result` field is specified, copies `Result` into the current result.
    * Else, copies the current input into the current result.
    */
-  private async handlePassState() {
+  private async handlePassState(): Promise<void> {
     const state = this.currState as PassState;
 
     if (state.Result) {
@@ -340,7 +340,7 @@ export class StateMachine {
    * Pauses the state machine execution for a certain amount of time
    * based on one of the `Seconds`, `Timestamp`, `SecondsPath` or `TimestampPath` fields.
    */
-  private async handleWaitState() {
+  private async handleWaitState(): Promise<void> {
     const state = this.currState as WaitState;
 
     if (state.Seconds) {
@@ -380,7 +380,7 @@ export class StateMachine {
    * If no rule matches and the `Default` field is not specified, throws a
    * States.NoChoiceMatched error.
    */
-  private async handleChoiceState() {
+  private async handleChoiceState(): Promise<void> {
     const state = this.currState as ChoiceState;
 
     for (const choice of state.Choices) {
@@ -406,7 +406,7 @@ export class StateMachine {
    *
    * Ends the state machine execution successfully.
    */
-  private async handleSucceedState() {
+  private async handleSucceedState(): Promise<void> {
     this.currResult = this.currInput;
   }
 
@@ -415,7 +415,7 @@ export class StateMachine {
    *
    * Ends the state machine execution and marks it as a failure.
    */
-  private async handleFailState() {
+  private async handleFailState(): Promise<void> {
     // TODO: Implement behavior of Fail state
   }
 
@@ -425,7 +425,7 @@ export class StateMachine {
    * @param json The object to evaluate (whether of null, boolean, number, string, object, or array type).
    * @returns The value of the property that was queried for, if found. Otherwise returns `undefined`.
    */
-  private jsonQuery(pathExpression: string, json: JSONValue) {
+  private jsonQuery(pathExpression: string, json: JSONValue): any {
     // If the expression starts with double `$$`, evaluate the path in the context object.
     if (pathExpression.startsWith('$$')) {
       return jp({ path: pathExpression.slice(1), json: this.context, wrap: false });
