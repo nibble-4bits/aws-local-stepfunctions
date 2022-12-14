@@ -852,7 +852,7 @@ describe('State Machine', () => {
       const stateMachine = new StateMachine(definition, { checkArn: false });
       const result = await stateMachine.run(input, {
         overrides: {
-          taskResourceLocalHandler: {
+          taskResourceLocalHandlers: {
             TaskState: localHandlerFn,
           },
         },
@@ -1214,6 +1214,37 @@ describe('State Machine', () => {
       await stateMachine.run(input);
 
       expect(mockSleepFunction).toHaveBeenCalledWith(20700000);
+    });
+
+    test('should pause execution for the specified amount of milliseconds if wait time override option is set', async () => {
+      const definition: StateMachineDefinition = {
+        StartAt: 'PassState',
+        States: {
+          PassState: {
+            Type: 'Pass',
+            Parameters: { waitUntil: '2022-12-05T05:45:00Z' },
+            Next: 'WaitState',
+          },
+          WaitState: {
+            Type: 'Wait',
+            TimestampPath: '$.waitUntil',
+            End: true,
+          },
+        },
+      };
+      const input = {};
+
+      const stateMachine = new StateMachine(definition);
+      await stateMachine.run(input, {
+        overrides: {
+          waitTimeOverrides: {
+            WaitState: 1500,
+          },
+        },
+      });
+
+      expect(mockSleepFunction).toHaveBeenCalledTimes(1);
+      expect(mockSleepFunction).toHaveBeenCalledWith(1500);
     });
   });
 

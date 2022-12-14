@@ -4,8 +4,13 @@ type TaskStateResourceLocalHandler = {
   [taskStateName: string]: (...args: any) => any;
 };
 
+type WaitStateTimeOverride = {
+  [waitStateName: string]: number;
+};
+
 interface Overrides {
-  taskResourceLocalHandler?: TaskStateResourceLocalHandler;
+  taskResourceLocalHandlers?: TaskStateResourceLocalHandler;
+  waitTimeOverrides?: WaitStateTimeOverride;
 }
 
 export interface RunOptions {

@@ -262,8 +262,8 @@ export class StateMachine {
 
     try {
       // If local override for task resource is defined, use that
-      if (options?.overrides?.taskResourceLocalHandler?.[this.currStateName]) {
-        const overrideFn = options?.overrides?.taskResourceLocalHandler?.[this.currStateName];
+      if (options?.overrides?.taskResourceLocalHandlers?.[this.currStateName]) {
+        const overrideFn = options?.overrides?.taskResourceLocalHandlers?.[this.currStateName];
         const result = await overrideFn(this.currInput);
         this.currResult = result;
         return;
@@ -351,9 +351,17 @@ export class StateMachine {
    * Pauses the state machine execution for a certain amount of time
    * based on one of the `Seconds`, `Timestamp`, `SecondsPath` or `TimestampPath` fields.
    */
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  private async handleWaitState(_options?: RunOptions): Promise<void> {
+  private async handleWaitState(options?: RunOptions): Promise<void> {
     const state = this.currState as WaitState;
+    const waitTimeOverrideOption = options?.overrides?.waitTimeOverrides?.[this.currStateName];
+
+    if (typeof waitTimeOverrideOption === 'number') {
+      // If the wait time override is set and is a number, sleep for the specified number of milliseconds
+      // Else, if set to `true`, simply finish the state without sleeping at all.
+      await sleep(waitTimeOverrideOption);
+      this.currResult = this.currInput;
+      return;
+    }
 
     if (state.Seconds) {
       await sleep(state.Seconds * 1000);
