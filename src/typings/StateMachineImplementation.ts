@@ -1,11 +1,11 @@
 import type { StateType } from './StateType';
 
-type TaskStateResourceLocalOverrides = {
+type TaskStateResourceLocalHandler = {
   [taskStateName: string]: (...args: any) => any;
 };
 
 interface Overrides {
-  taskResourceLocalOverrides?: TaskStateResourceLocalOverrides;
+  taskResourceLocalHandler?: TaskStateResourceLocalHandler;
 }
 
 export interface RunOptions {

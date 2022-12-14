@@ -1,6 +1,5 @@
 import type { AllStates } from './typings/AllStates';
 import type { StateMachineDefinition } from './typings/StateMachineDefinition';
-import type { StateType } from './typings/StateType';
 import type { TaskState } from './typings/TaskState';
 import type { PayloadTemplate } from './typings/InputOutputProcessing';
 import type { JSONValue } from './typings/JSONValue';
@@ -8,6 +7,7 @@ import type { PassState } from './typings/PassState';
 import type { WaitState } from './typings/WaitState';
 import type { MapState } from './typings/MapState';
 import type { ChoiceState } from './typings/ChoiceState';
+import type { RunOptions, StateHandler, ValidationOptions } from './typings/StateMachineImplementation';
 import { JSONPath as jp } from 'jsonpath-plus';
 import { isPlainObj, sleep } from './util';
 import { LambdaClient } from './aws/LambdaClient';
@@ -16,15 +16,6 @@ import { testChoiceRule } from './ChoiceHelper';
 import aslValidator from 'asl-validator';
 import set from 'lodash/set.js';
 import cloneDeep from 'lodash/cloneDeep.js';
-
-type StateHandler = {
-  [T in StateType]: () => Promise<void>;
-};
-
-interface ValidationOptions {
-  readonly checkPaths?: boolean;
-  readonly checkArn?: boolean;
-}
 
 export class StateMachine {
   /**
@@ -111,8 +102,9 @@ export class StateMachine {
   /**
    * Executes the state machine, running through the states specified in the definiton.
    * @param input The input to pass to this state machine execution.
+   * @param options Miscellaneous options to control certain behaviors of the execution.
    */
-  async run(input: JSONValue): Promise<JSONValue> {
+  async run(input: JSONValue, options?: RunOptions): Promise<JSONValue> {
     this.rawInput = input;
     this.currInput = input;
 
@@ -122,7 +114,7 @@ export class StateMachine {
 
       this.processInput();
 
-      await this.stateHandlers[this.currState.Type]();
+      await this.stateHandlers[this.currState.Type](options);
 
       this.processResult();
 
@@ -264,11 +256,19 @@ export class StateMachine {
    * Invokes the Lambda function specified in the `Resource` field
    * and sets the current result of the state machine to the value returned by the Lambda.
    */
-  private async handleTaskState(): Promise<void> {
+  private async handleTaskState(options?: RunOptions): Promise<void> {
     const state = this.currState as TaskState;
     const lambdaClient = new LambdaClient();
 
     try {
+      // If local override for task resource is defined, use that
+      if (options?.overrides?.taskResourceLocalHandler?.[this.currStateName]) {
+        const overrideFn = options?.overrides?.taskResourceLocalHandler?.[this.currStateName];
+        const result = await overrideFn(this.currInput);
+        this.currResult = result;
+        return;
+      }
+
       const result = await lambdaClient.invokeFunction(state.Resource, this.currInput);
       this.currResult = result;
     } catch (error) {
@@ -289,7 +289,7 @@ export class StateMachine {
    * by the `ItemsPath` field, and then processes each item by passing it
    * as the input to the state machine specified in the `Iterator` field.
    */
-  private async handleMapState(): Promise<void> {
+  private async handleMapState(options?: RunOptions): Promise<void> {
     const state = this.currState as MapState;
 
     let items = this.currInput;
@@ -321,7 +321,7 @@ export class StateMachine {
 
       // Pass the current parameter value if defined, otherwise pass the current item being iterated
       const mapStateMachine = new StateMachine(state.Iterator, this.validationOptions);
-      result[i] = await mapStateMachine.run(paramValue ?? item);
+      result[i] = await mapStateMachine.run(paramValue ?? item, options);
     }
 
     delete this.context['Map'];
