@@ -834,6 +834,34 @@ describe('State Machine', () => {
       expect(mockInvokeFunction).toHaveBeenCalledWith('mock-arn', { num1: 5, num2: 3 });
       expect(result).toBe(8);
     });
+
+    test('should call function specified in local handler override option instead of invoking Lambda function', async () => {
+      const definition: StateMachineDefinition = {
+        StartAt: 'TaskState',
+        States: {
+          TaskState: {
+            Type: 'Task',
+            Resource: 'mock-arn',
+            End: true,
+          },
+        },
+      };
+      const input = { num1: 5, num2: 3 };
+
+      const localHandlerFn = jest.fn((event) => event.num1 + event.num2);
+      const stateMachine = new StateMachine(definition, { checkArn: false });
+      const result = await stateMachine.run(input, {
+        overrides: {
+          taskResourceLocalHandler: {
+            TaskState: localHandlerFn,
+          },
+        },
+      });
+
+      expect(localHandlerFn).toHaveBeenCalledWith(input);
+      expect(mockInvokeFunction).not.toHaveBeenCalled();
+      expect(result).toBe(8);
+    });
   });
 
   describe('Map State', () => {
