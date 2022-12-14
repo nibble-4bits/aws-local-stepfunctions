@@ -334,7 +334,8 @@ export class StateMachine {
    * If the `Result` field is specified, copies `Result` into the current result.
    * Else, copies the current input into the current result.
    */
-  private async handlePassState(): Promise<void> {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  private async handlePassState(_options?: RunOptions): Promise<void> {
     const state = this.currState as PassState;
 
     if (state.Result) {
@@ -350,7 +351,8 @@ export class StateMachine {
    * Pauses the state machine execution for a certain amount of time
    * based on one of the `Seconds`, `Timestamp`, `SecondsPath` or `TimestampPath` fields.
    */
-  private async handleWaitState(): Promise<void> {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  private async handleWaitState(_options?: RunOptions): Promise<void> {
     const state = this.currState as WaitState;
 
     if (state.Seconds) {
@@ -390,7 +392,8 @@ export class StateMachine {
    * If no rule matches and the `Default` field is not specified, throws a
    * States.NoChoiceMatched error.
    */
-  private async handleChoiceState(): Promise<void> {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  private async handleChoiceState(_options?: RunOptions): Promise<void> {
     const state = this.currState as ChoiceState;
 
     for (const choice of state.Choices) {
@@ -416,7 +419,8 @@ export class StateMachine {
    *
    * Ends the state machine execution successfully.
    */
-  private async handleSucceedState(): Promise<void> {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  private async handleSucceedState(_options?: RunOptions): Promise<void> {
     this.currResult = this.currInput;
   }
 
@@ -425,7 +429,8 @@ export class StateMachine {
    *
    * Ends the state machine execution and marks it as a failure.
    */
-  private async handleFailState(): Promise<void> {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  private async handleFailState(_options?: RunOptions): Promise<void> {
     // TODO: Implement behavior of Fail state
   }
 
