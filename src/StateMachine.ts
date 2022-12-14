@@ -262,8 +262,8 @@ export class StateMachine {
 
     try {
       // If local override for task resource is defined, use that
-      if (options?.overrides?.taskResourceLocalHandler?.[this.currStateName]) {
-        const overrideFn = options?.overrides?.taskResourceLocalHandler?.[this.currStateName];
+      if (options?.overrides?.taskResourceLocalHandlers?.[this.currStateName]) {
+        const overrideFn = options?.overrides?.taskResourceLocalHandlers?.[this.currStateName];
         const result = await overrideFn(this.currInput);
         this.currResult = result;
         return;

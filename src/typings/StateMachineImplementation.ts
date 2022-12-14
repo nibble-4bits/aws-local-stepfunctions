@@ -5,7 +5,7 @@ type TaskStateResourceLocalHandler = {
 };
 
 interface Overrides {
-  taskResourceLocalHandler?: TaskStateResourceLocalHandler;
+  taskResourceLocalHandlers?: TaskStateResourceLocalHandler;
 }
 
 export interface RunOptions {

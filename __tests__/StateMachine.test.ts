@@ -852,7 +852,7 @@ describe('State Machine', () => {
       const stateMachine = new StateMachine(definition, { checkArn: false });
       const result = await stateMachine.run(input, {
         overrides: {
-          taskResourceLocalHandler: {
+          taskResourceLocalHandlers: {
             TaskState: localHandlerFn,
           },
         },
