@@ -259,11 +259,11 @@ export class StateMachine {
   private async handleTaskState(options?: RunOptions): Promise<void> {
     const state = this.currState as TaskState;
     const lambdaClient = new LambdaClient();
+    const overrideFn = options?.overrides?.taskResourceLocalHandlers?.[this.currStateName];
 
     try {
       // If local override for task resource is defined, use that
-      if (options?.overrides?.taskResourceLocalHandlers?.[this.currStateName]) {
-        const overrideFn = options?.overrides?.taskResourceLocalHandlers?.[this.currStateName];
+      if (overrideFn) {
         const result = await overrideFn(this.currInput);
         this.currResult = result;
         return;
@@ -355,9 +355,8 @@ export class StateMachine {
     const state = this.currState as WaitState;
     const waitTimeOverrideOption = options?.overrides?.waitTimeOverrides?.[this.currStateName];
 
-    if (typeof waitTimeOverrideOption === 'number') {
-      // If the wait time override is set and is a number, sleep for the specified number of milliseconds
-      // Else, if set to `true`, simply finish the state without sleeping at all.
+    if (waitTimeOverrideOption) {
+      // If the wait time override is set, sleep for the specified number of milliseconds
       await sleep(waitTimeOverrideOption);
       this.currResult = this.currInput;
       return;
