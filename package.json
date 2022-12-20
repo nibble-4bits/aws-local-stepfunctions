@@ -34,7 +34,7 @@
   },
   "scripts": {
     "test": "jest",
-    "build": "bunchee --target es2015 --minify src/main.ts",
+    "build": "bunchee --minify src/main.ts",
     "prettier": "prettier --write src/**/*.ts",
     "lint": "eslint src/**/*.ts",
     "lint:fix": "eslint src/**/*.ts --fix"
