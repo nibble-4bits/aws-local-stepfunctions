@@ -13,6 +13,10 @@
   - [x] Pass
   - [x] Wait
   - [x] Succeed
+  - [x] Map
+    - [x] `Iterator`
+    - [x] `ItemsPath`
+    - [x] `MaxConcurrency`
 
 ## Limited support
 
@@ -23,10 +27,6 @@
     - [ ] `HeartbeatSeconds`
     - [ ] `TimeoutSecondsPath`
     - [ ] `HeartbeatSecondsPath`
-  - Map
-    - [x] `Iterator`
-    - [x] `ItemsPath`
-    - [ ] `MaxConcurrency`
   - Choice
     - Boolean expressions
       - [x] `And`
