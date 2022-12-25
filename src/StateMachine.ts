@@ -322,7 +322,8 @@ export class StateMachine {
       return mapStateMachine.run(paramValue ?? item, options);
     };
 
-    const limit = pLimit(state.MaxConcurrency || 40); // If `MaxConcurrency` is 0 or not specified, default to running 40 iterations concurrently
+    const DEFAULT_MAX_CONCURRENCY = 40; // If `MaxConcurrency` is 0 or not specified, default to running 40 iterations concurrently
+    const limit = pLimit(state.MaxConcurrency || DEFAULT_MAX_CONCURRENCY);
     const input = items.map((item, i) => limit(() => processItem(item, i)));
     const result = await Promise.all(input);
 
