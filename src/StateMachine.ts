@@ -16,6 +16,7 @@ import { testChoiceRule } from './ChoiceHelper';
 import aslValidator from 'asl-validator';
 import set from 'lodash/set.js';
 import cloneDeep from 'lodash/cloneDeep.js';
+import pLimit from 'p-limit';
 
 export class StateMachine {
   /**
@@ -302,14 +303,11 @@ export class StateMachine {
       return;
     }
 
-    const result = new Array(items.length);
-    let paramValue;
-    for (let i = 0; i < items.length; i++) {
-      const item = items[i];
-
+    const processItem = (item: JSONValue, index: number): Promise<JSONValue> => {
+      let paramValue;
       this.context['Map'] = {
         Item: {
-          Index: i,
+          Index: index,
           Value: item,
         },
       };
@@ -321,8 +319,12 @@ export class StateMachine {
 
       // Pass the current parameter value if defined, otherwise pass the current item being iterated
       const mapStateMachine = new StateMachine(state.Iterator, this.validationOptions);
-      result[i] = await mapStateMachine.run(paramValue ?? item, options);
-    }
+      return mapStateMachine.run(paramValue ?? item, options);
+    };
+
+    const limit = pLimit(state.MaxConcurrency || 40); // If `MaxConcurrency` is 0 or not specified, default to running 40 iterations concurrently
+    const input = items.map((item, i) => limit(() => processItem(item, i)));
+    const result = await Promise.all(input);
 
     delete this.context['Map'];
     this.currResult = result;
