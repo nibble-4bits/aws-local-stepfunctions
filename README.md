@@ -6,6 +6,19 @@ This package lets you run AWS Step Functions locally on your machine!
 
 > NOTE: This is a work in progress. Some features defined in the specification might not be supported at all yet or might have limited support.
 
+## Table of Contents
+
+- [Features](#features)
+- [Installation](#installation)
+- [Importing](#importing)
+  - [Node.js](#nodejs)
+    - [CommonJS](#commonjs)
+    - [ES Module](#es-module)
+- [API](#api)
+  - [Constructor](#constructor-new-statemachinedefinition-validationoptions)
+  - [StateMachine.run](#async-statemachineruninput-options)
+- [License](#license)
+
 ## Features
 
 To see a list of features that have full support, partial support, or no support, refer to [this document](/docs/feature-support.md).
