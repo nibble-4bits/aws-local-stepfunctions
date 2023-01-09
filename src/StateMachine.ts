@@ -358,7 +358,7 @@ export class StateMachine {
     const state = this.currState as WaitState;
     const waitTimeOverrideOption = options?.overrides?.waitTimeOverrides?.[this.currStateName];
 
-    if (waitTimeOverrideOption) {
+    if (waitTimeOverrideOption !== undefined) {
       // If the wait time override is set, sleep for the specified number of milliseconds
       await sleep(waitTimeOverrideOption);
       this.currResult = this.currInput;
