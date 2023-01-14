@@ -16,6 +16,7 @@ import set from 'lodash/set.js';
 import cloneDeep from 'lodash/cloneDeep.js';
 import pLimit from 'p-limit';
 import { TaskStateHandler } from './stateHandlers/TaskStateHandler';
+import { jsonPathQuery } from './JsonPath';
 
 export class StateMachine {
   /**
@@ -146,7 +147,7 @@ export class StateMachine {
         return {};
       }
 
-      return this.jsonQuery(this.currState.InputPath!, this.currInput);
+      return jsonPathQuery(this.currState.InputPath!, this.currInput, this.context);
     }
 
     return this.currInput;
@@ -171,7 +172,7 @@ export class StateMachine {
       // Only resolve value if key ends with `.$` and value is a string
       if (key.endsWith('.$') && typeof value === 'string') {
         sanitizedKey = key.replace('.$', '');
-        resolvedValue = this.jsonQuery(value, json);
+        resolvedValue = jsonPathQuery(value, json, this.context);
       }
 
       return [sanitizedKey, resolvedValue];
@@ -231,7 +232,7 @@ export class StateMachine {
         return {};
       }
 
-      return this.jsonQuery(this.currState.OutputPath!, this.currResult);
+      return jsonPathQuery(this.currState.OutputPath!, this.currResult, this.context);
     }
 
     return this.currResult;
@@ -277,7 +278,7 @@ export class StateMachine {
 
     let items = this.currInput;
     if (state.ItemsPath) {
-      items = this.jsonQuery(state.ItemsPath, this.currInput);
+      items = jsonPathQuery(state.ItemsPath, this.currInput, this.context);
     }
 
     if (!Array.isArray(items)) {
@@ -356,10 +357,10 @@ export class StateMachine {
 
       await sleep(timeDiff);
     } else if (state.SecondsPath) {
-      const seconds = this.jsonQuery(state.SecondsPath, this.currInput);
+      const seconds = jsonPathQuery(state.SecondsPath, this.currInput, this.context);
       await sleep(seconds * 1000);
     } else if (state.TimestampPath) {
-      const timestamp = this.jsonQuery(state.TimestampPath, this.currInput);
+      const timestamp = jsonPathQuery(state.TimestampPath, this.currInput, this.context);
       const dateTimestamp = new Date(timestamp);
       const currentTime = Date.now();
       const timeDiff = dateTimestamp.getTime() - currentTime;
@@ -432,6 +433,7 @@ export class StateMachine {
    * @param json The object to evaluate (whether of null, boolean, number, string, object, or array type).
    * @returns The value of the property that was queried for, if found. Otherwise returns `undefined`.
    */
+  // TODO: Remove this method once the `ChoiceStateHandler` class is implemented.
   private jsonQuery(pathExpression: string, json: JSONValue): any {
     // If the expression starts with double `$$`, evaluate the path in the context object.
     if (pathExpression.startsWith('$$')) {
