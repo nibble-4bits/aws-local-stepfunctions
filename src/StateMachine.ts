@@ -10,13 +10,12 @@ import type { ChoiceState } from './typings/ChoiceState';
 import type { RunOptions, StateHandler, ValidationOptions } from './typings/StateMachineImplementation';
 import { JSONPath as jp } from 'jsonpath-plus';
 import { isPlainObj, sleep } from './util';
-import { LambdaClient } from './aws/LambdaClient';
-import { LambdaExecutionError } from './error/LambdaExecutionError';
 import { testChoiceRule } from './ChoiceHelper';
 import aslValidator from 'asl-validator';
 import set from 'lodash/set.js';
 import cloneDeep from 'lodash/cloneDeep.js';
 import pLimit from 'p-limit';
+import { TaskStateHandler } from './stateHandlers/TaskStateHandler';
 
 export class StateMachine {
   /**
@@ -258,29 +257,12 @@ export class StateMachine {
    * and sets the current result of the state machine to the value returned by the Lambda.
    */
   private async handleTaskState(options?: RunOptions): Promise<void> {
-    const state = this.currState as TaskState;
-    const lambdaClient = new LambdaClient();
     const overrideFn = options?.overrides?.taskResourceLocalHandlers?.[this.currStateName];
 
-    try {
-      // If local override for task resource is defined, use that
-      if (overrideFn) {
-        const result = await overrideFn(this.currInput);
-        this.currResult = result;
-        return;
-      }
+    const taskStateHandler = new TaskStateHandler(this.currState as TaskState);
+    const result = await taskStateHandler.executeState(this.currInput, { overrideFn });
 
-      const result = await lambdaClient.invokeFunction(state.Resource, this.currInput);
-      this.currResult = result;
-    } catch (error) {
-      if (error instanceof LambdaExecutionError) {
-        console.error(error.toString());
-      } else {
-        console.error(error);
-      }
-
-      throw error;
-    }
+    this.currResult = result;
   }
 
   /**
