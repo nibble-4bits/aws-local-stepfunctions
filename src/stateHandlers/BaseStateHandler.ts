@@ -12,7 +12,11 @@ abstract class BaseStateHandler {
     this.stateDefinition = stateDefinition;
   }
 
-  abstract executeState(input: JSONValue, options?: TaskStateHandlerOptions): Promise<JSONValue>;
+  abstract executeState(
+    input: JSONValue,
+    context: Record<string, unknown>,
+    options?: TaskStateHandlerOptions
+  ): Promise<JSONValue>;
 }
 
 export { BaseStateHandler };

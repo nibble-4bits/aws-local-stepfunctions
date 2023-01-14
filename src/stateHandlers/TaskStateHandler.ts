@@ -9,7 +9,11 @@ class TaskStateHandler extends BaseStateHandler {
     super(stateDefinition);
   }
 
-  override async executeState(input: JSONValue, options?: TaskStateHandlerOptions): Promise<JSONValue> {
+  override async executeState(
+    input: JSONValue,
+    context: Record<string, unknown>,
+    options?: TaskStateHandlerOptions
+  ): Promise<JSONValue> {
     const state = this.stateDefinition as TaskState;
     const lambdaClient = new LambdaClient();
 
