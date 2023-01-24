@@ -11,6 +11,8 @@ export type MapStateHandlerOptions = {
   runOptions: RunOptions | undefined;
 };
 
+export type PassStateHandlerOptions = Record<string, unknown>;
+
 abstract class BaseStateHandler<T extends BaseState> {
   protected stateDefinition: T;
 
@@ -21,7 +23,7 @@ abstract class BaseStateHandler<T extends BaseState> {
   abstract executeState(
     input: JSONValue,
     context: Record<string, unknown>,
-    options?: TaskStateHandlerOptions | MapStateHandlerOptions
+    options?: TaskStateHandlerOptions | MapStateHandlerOptions | PassStateHandlerOptions
   ): Promise<JSONValue>;
 }
 

@@ -20,6 +20,7 @@ import {
 } from './InputOutputProcessing';
 import { TaskStateHandler } from './stateHandlers/TaskStateHandler';
 import { MapStateHandler } from './stateHandlers/MapStateHandler';
+import { PassStateHandler } from './stateHandlers/PassStateHandler';
 
 export class StateMachine {
   /**
@@ -209,13 +210,10 @@ export class StateMachine {
    */
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   private async handlePassState(_options?: RunOptions): Promise<void> {
-    const state = this.currState as PassState;
+    const passStateHandler = new PassStateHandler(this.currState as PassState);
+    const result = await passStateHandler.executeState(this.currInput, this.context);
 
-    if (state.Result) {
-      this.currResult = state.Result;
-    } else {
-      this.currResult = this.currInput;
-    }
+    this.currResult = result;
   }
 
   /**
