@@ -13,6 +13,10 @@ export type MapStateHandlerOptions = {
 
 export type PassStateHandlerOptions = Record<string, unknown>;
 
+export type WaitStateHandlerOptions = {
+  waitTimeOverrideOption: number | undefined;
+};
+
 abstract class BaseStateHandler<T extends BaseState> {
   protected stateDefinition: T;
 
@@ -23,7 +27,7 @@ abstract class BaseStateHandler<T extends BaseState> {
   abstract executeState(
     input: JSONValue,
     context: Record<string, unknown>,
-    options?: TaskStateHandlerOptions | MapStateHandlerOptions | PassStateHandlerOptions
+    options?: TaskStateHandlerOptions | MapStateHandlerOptions | PassStateHandlerOptions | WaitStateHandlerOptions
   ): Promise<JSONValue>;
 }
 

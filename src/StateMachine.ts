@@ -8,10 +8,8 @@ import type { MapState } from './typings/MapState';
 import type { ChoiceState } from './typings/ChoiceState';
 import type { RunOptions, StateHandler, ValidationOptions } from './typings/StateMachineImplementation';
 import { JSONPath as jp } from 'jsonpath-plus';
-import { sleep } from './util';
 import { testChoiceRule } from './ChoiceHelper';
 import aslValidator from 'asl-validator';
-import { jsonPathQuery } from './JsonPath';
 import {
   processInputPath,
   processOutputPath,
@@ -21,6 +19,7 @@ import {
 import { TaskStateHandler } from './stateHandlers/TaskStateHandler';
 import { MapStateHandler } from './stateHandlers/MapStateHandler';
 import { PassStateHandler } from './stateHandlers/PassStateHandler';
+import { WaitStateHandler } from './stateHandlers/WaitStateHandler';
 
 export class StateMachine {
   /**
@@ -223,37 +222,12 @@ export class StateMachine {
    * based on one of the `Seconds`, `Timestamp`, `SecondsPath` or `TimestampPath` fields.
    */
   private async handleWaitState(options?: RunOptions): Promise<void> {
-    const state = this.currState as WaitState;
     const waitTimeOverrideOption = options?.overrides?.waitTimeOverrides?.[this.currStateName];
 
-    if (waitTimeOverrideOption !== undefined) {
-      // If the wait time override is set, sleep for the specified number of milliseconds
-      await sleep(waitTimeOverrideOption);
-      this.currResult = this.currInput;
-      return;
-    }
+    const waitStateHandler = new WaitStateHandler(this.currState as WaitState);
+    const result = await waitStateHandler.executeState(this.currInput, this.context, { waitTimeOverrideOption });
 
-    if (state.Seconds) {
-      await sleep(state.Seconds * 1000);
-    } else if (state.Timestamp) {
-      const dateTimestamp = new Date(state.Timestamp);
-      const currentTime = Date.now();
-      const timeDiff = dateTimestamp.getTime() - currentTime;
-
-      await sleep(timeDiff);
-    } else if (state.SecondsPath) {
-      const seconds = jsonPathQuery(state.SecondsPath, this.currInput, this.context);
-      await sleep(seconds * 1000);
-    } else if (state.TimestampPath) {
-      const timestamp = jsonPathQuery(state.TimestampPath, this.currInput, this.context);
-      const dateTimestamp = new Date(timestamp);
-      const currentTime = Date.now();
-      const timeDiff = dateTimestamp.getTime() - currentTime;
-
-      await sleep(timeDiff);
-    }
-
-    this.currResult = this.currInput;
+    this.currResult = result;
   }
 
   /**
