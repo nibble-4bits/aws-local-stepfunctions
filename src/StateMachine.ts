@@ -11,8 +11,6 @@ import { JSONPath as jp } from 'jsonpath-plus';
 import { sleep } from './util';
 import { testChoiceRule } from './ChoiceHelper';
 import aslValidator from 'asl-validator';
-import pLimit from 'p-limit';
-import { TaskStateHandler } from './stateHandlers/TaskStateHandler';
 import { jsonPathQuery } from './JsonPath';
 import {
   processInputPath,
@@ -20,6 +18,8 @@ import {
   processPayloadTemplate,
   processResultPath,
 } from './InputOutputProcessing';
+import { TaskStateHandler } from './stateHandlers/TaskStateHandler';
+import { MapStateHandler } from './stateHandlers/MapStateHandler';
 
 export class StateMachine {
   /**
@@ -179,7 +179,7 @@ export class StateMachine {
     const overrideFn = options?.overrides?.taskResourceLocalHandlers?.[this.currStateName];
 
     const taskStateHandler = new TaskStateHandler(this.currState as TaskState);
-    const result = await taskStateHandler.executeState(this.currInput, { overrideFn });
+    const result = await taskStateHandler.executeState(this.currInput, this.context, { overrideFn });
 
     this.currResult = result;
   }
@@ -192,43 +192,12 @@ export class StateMachine {
    * as the input to the state machine specified in the `Iterator` field.
    */
   private async handleMapState(options?: RunOptions): Promise<void> {
-    const state = this.currState as MapState;
+    const mapStateHandler = new MapStateHandler(this.currState as MapState);
+    const result = await mapStateHandler.executeState(this.currInput, this.context, {
+      validationOptions: this.validationOptions,
+      runOptions: options,
+    });
 
-    let items = this.currInput;
-    if (state.ItemsPath) {
-      items = jsonPathQuery(state.ItemsPath, this.currInput, this.context);
-    }
-
-    if (!Array.isArray(items)) {
-      // TODO: throw error instead of returning, because current input is not an array.
-      return;
-    }
-
-    const processItem = (item: JSONValue, index: number): Promise<JSONValue> => {
-      let paramValue;
-      this.context['Map'] = {
-        Item: {
-          Index: index,
-          Value: item,
-        },
-      };
-
-      // Handle `Parameters` field if specified
-      if (state.Parameters) {
-        paramValue = processPayloadTemplate(state.Parameters, this.currInput, this.context);
-      }
-
-      // Pass the current parameter value if defined, otherwise pass the current item being iterated
-      const mapStateMachine = new StateMachine(state.Iterator, this.validationOptions);
-      return mapStateMachine.run(paramValue ?? item, options);
-    };
-
-    const DEFAULT_MAX_CONCURRENCY = 40; // If `MaxConcurrency` is 0 or not specified, default to running 40 iterations concurrently
-    const limit = pLimit(state.MaxConcurrency || DEFAULT_MAX_CONCURRENCY);
-    const input = items.map((item, i) => limit(() => processItem(item, i)));
-    const result = await Promise.all(input);
-
-    delete this.context['Map'];
     this.currResult = result;
   }
 
