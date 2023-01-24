@@ -11,10 +11,10 @@ export type MapStateHandlerOptions = {
   runOptions: RunOptions | undefined;
 };
 
-abstract class BaseStateHandler {
-  protected stateDefinition: BaseState;
+abstract class BaseStateHandler<T extends BaseState> {
+  protected stateDefinition: T;
 
-  constructor(stateDefinition: BaseState) {
+  constructor(stateDefinition: T) {
     this.stateDefinition = stateDefinition;
   }
 

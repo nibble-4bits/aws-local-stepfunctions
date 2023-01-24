@@ -4,7 +4,7 @@ import { BaseStateHandler, TaskStateHandlerOptions } from './BaseStateHandler';
 import { LambdaClient } from '../aws/LambdaClient';
 import { LambdaExecutionError } from '../error/LambdaExecutionError';
 
-class TaskStateHandler extends BaseStateHandler {
+class TaskStateHandler extends BaseStateHandler<TaskState> {
   constructor(stateDefinition: TaskState) {
     super(stateDefinition);
   }
@@ -14,7 +14,7 @@ class TaskStateHandler extends BaseStateHandler {
     context: Record<string, unknown>,
     options?: TaskStateHandlerOptions
   ): Promise<JSONValue> {
-    const state = this.stateDefinition as TaskState;
+    const state = this.stateDefinition;
     const lambdaClient = new LambdaClient();
 
     try {

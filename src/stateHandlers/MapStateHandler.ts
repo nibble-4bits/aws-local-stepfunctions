@@ -6,7 +6,7 @@ import { jsonPathQuery } from '../JsonPath';
 import { processPayloadTemplate } from '../InputOutputProcessing';
 import pLimit from 'p-limit';
 
-class MapStateHandler extends BaseStateHandler {
+class MapStateHandler extends BaseStateHandler<MapState> {
   constructor(stateDefinition: MapState) {
     super(stateDefinition);
   }
@@ -18,7 +18,7 @@ class MapStateHandler extends BaseStateHandler {
     index: number,
     options: MapStateHandlerOptions | undefined
   ): Promise<JSONValue> {
-    const state = this.stateDefinition as MapState;
+    const state = this.stateDefinition;
 
     let paramValue;
     context['Map'] = {
@@ -43,7 +43,7 @@ class MapStateHandler extends BaseStateHandler {
     context: Record<string, unknown>,
     options?: MapStateHandlerOptions
   ): Promise<JSONValue> {
-    const state = this.stateDefinition as MapState;
+    const state = this.stateDefinition;
 
     let items = input;
     if (state.ItemsPath) {
