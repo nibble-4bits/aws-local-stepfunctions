@@ -1,7 +1,6 @@
 import type { AllStates } from './typings/AllStates';
 import type { StateMachineDefinition } from './typings/StateMachineDefinition';
 import type { TaskState } from './typings/TaskState';
-import type { PayloadTemplate } from './typings/InputOutputProcessing';
 import type { JSONValue } from './typings/JSONValue';
 import type { PassState } from './typings/PassState';
 import type { WaitState } from './typings/WaitState';
@@ -9,14 +8,18 @@ import type { MapState } from './typings/MapState';
 import type { ChoiceState } from './typings/ChoiceState';
 import type { RunOptions, StateHandler, ValidationOptions } from './typings/StateMachineImplementation';
 import { JSONPath as jp } from 'jsonpath-plus';
-import { isPlainObj, sleep } from './util';
+import { sleep } from './util';
 import { testChoiceRule } from './ChoiceHelper';
 import aslValidator from 'asl-validator';
-import set from 'lodash/set.js';
-import cloneDeep from 'lodash/cloneDeep.js';
 import pLimit from 'p-limit';
 import { TaskStateHandler } from './stateHandlers/TaskStateHandler';
 import { jsonPathQuery } from './JsonPath';
+import {
+  processInputPath,
+  processOutputPath,
+  processPayloadTemplate,
+  processResultPath,
+} from './InputOutputProcessing';
 
 export class StateMachine {
   /**
@@ -135,107 +138,18 @@ export class StateMachine {
   }
 
   /**
-   * Process the current input according to the path defined in the `InputPath` field, if specified in the current state.
-   * @returns
-   * * If `InputPath` is not specified, returns the current input unmodified.
-   * * If `InputPath` is `null`, returns an empty object (`{}`).
-   * * If `InputPath` is a string, it's considered a JSONPath and the selected portion of the current input is returned.
-   */
-  private processInputPath(): JSONValue {
-    if ('InputPath' in this.currState) {
-      if (this.currState.InputPath === null) {
-        return {};
-      }
-
-      return jsonPathQuery(this.currState.InputPath!, this.currInput, this.context);
-    }
-
-    return this.currInput;
-  }
-
-  /**
-   * Recursively process a payload template to resolve the properties that are JSONPaths.
-   * @param payloadTemplate The payload template to process.
-   * @param json The object to evaluate with JSONPath (whether of null, boolean, number, string, object, or array type).
-   * @returns The processed payload template.
-   */
-  private processPayloadTemplate(payloadTemplate: PayloadTemplate, json: JSONValue): PayloadTemplate {
-    const resolvedProperties = Object.entries(payloadTemplate).map(([key, value]) => {
-      let sanitizedKey = key;
-      let resolvedValue = value;
-
-      // Recursively process child object
-      if (isPlainObj(value)) {
-        resolvedValue = this.processPayloadTemplate(value, json);
-      }
-
-      // Only resolve value if key ends with `.$` and value is a string
-      if (key.endsWith('.$') && typeof value === 'string') {
-        sanitizedKey = key.replace('.$', '');
-        resolvedValue = jsonPathQuery(value, json, this.context);
-      }
-
-      return [sanitizedKey, resolvedValue];
-    });
-
-    return Object.fromEntries(resolvedProperties);
-  }
-
-  /**
    * Process the current input according to the `InputPath` and `Parameters` fields.
    */
   private processInput(): void {
-    this.currInput = this.processInputPath();
+    if ('InputPath' in this.currState) {
+      this.currInput = processInputPath(this.currState.InputPath, this.currInput, this.context);
+    }
+
     if ('Parameters' in this.currState && this.currState.Type !== 'Map') {
       // `Parameters` field is handled differently in the `Map` state,
       // hence why we omit processing it here.
-      this.currInput = this.processPayloadTemplate(this.currState.Parameters!, this.currInput);
+      this.currInput = processPayloadTemplate(this.currState.Parameters, this.currInput, this.context);
     }
-  }
-
-  /**
-   * Process the current result according to the path defined in the `ResultPath` field, if specified in the current state.
-   * @returns
-   * * If `ResultPath` is not specified, returns the current result unmodified.
-   * * If `ResultPath` is `null`, returns the raw input (i.e. the input passed to current state).
-   * * If `ResultPath` is a string, it's considered a JSONPath and returns a combination of the raw input with the current result,
-   * by placing the current result in the specified path.
-   */
-  private processResultPath(): JSONValue {
-    if ('ResultPath' in this.currState) {
-      if (this.currState.ResultPath === null) {
-        return this.rawInput;
-      }
-
-      const sanitizedPath = this.currState.ResultPath!.replace('$.', '');
-      if (isPlainObj(this.rawInput)) {
-        const clonedRawInput = cloneDeep(this.rawInput) as object;
-        return set(clonedRawInput, sanitizedPath, this.currResult);
-      } else {
-        // TODO: throw exception since rawInput is not an object, thus ResultPath won't work.
-      }
-    }
-
-    return this.currResult;
-  }
-
-  /**
-   * Process the current result according to the path defined in the `OutputPath` field, if specified in the current state.
-   * @returns
-   * * If `OutputPath` is not specified, returns the current result unmodified.
-   * * If `OutputPath` is `null`, returns an empty object (`{}`).
-   * * If `OutputPath` is a string, it's considered a JSONPath and the selected portion of the current result is returned.
-   */
-  private processOutputPath(): JSONValue {
-    if ('OutputPath' in this.currState) {
-      if (this.currState.OutputPath === null) {
-        return {};
-      }
-
-      return jsonPathQuery(this.currState.OutputPath!, this.currResult, this.context);
-    }
-
-    return this.currResult;
   }
 
   /**
@@ -243,12 +157,16 @@ export class StateMachine {
    */
   private processResult(): void {
     if ('ResultSelector' in this.currState) {
-      this.currResult = this.processPayloadTemplate(this.currState.ResultSelector!, this.currResult);
+      this.currResult = processPayloadTemplate(this.currState.ResultSelector, this.currResult, this.context);
     }
 
-    this.currResult = this.processResultPath();
+    if ('ResultPath' in this.currState) {
+      this.currResult = processResultPath(this.currState.ResultPath, this.rawInput, this.currResult);
+    }
 
-    this.currResult = this.processOutputPath();
+    if ('OutputPath' in this.currState) {
+      this.currResult = processOutputPath(this.currState.OutputPath, this.currResult, this.context);
+    }
   }
 
   /**
@@ -297,7 +215,7 @@ export class StateMachine {
 
       // Handle `Parameters` field if specified
       if (state.Parameters) {
-        paramValue = this.processPayloadTemplate(state.Parameters, this.currInput);
+        paramValue = processPayloadTemplate(state.Parameters, this.currInput, this.context);
       }
 
       // Pass the current parameter value if defined, otherwise pass the current item being iterated
