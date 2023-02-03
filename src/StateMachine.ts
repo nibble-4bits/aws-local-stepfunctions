@@ -6,6 +6,7 @@ import type { PassState } from './typings/PassState';
 import type { WaitState } from './typings/WaitState';
 import type { MapState } from './typings/MapState';
 import type { ChoiceState } from './typings/ChoiceState';
+import type { SucceedState } from './typings/SucceedState';
 import type { RunOptions, StateHandler, ValidationOptions } from './typings/StateMachineImplementation';
 import { JSONPath as jp } from 'jsonpath-plus';
 import aslValidator from 'asl-validator';
@@ -20,6 +21,7 @@ import { MapStateHandler } from './stateHandlers/MapStateHandler';
 import { PassStateHandler } from './stateHandlers/PassStateHandler';
 import { WaitStateHandler } from './stateHandlers/WaitStateHandler';
 import { ChoiceStateHandler } from './stateHandlers/ChoiceStateHandler';
+import { SucceedStateHandler } from './stateHandlers/SucceedStateHandler';
 
 export class StateMachine {
   /**
@@ -262,7 +264,10 @@ export class StateMachine {
    */
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   private async handleSucceedState(_options?: RunOptions): Promise<void> {
-    this.currResult = this.currInput;
+    const succeedStateHandler = new SucceedStateHandler(this.currState as SucceedState);
+    const { stateResult } = await succeedStateHandler.executeState(this.currInput, this.context);
+
+    this.currResult = stateResult;
   }
 
   /**

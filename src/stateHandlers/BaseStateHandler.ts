@@ -21,6 +21,8 @@ export type WaitStateHandlerOptions = {
 
 export type ChoiceStateHandlerOptions = Record<string, unknown>;
 
+export type SucceedStateHandlerOptions = Record<string, unknown>;
+
 export interface ExecutionResult {
   stateResult: JSONValue;
   nextState?: string;
