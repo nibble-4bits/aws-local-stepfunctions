@@ -179,9 +179,9 @@ export class StateMachine {
     const overrideFn = options?.overrides?.taskResourceLocalHandlers?.[this.currStateName];
 
     const taskStateHandler = new TaskStateHandler(this.currState as TaskState);
-    const result = await taskStateHandler.executeState(this.currInput, this.context, { overrideFn });
+    const { stateResult } = await taskStateHandler.executeState(this.currInput, this.context, { overrideFn });
 
-    this.currResult = result;
+    this.currResult = stateResult;
   }
 
   /**
@@ -193,12 +193,12 @@ export class StateMachine {
    */
   private async handleMapState(options?: RunOptions): Promise<void> {
     const mapStateHandler = new MapStateHandler(this.currState as MapState);
-    const result = await mapStateHandler.executeState(this.currInput, this.context, {
+    const { stateResult } = await mapStateHandler.executeState(this.currInput, this.context, {
       validationOptions: this.validationOptions,
       runOptions: options,
     });
 
-    this.currResult = result;
+    this.currResult = stateResult;
   }
 
   /**
@@ -210,9 +210,9 @@ export class StateMachine {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   private async handlePassState(_options?: RunOptions): Promise<void> {
     const passStateHandler = new PassStateHandler(this.currState as PassState);
-    const result = await passStateHandler.executeState(this.currInput, this.context);
+    const { stateResult } = await passStateHandler.executeState(this.currInput, this.context);
 
-    this.currResult = result;
+    this.currResult = stateResult;
   }
 
   /**
@@ -225,9 +225,11 @@ export class StateMachine {
     const waitTimeOverrideOption = options?.overrides?.waitTimeOverrides?.[this.currStateName];
 
     const waitStateHandler = new WaitStateHandler(this.currState as WaitState);
-    const result = await waitStateHandler.executeState(this.currInput, this.context, { waitTimeOverrideOption });
+    const { stateResult } = await waitStateHandler.executeState(this.currInput, this.context, {
+      waitTimeOverrideOption,
+    });
 
-    this.currResult = result;
+    this.currResult = stateResult;
   }
 
   /**

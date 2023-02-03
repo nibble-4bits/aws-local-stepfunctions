@@ -1,6 +1,6 @@
 import type { MapState } from '../typings/MapState';
 import type { JSONValue } from '../typings/JSONValue';
-import { BaseStateHandler, MapStateHandlerOptions } from './BaseStateHandler';
+import { BaseStateHandler, ExecutionResult, MapStateHandlerOptions } from './BaseStateHandler';
 import { StateMachine } from '../StateMachine';
 import { jsonPathQuery } from '../JsonPath';
 import { processPayloadTemplate } from '../InputOutputProcessing';
@@ -42,7 +42,7 @@ class MapStateHandler extends BaseStateHandler<MapState> {
     input: JSONValue,
     context: Record<string, unknown>,
     options?: MapStateHandlerOptions
-  ): Promise<JSONValue> {
+  ): Promise<ExecutionResult> {
     const state = this.stateDefinition;
 
     let items = input;
@@ -52,7 +52,7 @@ class MapStateHandler extends BaseStateHandler<MapState> {
 
     if (!Array.isArray(items)) {
       // TODO: throw error instead of returning, because current input is not an array.
-      return [];
+      return this.buildExecutionResult([]);
     }
 
     const DEFAULT_MAX_CONCURRENCY = 40; // If `MaxConcurrency` is 0 or not specified, default to running 40 iterations concurrently
@@ -63,7 +63,7 @@ class MapStateHandler extends BaseStateHandler<MapState> {
     const result = await Promise.all(processedItemsPromise);
 
     delete context['Map'];
-    return result;
+    return this.buildExecutionResult(result);
   }
 }
 

@@ -1,6 +1,6 @@
 import type { JSONValue } from '../typings/JSONValue';
 import type { PassState } from '../typings/PassState';
-import { BaseStateHandler, PassStateHandlerOptions } from './BaseStateHandler';
+import { BaseStateHandler, ExecutionResult, PassStateHandlerOptions } from './BaseStateHandler';
 
 class PassStateHandler extends BaseStateHandler<PassState> {
   constructor(stateDefinition: PassState) {
@@ -13,12 +13,12 @@ class PassStateHandler extends BaseStateHandler<PassState> {
     context: Record<string, unknown>,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     options?: PassStateHandlerOptions
-  ): Promise<JSONValue> {
+  ): Promise<ExecutionResult> {
     if (this.stateDefinition.Result) {
-      return this.stateDefinition.Result;
+      return this.buildExecutionResult(this.stateDefinition.Result);
     }
 
-    return input;
+    return this.buildExecutionResult(input);
   }
 }
 

@@ -1,6 +1,6 @@
 import type { JSONValue } from '../typings/JSONValue';
 import type { WaitState } from '../typings/WaitState';
-import { BaseStateHandler, WaitStateHandlerOptions } from './BaseStateHandler';
+import { BaseStateHandler, ExecutionResult, WaitStateHandlerOptions } from './BaseStateHandler';
 import { jsonPathQuery } from '../JsonPath';
 import { sleep } from '../util';
 
@@ -13,13 +13,13 @@ class WaitStateHandler extends BaseStateHandler<WaitState> {
     input: JSONValue,
     context: Record<string, unknown>,
     options?: WaitStateHandlerOptions
-  ): Promise<JSONValue> {
+  ): Promise<ExecutionResult> {
     const state = this.stateDefinition;
 
     if (options?.waitTimeOverrideOption !== undefined) {
       // If the wait time override is set, sleep for the specified number of milliseconds
       await sleep(options.waitTimeOverrideOption);
-      return input;
+      return this.buildExecutionResult(input);
     }
 
     if (state.Seconds) {
@@ -42,7 +42,7 @@ class WaitStateHandler extends BaseStateHandler<WaitState> {
       await sleep(timeDiff);
     }
 
-    return input;
+    return this.buildExecutionResult(input);
   }
 }
 
