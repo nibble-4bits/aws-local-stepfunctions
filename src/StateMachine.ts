@@ -8,7 +8,6 @@ import type { MapState } from './typings/MapState';
 import type { ChoiceState } from './typings/ChoiceState';
 import type { SucceedState } from './typings/SucceedState';
 import type { RunOptions, StateHandler, ValidationOptions } from './typings/StateMachineImplementation';
-import { JSONPath as jp } from 'jsonpath-plus';
 import aslValidator from 'asl-validator';
 import {
   processInputPath,
@@ -278,21 +277,5 @@ export class StateMachine {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   private async handleFailState(_options?: RunOptions): Promise<void> {
     // TODO: Implement behavior of Fail state
-  }
-
-  /**
-   * Queries for a property in an object using a JSONPath expression.
-   * @param pathExpression The JSONPath expression to query for.
-   * @param json The object to evaluate (whether of null, boolean, number, string, object, or array type).
-   * @returns The value of the property that was queried for, if found. Otherwise returns `undefined`.
-   */
-  // TODO: Remove this method once the `ChoiceStateHandler` class is implemented.
-  private jsonQuery(pathExpression: string, json: JSONValue): any {
-    // If the expression starts with double `$$`, evaluate the path in the context object.
-    if (pathExpression.startsWith('$$')) {
-      return jp({ path: pathExpression.slice(1), json: this.context, wrap: false });
-    }
-
-    return jp({ path: pathExpression, json, wrap: false });
   }
 }
