@@ -31,10 +31,10 @@ class WaitStateHandler extends BaseStateHandler<WaitState> {
 
       await sleep(timeDiff);
     } else if (state.SecondsPath) {
-      const seconds = jsonPathQuery(state.SecondsPath, input, context);
+      const seconds = jsonPathQuery<number>(state.SecondsPath, input, context);
       await sleep(seconds * 1000);
     } else if (state.TimestampPath) {
-      const timestamp = jsonPathQuery(state.TimestampPath, input, context);
+      const timestamp = jsonPathQuery<string>(state.TimestampPath, input, context);
       const dateTimestamp = new Date(timestamp);
       const currentTime = Date.now();
       const timeDiff = dateTimestamp.getTime() - currentTime;

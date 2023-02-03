@@ -23,189 +23,189 @@ class ChoiceStateHandler extends BaseStateHandler<ChoiceState> {
     }
 
     if ('StringEquals' in choiceRule) {
-      const varValue = jsonPathQuery(choiceRule.Variable, input) as string;
+      const varValue = jsonPathQuery<string>(choiceRule.Variable, input);
       return varValue === choiceRule.StringEquals!;
     }
 
     if ('StringEqualsPath' in choiceRule) {
-      const varValue = jsonPathQuery(choiceRule.Variable, input) as string;
-      const stringValue = jsonPathQuery(choiceRule.StringEqualsPath!, input) as string;
+      const varValue = jsonPathQuery<string>(choiceRule.Variable, input);
+      const stringValue = jsonPathQuery<string>(choiceRule.StringEqualsPath!, input);
       return varValue === stringValue;
     }
 
     if ('StringLessThan' in choiceRule) {
-      const varValue = jsonPathQuery(choiceRule.Variable, input) as string;
+      const varValue = jsonPathQuery<string>(choiceRule.Variable, input);
       return varValue < choiceRule.StringLessThan!;
     }
 
     if ('StringLessThanPath' in choiceRule) {
-      const varValue = jsonPathQuery(choiceRule.Variable, input) as string;
-      const stringValue = jsonPathQuery(choiceRule.StringLessThanPath!, input) as string;
+      const varValue = jsonPathQuery<string>(choiceRule.Variable, input);
+      const stringValue = jsonPathQuery<string>(choiceRule.StringLessThanPath!, input);
       return varValue < stringValue;
     }
 
     if ('StringGreaterThan' in choiceRule) {
-      const varValue = jsonPathQuery(choiceRule.Variable, input) as string;
+      const varValue = jsonPathQuery<string>(choiceRule.Variable, input);
       return varValue > choiceRule.StringGreaterThan!;
     }
 
     if ('StringGreaterThanPath' in choiceRule) {
-      const varValue = jsonPathQuery(choiceRule.Variable, input) as string;
-      const stringValue = jsonPathQuery(choiceRule.StringGreaterThanPath!, input) as string;
+      const varValue = jsonPathQuery<string>(choiceRule.Variable, input);
+      const stringValue = jsonPathQuery<string>(choiceRule.StringGreaterThanPath!, input);
       return varValue > stringValue;
     }
 
     if ('StringLessThanEquals' in choiceRule) {
-      const varValue = jsonPathQuery(choiceRule.Variable, input) as string;
+      const varValue = jsonPathQuery<string>(choiceRule.Variable, input);
       return varValue <= choiceRule.StringLessThanEquals!;
     }
 
     if ('StringLessThanEqualsPath' in choiceRule) {
-      const varValue = jsonPathQuery(choiceRule.Variable, input) as string;
-      const stringValue = jsonPathQuery(choiceRule.StringLessThanEqualsPath!, input) as string;
+      const varValue = jsonPathQuery<string>(choiceRule.Variable, input);
+      const stringValue = jsonPathQuery<string>(choiceRule.StringLessThanEqualsPath!, input);
       return varValue <= stringValue;
     }
 
     if ('StringGreaterThanEquals' in choiceRule) {
-      const varValue = jsonPathQuery(choiceRule.Variable, input) as string;
+      const varValue = jsonPathQuery<string>(choiceRule.Variable, input);
       return varValue >= choiceRule.StringGreaterThanEquals!;
     }
 
     if ('StringGreaterThanEqualsPath' in choiceRule) {
-      const varValue = jsonPathQuery(choiceRule.Variable, input) as string;
-      const stringValue = jsonPathQuery(choiceRule.StringGreaterThanEqualsPath!, input) as string;
+      const varValue = jsonPathQuery<string>(choiceRule.Variable, input);
+      const stringValue = jsonPathQuery<string>(choiceRule.StringGreaterThanEqualsPath!, input);
       return varValue >= stringValue;
     }
 
     if ('StringMatches' in choiceRule) {
-      const varValue = jsonPathQuery(choiceRule.Variable, input) as string;
+      const varValue = jsonPathQuery<string>(choiceRule.Variable, input);
       const isMatch = wcmatch(choiceRule.StringMatches!, { separator: false });
       return isMatch(varValue);
     }
 
     if ('NumericEquals' in choiceRule) {
-      const varValue = jsonPathQuery(choiceRule.Variable, input) as number;
+      const varValue = jsonPathQuery<number>(choiceRule.Variable, input);
       return varValue === choiceRule.NumericEquals!;
     }
 
     if ('NumericEqualsPath' in choiceRule) {
-      const varValue = jsonPathQuery(choiceRule.Variable, input) as number;
-      const numberValue = jsonPathQuery(choiceRule.NumericEqualsPath!, input) as number;
+      const varValue = jsonPathQuery<number>(choiceRule.Variable, input);
+      const numberValue = jsonPathQuery<number>(choiceRule.NumericEqualsPath!, input);
       return varValue === numberValue;
     }
 
     if ('NumericLessThan' in choiceRule) {
-      const varValue = jsonPathQuery(choiceRule.Variable, input) as number;
+      const varValue = jsonPathQuery<number>(choiceRule.Variable, input);
       return varValue < choiceRule.NumericLessThan!;
     }
 
     if ('NumericLessThanPath' in choiceRule) {
-      const varValue = jsonPathQuery(choiceRule.Variable, input) as number;
-      const numberValue = jsonPathQuery(choiceRule.NumericLessThanPath!, input) as number;
+      const varValue = jsonPathQuery<number>(choiceRule.Variable, input);
+      const numberValue = jsonPathQuery<number>(choiceRule.NumericLessThanPath!, input);
       return varValue < numberValue;
     }
 
     if ('NumericGreaterThan' in choiceRule) {
-      const varValue = jsonPathQuery(choiceRule.Variable, input) as number;
+      const varValue = jsonPathQuery<number>(choiceRule.Variable, input);
       return varValue > choiceRule.NumericGreaterThan!;
     }
 
     if ('NumericGreaterThanPath' in choiceRule) {
-      const varValue = jsonPathQuery(choiceRule.Variable, input) as number;
-      const numberValue = jsonPathQuery(choiceRule.NumericGreaterThanPath!, input) as number;
+      const varValue = jsonPathQuery<number>(choiceRule.Variable, input);
+      const numberValue = jsonPathQuery<number>(choiceRule.NumericGreaterThanPath!, input);
       return varValue > numberValue;
     }
 
     if ('NumericLessThanEquals' in choiceRule) {
-      const varValue = jsonPathQuery(choiceRule.Variable, input) as number;
+      const varValue = jsonPathQuery<number>(choiceRule.Variable, input);
       return varValue <= choiceRule.NumericLessThanEquals!;
     }
 
     if ('NumericLessThanEqualsPath' in choiceRule) {
-      const varValue = jsonPathQuery(choiceRule.Variable, input) as number;
-      const numberValue = jsonPathQuery(choiceRule.NumericLessThanEqualsPath!, input) as number;
+      const varValue = jsonPathQuery<number>(choiceRule.Variable, input);
+      const numberValue = jsonPathQuery<number>(choiceRule.NumericLessThanEqualsPath!, input);
       return varValue <= numberValue;
     }
 
     if ('NumericGreaterThanEquals' in choiceRule) {
-      const varValue = jsonPathQuery(choiceRule.Variable, input) as number;
+      const varValue = jsonPathQuery<number>(choiceRule.Variable, input);
       return varValue >= choiceRule.NumericGreaterThanEquals!;
     }
 
     if ('NumericGreaterThanEqualsPath' in choiceRule) {
-      const varValue = jsonPathQuery(choiceRule.Variable, input) as number;
-      const numberValue = jsonPathQuery(choiceRule.NumericGreaterThanEqualsPath!, input) as number;
+      const varValue = jsonPathQuery<number>(choiceRule.Variable, input);
+      const numberValue = jsonPathQuery<number>(choiceRule.NumericGreaterThanEqualsPath!, input);
       return varValue >= numberValue;
     }
 
     if ('BooleanEquals' in choiceRule) {
-      const varValue = jsonPathQuery(choiceRule.Variable, input) as boolean;
+      const varValue = jsonPathQuery<boolean>(choiceRule.Variable, input);
       return varValue === choiceRule.BooleanEquals!;
     }
 
     if ('BooleanEqualsPath' in choiceRule) {
-      const varValue = jsonPathQuery(choiceRule.Variable, input) as boolean;
-      const booleanValue = jsonPathQuery(choiceRule.BooleanEqualsPath!, input) as boolean;
+      const varValue = jsonPathQuery<boolean>(choiceRule.Variable, input);
+      const booleanValue = jsonPathQuery<boolean>(choiceRule.BooleanEqualsPath!, input);
       return varValue === booleanValue;
     }
 
     if ('TimestampEquals' in choiceRule) {
-      const varValue = new Date(jsonPathQuery(choiceRule.Variable, input) as string);
+      const varValue = new Date(jsonPathQuery<string>(choiceRule.Variable, input));
       const timestampValue = new Date(choiceRule.TimestampEquals!);
       return varValue.getTime() === timestampValue.getTime();
     }
 
     if ('TimestampEqualsPath' in choiceRule) {
-      const varValue = new Date(jsonPathQuery(choiceRule.Variable, input) as string);
-      const timestampValue = new Date(jsonPathQuery(choiceRule.TimestampEqualsPath!, input) as string);
+      const varValue = new Date(jsonPathQuery<string>(choiceRule.Variable, input));
+      const timestampValue = new Date(jsonPathQuery<string>(choiceRule.TimestampEqualsPath!, input));
       return varValue.getTime() === timestampValue.getTime();
     }
 
     if ('TimestampLessThan' in choiceRule) {
-      const varValue = new Date(jsonPathQuery(choiceRule.Variable, input) as string);
+      const varValue = new Date(jsonPathQuery<string>(choiceRule.Variable, input));
       const timestampValue = new Date(choiceRule.TimestampLessThan!);
       return varValue < timestampValue;
     }
 
     if ('TimestampLessThanPath' in choiceRule) {
-      const varValue = new Date(jsonPathQuery(choiceRule.Variable, input) as string);
-      const timestampValue = new Date(jsonPathQuery(choiceRule.TimestampLessThanPath!, input) as string);
+      const varValue = new Date(jsonPathQuery<string>(choiceRule.Variable, input));
+      const timestampValue = new Date(jsonPathQuery<string>(choiceRule.TimestampLessThanPath!, input));
       return varValue < timestampValue;
     }
 
     if ('TimestampGreaterThan' in choiceRule) {
-      const varValue = new Date(jsonPathQuery(choiceRule.Variable, input) as string);
+      const varValue = new Date(jsonPathQuery<string>(choiceRule.Variable, input));
       const timestampValue = new Date(choiceRule.TimestampGreaterThan!);
       return varValue > timestampValue;
     }
 
     if ('TimestampGreaterThanPath' in choiceRule) {
-      const varValue = new Date(jsonPathQuery(choiceRule.Variable, input) as string);
-      const timestampValue = new Date(jsonPathQuery(choiceRule.TimestampGreaterThanPath!, input) as string);
+      const varValue = new Date(jsonPathQuery<string>(choiceRule.Variable, input));
+      const timestampValue = new Date(jsonPathQuery<string>(choiceRule.TimestampGreaterThanPath!, input));
       return varValue > timestampValue;
     }
 
     if ('TimestampLessThanEquals' in choiceRule) {
-      const varValue = new Date(jsonPathQuery(choiceRule.Variable, input) as string);
+      const varValue = new Date(jsonPathQuery<string>(choiceRule.Variable, input));
       const timestampValue = new Date(choiceRule.TimestampLessThanEquals!);
       return varValue <= timestampValue;
     }
 
     if ('TimestampLessThanEqualsPath' in choiceRule) {
-      const varValue = new Date(jsonPathQuery(choiceRule.Variable, input) as string);
-      const timestampValue = new Date(jsonPathQuery(choiceRule.TimestampLessThanEqualsPath!, input) as string);
+      const varValue = new Date(jsonPathQuery<string>(choiceRule.Variable, input));
+      const timestampValue = new Date(jsonPathQuery<string>(choiceRule.TimestampLessThanEqualsPath!, input));
       return varValue <= timestampValue;
     }
 
     if ('TimestampGreaterThanEquals' in choiceRule) {
-      const varValue = new Date(jsonPathQuery(choiceRule.Variable, input) as string);
+      const varValue = new Date(jsonPathQuery<string>(choiceRule.Variable, input));
       const timestampValue = new Date(choiceRule.TimestampGreaterThanEquals!);
       return varValue >= timestampValue;
     }
 
     if ('TimestampGreaterThanEqualsPath' in choiceRule) {
-      const varValue = new Date(jsonPathQuery(choiceRule.Variable, input) as string);
-      const timestampValue = new Date(jsonPathQuery(choiceRule.TimestampGreaterThanEqualsPath!, input) as string);
+      const varValue = new Date(jsonPathQuery<string>(choiceRule.Variable, input));
+      const timestampValue = new Date(jsonPathQuery<string>(choiceRule.TimestampGreaterThanEqualsPath!, input));
       return varValue >= timestampValue;
     }
 
@@ -240,7 +240,7 @@ class ChoiceStateHandler extends BaseStateHandler<ChoiceState> {
     }
 
     if ('IsTimestamp' in choiceRule) {
-      const varValue = jsonPathQuery(choiceRule.Variable, input) as string;
+      const varValue = jsonPathQuery<string>(choiceRule.Variable, input);
       const IsTimestampTrue = choiceRule.IsTimestamp!;
       return IsTimestampTrue && /\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(Z|(\+|-)\d{2}:\d{2})/.test(varValue);
     }
