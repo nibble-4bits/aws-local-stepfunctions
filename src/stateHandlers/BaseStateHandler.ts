@@ -19,6 +19,8 @@ export type WaitStateHandlerOptions = {
   waitTimeOverrideOption: number | undefined;
 };
 
+export type ChoiceStateHandlerOptions = Record<string, unknown>;
+
 export interface ExecutionResult {
   stateResult: JSONValue;
   nextState?: string;

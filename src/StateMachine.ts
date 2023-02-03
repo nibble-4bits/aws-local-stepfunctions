@@ -8,7 +8,6 @@ import type { MapState } from './typings/MapState';
 import type { ChoiceState } from './typings/ChoiceState';
 import type { RunOptions, StateHandler, ValidationOptions } from './typings/StateMachineImplementation';
 import { JSONPath as jp } from 'jsonpath-plus';
-import { testChoiceRule } from './ChoiceHelper';
 import aslValidator from 'asl-validator';
 import {
   processInputPath,
@@ -20,6 +19,7 @@ import { TaskStateHandler } from './stateHandlers/TaskStateHandler';
 import { MapStateHandler } from './stateHandlers/MapStateHandler';
 import { PassStateHandler } from './stateHandlers/PassStateHandler';
 import { WaitStateHandler } from './stateHandlers/WaitStateHandler';
+import { ChoiceStateHandler } from './stateHandlers/ChoiceStateHandler';
 
 export class StateMachine {
   /**
@@ -248,24 +248,11 @@ export class StateMachine {
    */
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   private async handleChoiceState(_options?: RunOptions): Promise<void> {
-    const state = this.currState as ChoiceState;
+    const choiceStateHandler = new ChoiceStateHandler(this.currState as ChoiceState);
+    const { stateResult, nextState } = await choiceStateHandler.executeState(this.currInput, this.context);
 
-    for (const choice of state.Choices) {
-      const choiceIsMatch = testChoiceRule(choice, this.currInput, this.jsonQuery);
-      if (choiceIsMatch) {
-        this.currStateName = choice.Next;
-        this.currResult = this.currInput;
-        return;
-      }
-    }
-
-    if (state.Default) {
-      this.currStateName = state.Default;
-      this.currResult = this.currInput;
-      return;
-    }
-
-    // TODO: Throw States.NoChoiceMatched error here because all choices failed to match and no `Default` field was specified.
+    this.currResult = stateResult;
+    this.currStateName = nextState!;
   }
 
   /**
