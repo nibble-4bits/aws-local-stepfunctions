@@ -53,7 +53,7 @@ abstract class BaseStateHandler<T extends BaseState | IntermediateState | Termin
   abstract executeState(
     input: JSONValue,
     context: Record<string, unknown>,
-    options?: TaskStateHandlerOptions | MapStateHandlerOptions | PassStateHandlerOptions | WaitStateHandlerOptions
+    options?: Record<string, unknown>
   ): Promise<ExecutionResult>;
 }
 
