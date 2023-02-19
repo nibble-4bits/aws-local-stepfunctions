@@ -1,6 +1,8 @@
 import type { JSONValue } from '../typings/JSONValue';
 import type { PassState } from '../typings/PassState';
-import { BaseStateHandler, ExecutionResult, PassStateHandlerOptions } from './BaseStateHandler';
+import { BaseStateHandler, ExecutionResult } from './BaseStateHandler';
+
+type PassStateHandlerOptions = Record<string, unknown>;
 
 class PassStateHandler extends BaseStateHandler<PassState> {
   constructor(stateDefinition: PassState) {

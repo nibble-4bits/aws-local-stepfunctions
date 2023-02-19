@@ -1,8 +1,12 @@
 import type { JSONValue } from '../typings/JSONValue';
 import type { WaitState } from '../typings/WaitState';
-import { BaseStateHandler, ExecutionResult, WaitStateHandlerOptions } from './BaseStateHandler';
+import { BaseStateHandler, ExecutionResult } from './BaseStateHandler';
 import { jsonPathQuery } from '../JsonPath';
 import { sleep } from '../util';
+
+type WaitStateHandlerOptions = {
+  waitTimeOverrideOption: number | undefined;
+};
 
 class WaitStateHandler extends BaseStateHandler<WaitState> {
   constructor(stateDefinition: WaitState) {

@@ -1,8 +1,12 @@
 import type { TaskState } from '../typings/TaskState';
 import type { JSONValue } from '../typings/JSONValue';
-import { BaseStateHandler, ExecutionResult, TaskStateHandlerOptions } from './BaseStateHandler';
+import { BaseStateHandler, ExecutionResult } from './BaseStateHandler';
 import { LambdaClient } from '../aws/LambdaClient';
 import { LambdaExecutionError } from '../error/LambdaExecutionError';
+
+type TaskStateHandlerOptions = {
+  overrideFn: ((input: JSONValue) => Promise<JSONValue>) | undefined;
+};
 
 class TaskStateHandler extends BaseStateHandler<TaskState> {
   constructor(stateDefinition: TaskState) {

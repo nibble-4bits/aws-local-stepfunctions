@@ -1,29 +1,7 @@
 import type { IntermediateState } from '../typings/IntermediateState';
 import type { TerminalState } from '../typings/TerminalState';
 import type { JSONValue } from '../typings/JSONValue';
-import type { ValidationOptions, RunOptions } from '../typings/StateMachineImplementation';
 import type { BaseState } from '../typings/BaseState';
-
-export type TaskStateHandlerOptions = {
-  overrideFn: ((...args: any) => any) | undefined;
-};
-
-export type MapStateHandlerOptions = {
-  validationOptions: ValidationOptions | undefined;
-  runOptions: RunOptions | undefined;
-};
-
-export type PassStateHandlerOptions = Record<string, unknown>;
-
-export type WaitStateHandlerOptions = {
-  waitTimeOverrideOption: number | undefined;
-};
-
-export type ChoiceStateHandlerOptions = Record<string, unknown>;
-
-export type SucceedStateHandlerOptions = Record<string, unknown>;
-
-export type FailStateHandlerOptions = Record<string, unknown>;
 
 export interface ExecutionResult {
   stateResult: JSONValue;

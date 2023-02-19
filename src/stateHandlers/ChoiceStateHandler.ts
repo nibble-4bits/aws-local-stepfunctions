@@ -1,8 +1,10 @@
 import type { JSONValue } from '../typings/JSONValue';
 import type { ChoiceState, ChoiceRuleWithoutNext } from '../typings/ChoiceState';
-import { BaseStateHandler, ChoiceStateHandlerOptions, ExecutionResult } from './BaseStateHandler';
+import { BaseStateHandler, ExecutionResult } from './BaseStateHandler';
 import { jsonPathQuery } from '../JsonPath';
 import wcmatch from 'wildcard-match';
+
+type ChoiceStateHandlerOptions = Record<string, unknown>;
 
 class ChoiceStateHandler extends BaseStateHandler<ChoiceState> {
   constructor(stateDefinition: ChoiceState) {

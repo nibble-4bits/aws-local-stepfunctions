@@ -1,10 +1,16 @@
+import type { RunOptions, ValidationOptions } from '../typings/StateMachineImplementation';
 import type { MapState } from '../typings/MapState';
 import type { JSONValue } from '../typings/JSONValue';
-import { BaseStateHandler, ExecutionResult, MapStateHandlerOptions } from './BaseStateHandler';
+import { BaseStateHandler, ExecutionResult } from './BaseStateHandler';
 import { StateMachine } from '../StateMachine';
 import { jsonPathQuery } from '../JsonPath';
 import { processPayloadTemplate } from '../InputOutputProcessing';
 import pLimit from 'p-limit';
+
+type MapStateHandlerOptions = {
+  validationOptions: ValidationOptions | undefined;
+  runOptions: RunOptions | undefined;
+};
 
 class MapStateHandler extends BaseStateHandler<MapState> {
   constructor(stateDefinition: MapState) {

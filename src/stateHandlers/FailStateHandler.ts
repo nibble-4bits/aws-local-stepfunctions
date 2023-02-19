@@ -1,6 +1,8 @@
 import type { JSONValue } from '../typings/JSONValue';
 import type { FailState } from '../typings/FailState';
-import { BaseStateHandler, ExecutionResult, FailStateHandlerOptions } from './BaseStateHandler';
+import { BaseStateHandler, ExecutionResult } from './BaseStateHandler';
+
+type FailStateHandlerOptions = Record<string, unknown>;
 
 class FailStateHandler extends BaseStateHandler<FailState> {
   constructor(stateDefinition: FailState) {

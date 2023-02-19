@@ -1,6 +1,8 @@
 import type { JSONValue } from '../typings/JSONValue';
 import type { SucceedState } from '../typings/SucceedState';
-import { BaseStateHandler, ExecutionResult, SucceedStateHandlerOptions } from './BaseStateHandler';
+import { BaseStateHandler, ExecutionResult } from './BaseStateHandler';
+
+type SucceedStateHandlerOptions = Record<string, unknown>;
 
 class SucceedStateHandler extends BaseStateHandler<SucceedState> {
   constructor(stateDefinition: SucceedState) {
