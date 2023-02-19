@@ -7,20 +7,22 @@ import type { WaitState } from './typings/WaitState';
 import type { MapState } from './typings/MapState';
 import type { ChoiceState } from './typings/ChoiceState';
 import type { SucceedState } from './typings/SucceedState';
+import type { FailState } from './typings/FailState';
 import type { RunOptions, StateHandler, ValidationOptions } from './typings/StateMachineImplementation';
-import aslValidator from 'asl-validator';
-import {
-  processInputPath,
-  processOutputPath,
-  processPayloadTemplate,
-  processResultPath,
-} from './InputOutputProcessing';
 import { TaskStateHandler } from './stateHandlers/TaskStateHandler';
 import { MapStateHandler } from './stateHandlers/MapStateHandler';
 import { PassStateHandler } from './stateHandlers/PassStateHandler';
 import { WaitStateHandler } from './stateHandlers/WaitStateHandler';
 import { ChoiceStateHandler } from './stateHandlers/ChoiceStateHandler';
 import { SucceedStateHandler } from './stateHandlers/SucceedStateHandler';
+import { FailStateHandler } from './stateHandlers/FailStateHandler';
+import {
+  processInputPath,
+  processOutputPath,
+  processPayloadTemplate,
+  processResultPath,
+} from './InputOutputProcessing';
+import aslValidator from 'asl-validator';
 
 export class StateMachine {
   /**
@@ -276,6 +278,9 @@ export class StateMachine {
    */
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   private async handleFailState(_options?: RunOptions): Promise<void> {
-    // TODO: Implement behavior of Fail state
+    const failStateHandler = new FailStateHandler(this.currState as FailState);
+    const { stateResult } = await failStateHandler.executeState(this.currInput, this.context);
+
+    this.currResult = stateResult;
   }
 }
