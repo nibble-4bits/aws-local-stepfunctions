@@ -4,7 +4,8 @@
     "outDir": "build",
     "target": "ES2015",
     "declaration": true,
-    "noUncheckedIndexedAccess": false
+    "noUncheckedIndexedAccess": false,
+    "noUnusedParameters": false
   },
   "include": ["src/**/*.ts"],
   "exclude": ["node_modules"]

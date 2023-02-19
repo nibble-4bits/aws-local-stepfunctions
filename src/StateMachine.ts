@@ -211,7 +211,7 @@ export class StateMachine {
    * Else, copies the current input into the current result.
    */
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  private async handlePassState(_options?: RunOptions): Promise<void> {
+  private async handlePassState(options?: RunOptions): Promise<void> {
     const passStateHandler = new PassStateHandler(this.currState as PassState);
     const { stateResult } = await passStateHandler.executeState(this.currInput, this.context);
 
@@ -250,7 +250,7 @@ export class StateMachine {
    * States.NoChoiceMatched error.
    */
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  private async handleChoiceState(_options?: RunOptions): Promise<void> {
+  private async handleChoiceState(options?: RunOptions): Promise<void> {
     const choiceStateHandler = new ChoiceStateHandler(this.currState as ChoiceState);
     const { stateResult, nextState } = await choiceStateHandler.executeState(this.currInput, this.context);
 
@@ -264,7 +264,7 @@ export class StateMachine {
    * Ends the state machine execution successfully.
    */
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  private async handleSucceedState(_options?: RunOptions): Promise<void> {
+  private async handleSucceedState(options?: RunOptions): Promise<void> {
     const succeedStateHandler = new SucceedStateHandler(this.currState as SucceedState);
     const { stateResult } = await succeedStateHandler.executeState(this.currInput, this.context);
 
@@ -277,7 +277,7 @@ export class StateMachine {
    * Ends the state machine execution and marks it as a failure.
    */
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  private async handleFailState(_options?: RunOptions): Promise<void> {
+  private async handleFailState(options?: RunOptions): Promise<void> {
     const failStateHandler = new FailStateHandler(this.currState as FailState);
     const { stateResult } = await failStateHandler.executeState(this.currInput, this.context);
 
