@@ -12,7 +12,11 @@ import set from 'lodash/set.js';
  * * If `InputPath` is `null`, returns an empty object (`{}`).
  * * If `InputPath` is a string, it's considered a JSONPath and the selected portion of the current input is returned.
  */
-function processInputPath(path: string | null, input: JSONValue, context?: JSONValue): JSONValue {
+function processInputPath(path: string | null | undefined, input: JSONValue, context?: JSONValue): JSONValue {
+  if (path === undefined) {
+    return input;
+  }
+
   if (path === null) {
     return {};
   }
@@ -61,7 +65,11 @@ function processPayloadTemplate(
  * * If `ResultPath` is a string, it's considered a JSONPath and returns a combination of the raw input with the current result,
  * by placing the current result in the specified path.
  */
-function processResultPath(path: string | null, rawInput: JSONValue, result: JSONValue): JSONValue {
+function processResultPath(path: string | null | undefined, rawInput: JSONValue, result: JSONValue): JSONValue {
+  if (path === undefined) {
+    return result;
+  }
+
   if (path === null) {
     return rawInput;
   }
@@ -83,7 +91,11 @@ function processResultPath(path: string | null, rawInput: JSONValue, result: JSO
  * * If `OutputPath` is `null`, returns an empty object (`{}`).
  * * If `OutputPath` is a string, it's considered a JSONPath and the selected portion of the current result is returned.
  */
-function processOutputPath(path: string | null, result: JSONValue, context?: JSONValue): JSONValue {
+function processOutputPath(path: string | null | undefined, result: JSONValue, context?: JSONValue): JSONValue {
+  if (path === undefined) {
+    return result;
+  }
+
   if (path === null) {
     return {};
   }
