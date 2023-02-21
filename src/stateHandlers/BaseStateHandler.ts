@@ -2,12 +2,7 @@ import type { IntermediateState } from '../typings/IntermediateState';
 import type { TerminalState } from '../typings/TerminalState';
 import type { JSONValue } from '../typings/JSONValue';
 import type { BaseState } from '../typings/BaseState';
-
-export interface ExecutionResult {
-  stateResult: JSONValue;
-  nextState?: string;
-  isEndState?: boolean;
-}
+import type { ExecutionResult } from '../typings/StateHandlers';
 
 abstract class BaseStateHandler<T extends BaseState | IntermediateState | TerminalState> {
   protected stateDefinition: T;
