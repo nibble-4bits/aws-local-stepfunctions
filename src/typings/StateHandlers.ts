@@ -3,8 +3,8 @@ import type { RunOptions, ValidationOptions } from './StateMachineImplementation
 
 export interface ExecutionResult {
   stateResult: JSONValue;
-  nextState?: string;
-  isEndState?: boolean;
+  nextState: string;
+  isEndState: boolean;
 }
 
 export type TaskStateHandlerOptions = {

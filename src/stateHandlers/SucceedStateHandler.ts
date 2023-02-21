@@ -15,7 +15,7 @@ class SucceedStateHandler extends BaseStateHandler<SucceedState> {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     options?: SucceedStateHandlerOptions
   ): Promise<ExecutionResult> {
-    return { stateResult: input, isEndState: true };
+    return { stateResult: input, nextState: '', isEndState: true };
   }
 }
 

@@ -16,7 +16,7 @@ class FailStateHandler extends BaseStateHandler<FailState> {
     options?: FailStateHandlerOptions
   ): Promise<ExecutionResult> {
     // TODO: Implement behavior of fail state
-    return { stateResult: input, isEndState: true };
+    return { stateResult: input, nextState: '', isEndState: true };
   }
 }
 

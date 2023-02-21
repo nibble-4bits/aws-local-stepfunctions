@@ -261,12 +261,12 @@ class ChoiceStateHandler extends BaseStateHandler<ChoiceState> {
     for (const choice of state.Choices) {
       const choiceIsMatch = this.testChoiceRule(choice, input);
       if (choiceIsMatch) {
-        return { stateResult: input, nextState: choice.Next };
+        return { stateResult: input, nextState: choice.Next, isEndState: false };
       }
     }
 
     if (state.Default) {
-      return { stateResult: input, nextState: state.Default };
+      return { stateResult: input, nextState: state.Default, isEndState: false };
     }
 
     // TODO: Throw States.NoChoiceMatched error here because all choices failed to match and no `Default` field was specified.
