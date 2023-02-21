@@ -1,7 +1,9 @@
-import type { StateType } from './StateType';
+import type { AllStates } from './AllStates';
+import type { JSONValue } from './JSONValue';
+import type { ExecutionResult } from './StateHandlers';
 
 type TaskStateResourceLocalHandler = {
-  [taskStateName: string]: (...args: any) => any;
+  [taskStateName: string]: (input: JSONValue) => Promise<JSONValue>;
 };
 
 type WaitStateTimeOverride = {
@@ -18,7 +20,13 @@ export interface RunOptions {
 }
 
 export type StateHandler = {
-  [T in StateType]: (options?: RunOptions) => Promise<void>;
+  [T in AllStates as T['Type']]: (
+    stateDefinition: T,
+    input: JSONValue,
+    context: Record<string, unknown>,
+    stateName: string,
+    options?: RunOptions
+  ) => Promise<ExecutionResult>;
 };
 
 export interface ValidationOptions {
