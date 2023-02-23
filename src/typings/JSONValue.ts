@@ -1,1 +1,1 @@
-export type JSONValue = null | boolean | number | string | object | any[];
+export type JSONValue = null | boolean | number | string | object | JSONValue[];
