@@ -83,7 +83,7 @@ const stateMachine = new StateMachine(machineDefinition, { checkPaths: false });
 
 ### `async StateMachine.run(input[, options])`
 
-Executes the state machine with the given `input` parameter and returns the result of the execution.
+Runs the state machine with the given `input` parameter and returns the result of the execution. Each execution is independent of all others, meaning that you can concurrently call this method as many times as needed, without worrying about race conditions.
 
 It takes the following parameters:
 

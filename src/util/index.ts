@@ -3,7 +3,7 @@
  * @param value The value to test if it's a plain object or not.
  * @returns `true` if `value` is a plain object, `false` if not.
  */
-export function isPlainObj(value: any): boolean {
+export function isPlainObj(value: unknown): boolean {
   return !!value && Object.getPrototypeOf(value) === Object.prototype;
 }
 

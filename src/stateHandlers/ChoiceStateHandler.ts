@@ -1,10 +1,9 @@
 import type { JSONValue } from '../typings/JSONValue';
 import type { ChoiceState, ChoiceRuleWithoutNext } from '../typings/ChoiceState';
-import { BaseStateHandler, ExecutionResult } from './BaseStateHandler';
+import type { ChoiceStateHandlerOptions, ExecutionResult } from '../typings/StateHandlers';
+import { BaseStateHandler } from './BaseStateHandler';
 import { jsonPathQuery } from '../JsonPath';
 import wcmatch from 'wildcard-match';
-
-type ChoiceStateHandlerOptions = Record<string, unknown>;
 
 class ChoiceStateHandler extends BaseStateHandler<ChoiceState> {
   constructor(stateDefinition: ChoiceState) {
@@ -262,12 +261,12 @@ class ChoiceStateHandler extends BaseStateHandler<ChoiceState> {
     for (const choice of state.Choices) {
       const choiceIsMatch = this.testChoiceRule(choice, input);
       if (choiceIsMatch) {
-        return { stateResult: input, nextState: choice.Next };
+        return { stateResult: input, nextState: choice.Next, isEndState: false };
       }
     }
 
     if (state.Default) {
-      return { stateResult: input, nextState: state.Default };
+      return { stateResult: input, nextState: state.Default, isEndState: false };
     }
 
     // TODO: Throw States.NoChoiceMatched error here because all choices failed to match and no `Default` field was specified.

@@ -9,6 +9,7 @@ import type { ChoiceState } from './typings/ChoiceState';
 import type { SucceedState } from './typings/SucceedState';
 import type { FailState } from './typings/FailState';
 import type { RunOptions, StateHandler, ValidationOptions } from './typings/StateMachineImplementation';
+import type { ExecutionResult } from './typings/StateHandlers';
 import { TaskStateHandler } from './stateHandlers/TaskStateHandler';
 import { MapStateHandler } from './stateHandlers/MapStateHandler';
 import { PassStateHandler } from './stateHandlers/PassStateHandler';
@@ -23,47 +24,18 @@ import {
   processResultPath,
 } from './InputOutputProcessing';
 import aslValidator from 'asl-validator';
+import cloneDeep from 'lodash/cloneDeep.js';
 
 export class StateMachine {
   /**
-   * The name of the state currently being executed.
+   * The structure of the State Machine as represented by the Amazon States Language.
    */
-  private currStateName: string;
+  private readonly definition: StateMachineDefinition;
 
   /**
-   * The current state being executed.
+   * A map of functions to execute each type of state.
    */
-  private currState: AllStates;
-
-  /**
-   * The unmodified input to the current state.
-   */
-  private rawInput: JSONValue;
-
-  /**
-   * The input that can be modified according to the `InputPath` and `Parameters` fields of the current state.
-   */
-  private currInput: JSONValue;
-
-  /**
-   * The result that can be modified according to the `ResultSelector`, `ResultPath` and `OutputPath` fields of the current state.
-   */
-  private currResult: JSONValue;
-
-  /**
-   * The context object of the state machine.
-   */
-  private context: Record<string, unknown>;
-
-  /**
-   * A map of all states defined in the state machine.
-   */
-  private readonly states: Record<string, AllStates>;
-
-  /**
-   * A map of functions to handle each type of state.
-   */
-  private readonly stateHandlers: StateHandler;
+  private readonly stateExecutors: StateHandler;
 
   /**
    * Options to control whether to apply certain validations to the state machine definition.
@@ -87,21 +59,15 @@ export class StateMachine {
       throw new Error(`State machine definition is invalid, see error(s) below:\n ${errorsText('\n')}`);
     }
 
-    this.states = definition.States;
-    this.currStateName = definition.StartAt;
-    this.currState = this.states[this.currStateName];
-    this.rawInput = {};
-    this.currInput = {};
-    this.currResult = null;
-    this.context = {};
-    this.stateHandlers = {
-      Task: this.handleTaskState.bind(this),
-      Map: this.handleMapState.bind(this),
-      Pass: this.handlePassState.bind(this),
-      Wait: this.handleWaitState.bind(this),
-      Choice: this.handleChoiceState.bind(this),
-      Succeed: this.handleSucceedState.bind(this),
-      Fail: this.handleFailState.bind(this),
+    this.definition = definition;
+    this.stateExecutors = {
+      Task: this.executeTaskState,
+      Map: this.executeMapState,
+      Pass: this.executePassState,
+      Wait: this.executeWaitState,
+      Choice: this.executeChoiceState,
+      Succeed: this.executeSucceedState,
+      Fail: this.executeFailState,
     };
     this.validationOptions = validationOptions;
   }
@@ -112,64 +78,79 @@ export class StateMachine {
    * @param options Miscellaneous options to control certain behaviors of the execution.
    */
   async run(input: JSONValue, options?: RunOptions): Promise<JSONValue> {
-    this.rawInput = input;
-    this.currInput = input;
-
+    let currState = this.definition.States[this.definition.StartAt];
+    let currStateName = this.definition.StartAt;
+    let rawInput = cloneDeep(input);
+    let currInput = cloneDeep(input);
+    let currResult: JSONValue = null;
+    let nextState = '';
     let isEndState = false;
+    // eslint-disable-next-line prefer-const
+    let context: Record<string, unknown> = {};
+
     do {
-      this.currState = this.states[this.currStateName];
+      currInput = this.processInput(currState, currInput, context);
+      ({
+        stateResult: currResult,
+        nextState,
+        isEndState,
+        // @ts-expect-error Indexing `this.stateHandlers` by non-literal value produces a `never` type for the `stateDefinition` parameter of the handler being called
+      } = await this.stateExecutors[currState.Type](currState, currInput, context, currStateName, options));
+      currResult = this.processResult(currState, currResult, rawInput, context);
 
-      this.processInput();
+      rawInput = currResult;
+      currInput = currResult;
 
-      await this.stateHandlers[this.currState.Type](options);
-
-      this.processResult();
-
-      this.rawInput = this.currResult;
-      this.currInput = this.currResult;
-
-      if ('Next' in this.currState) {
-        this.currStateName = this.currState.Next;
-      }
-
-      if ('End' in this.currState || this.currState.Type === 'Succeed' || this.currState.Type === 'Fail') {
-        isEndState = true;
-      }
+      currState = this.definition.States[nextState];
+      currStateName = nextState;
     } while (!isEndState);
 
-    return this.currResult;
+    return currResult;
   }
 
   /**
    * Process the current input according to the `InputPath` and `Parameters` fields.
    */
-  private processInput(): void {
-    if ('InputPath' in this.currState) {
-      this.currInput = processInputPath(this.currState.InputPath, this.currInput, this.context);
+  private processInput(currentState: AllStates, input: JSONValue, context: Record<string, unknown>): JSONValue {
+    let processedInput = input;
+
+    if ('InputPath' in currentState) {
+      processedInput = processInputPath(currentState.InputPath, processedInput, context);
     }
 
-    if ('Parameters' in this.currState && this.currState.Type !== 'Map') {
+    if ('Parameters' in currentState && currentState.Type !== 'Map') {
       // `Parameters` field is handled differently in the `Map` state,
       // hence why we omit processing it here.
-      this.currInput = processPayloadTemplate(this.currState.Parameters, this.currInput, this.context);
+      processedInput = processPayloadTemplate(currentState.Parameters, processedInput, context);
     }
+
+    return processedInput;
   }
 
   /**
    * Process the current result according to the `ResultSelector`, `ResultPath` and `OutputPath` fields.
    */
-  private processResult(): void {
-    if ('ResultSelector' in this.currState) {
-      this.currResult = processPayloadTemplate(this.currState.ResultSelector, this.currResult, this.context);
+  private processResult(
+    currentState: AllStates,
+    result: JSONValue,
+    rawInput: JSONValue,
+    context: Record<string, unknown>
+  ): JSONValue {
+    let processedResult = result;
+
+    if ('ResultSelector' in currentState) {
+      processedResult = processPayloadTemplate(currentState.ResultSelector, processedResult, context);
     }
 
-    if ('ResultPath' in this.currState) {
-      this.currResult = processResultPath(this.currState.ResultPath, this.rawInput, this.currResult);
+    if ('ResultPath' in currentState) {
+      processedResult = processResultPath(currentState.ResultPath, rawInput, processedResult);
     }
 
-    if ('OutputPath' in this.currState) {
-      this.currResult = processOutputPath(this.currState.OutputPath, this.currResult, this.context);
+    if ('OutputPath' in currentState) {
+      processedResult = processOutputPath(currentState.OutputPath, processedResult, context);
     }
+
+    return processedResult;
   }
 
   /**
@@ -178,13 +159,19 @@ export class StateMachine {
    * Invokes the Lambda function specified in the `Resource` field
    * and sets the current result of the state machine to the value returned by the Lambda.
    */
-  private async handleTaskState(options?: RunOptions): Promise<void> {
-    const overrideFn = options?.overrides?.taskResourceLocalHandlers?.[this.currStateName];
+  private async executeTaskState(
+    stateDefinition: TaskState,
+    input: JSONValue,
+    context: Record<string, unknown>,
+    stateName: string,
+    options?: RunOptions
+  ): Promise<ExecutionResult> {
+    const overrideFn = options?.overrides?.taskResourceLocalHandlers?.[stateName];
 
-    const taskStateHandler = new TaskStateHandler(this.currState as TaskState);
-    const { stateResult } = await taskStateHandler.executeState(this.currInput, this.context, { overrideFn });
+    const taskStateHandler = new TaskStateHandler(stateDefinition);
+    const executionResult = await taskStateHandler.executeState(input, context, { overrideFn });
 
-    this.currResult = stateResult;
+    return executionResult;
   }
 
   /**
@@ -194,14 +181,20 @@ export class StateMachine {
    * by the `ItemsPath` field, and then processes each item by passing it
    * as the input to the state machine specified in the `Iterator` field.
    */
-  private async handleMapState(options?: RunOptions): Promise<void> {
-    const mapStateHandler = new MapStateHandler(this.currState as MapState);
-    const { stateResult } = await mapStateHandler.executeState(this.currInput, this.context, {
+  private async executeMapState(
+    stateDefinition: MapState,
+    input: JSONValue,
+    context: Record<string, unknown>,
+    stateName: string,
+    options?: RunOptions
+  ): Promise<ExecutionResult> {
+    const mapStateHandler = new MapStateHandler(stateDefinition);
+    const executionResult = await mapStateHandler.executeState(input, context, {
       validationOptions: this.validationOptions,
       runOptions: options,
     });
 
-    this.currResult = stateResult;
+    return executionResult;
   }
 
   /**
@@ -210,12 +203,19 @@ export class StateMachine {
    * If the `Result` field is specified, copies `Result` into the current result.
    * Else, copies the current input into the current result.
    */
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  private async handlePassState(options?: RunOptions): Promise<void> {
-    const passStateHandler = new PassStateHandler(this.currState as PassState);
-    const { stateResult } = await passStateHandler.executeState(this.currInput, this.context);
+  private async executePassState(
+    stateDefinition: PassState,
+    input: JSONValue,
+    context: Record<string, unknown>,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    stateName: string,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    options?: RunOptions
+  ): Promise<ExecutionResult> {
+    const passStateHandler = new PassStateHandler(stateDefinition);
+    const executionResult = await passStateHandler.executeState(input, context);
 
-    this.currResult = stateResult;
+    return executionResult;
   }
 
   /**
@@ -224,15 +224,21 @@ export class StateMachine {
    * Pauses the state machine execution for a certain amount of time
    * based on one of the `Seconds`, `Timestamp`, `SecondsPath` or `TimestampPath` fields.
    */
-  private async handleWaitState(options?: RunOptions): Promise<void> {
-    const waitTimeOverrideOption = options?.overrides?.waitTimeOverrides?.[this.currStateName];
+  private async executeWaitState(
+    stateDefinition: WaitState,
+    input: JSONValue,
+    context: Record<string, unknown>,
+    stateName: string,
+    options?: RunOptions
+  ): Promise<ExecutionResult> {
+    const waitTimeOverrideOption = options?.overrides?.waitTimeOverrides?.[stateName];
 
-    const waitStateHandler = new WaitStateHandler(this.currState as WaitState);
-    const { stateResult } = await waitStateHandler.executeState(this.currInput, this.context, {
+    const waitStateHandler = new WaitStateHandler(stateDefinition);
+    const executionResult = await waitStateHandler.executeState(input, context, {
       waitTimeOverrideOption,
     });
 
-    this.currResult = stateResult;
+    return executionResult;
   }
 
   /**
@@ -249,13 +255,19 @@ export class StateMachine {
    * If no rule matches and the `Default` field is not specified, throws a
    * States.NoChoiceMatched error.
    */
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  private async handleChoiceState(options?: RunOptions): Promise<void> {
-    const choiceStateHandler = new ChoiceStateHandler(this.currState as ChoiceState);
-    const { stateResult, nextState } = await choiceStateHandler.executeState(this.currInput, this.context);
+  private async executeChoiceState(
+    stateDefinition: ChoiceState,
+    input: JSONValue,
+    context: Record<string, unknown>,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    stateName: string,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    options?: RunOptions
+  ): Promise<ExecutionResult> {
+    const choiceStateHandler = new ChoiceStateHandler(stateDefinition);
+    const executionResult = await choiceStateHandler.executeState(input, context);
 
-    this.currResult = stateResult;
-    this.currStateName = nextState!;
+    return executionResult;
   }
 
   /**
@@ -263,12 +275,19 @@ export class StateMachine {
    *
    * Ends the state machine execution successfully.
    */
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  private async handleSucceedState(options?: RunOptions): Promise<void> {
-    const succeedStateHandler = new SucceedStateHandler(this.currState as SucceedState);
-    const { stateResult } = await succeedStateHandler.executeState(this.currInput, this.context);
+  private async executeSucceedState(
+    stateDefinition: SucceedState,
+    input: JSONValue,
+    context: Record<string, unknown>,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    stateName: string,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    options?: RunOptions
+  ): Promise<ExecutionResult> {
+    const succeedStateHandler = new SucceedStateHandler(stateDefinition);
+    const executionResult = await succeedStateHandler.executeState(input, context);
 
-    this.currResult = stateResult;
+    return executionResult;
   }
 
   /**
@@ -276,11 +295,18 @@ export class StateMachine {
    *
    * Ends the state machine execution and marks it as a failure.
    */
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  private async handleFailState(options?: RunOptions): Promise<void> {
-    const failStateHandler = new FailStateHandler(this.currState as FailState);
-    const { stateResult } = await failStateHandler.executeState(this.currInput, this.context);
+  private async executeFailState(
+    stateDefinition: FailState,
+    input: JSONValue,
+    context: Record<string, unknown>,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    stateName: string,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    options?: RunOptions
+  ): Promise<ExecutionResult> {
+    const failStateHandler = new FailStateHandler(stateDefinition);
+    const executionResult = await failStateHandler.executeState(input, context);
 
-    this.currResult = stateResult;
+    return executionResult;
   }
 }

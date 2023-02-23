@@ -1,8 +1,7 @@
 import type { JSONValue } from '../typings/JSONValue';
+import type { ExecutionResult, SucceedStateHandlerOptions } from '../typings/StateHandlers';
 import type { SucceedState } from '../typings/SucceedState';
-import { BaseStateHandler, ExecutionResult } from './BaseStateHandler';
-
-type SucceedStateHandlerOptions = Record<string, unknown>;
+import { BaseStateHandler } from './BaseStateHandler';
 
 class SucceedStateHandler extends BaseStateHandler<SucceedState> {
   constructor(stateDefinition: SucceedState) {
@@ -16,7 +15,7 @@ class SucceedStateHandler extends BaseStateHandler<SucceedState> {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     options?: SucceedStateHandlerOptions
   ): Promise<ExecutionResult> {
-    return { stateResult: input, isEndState: true };
+    return { stateResult: input, nextState: '', isEndState: true };
   }
 }
 

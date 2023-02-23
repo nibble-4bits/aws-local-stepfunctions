@@ -2,12 +2,7 @@ import type { IntermediateState } from '../typings/IntermediateState';
 import type { TerminalState } from '../typings/TerminalState';
 import type { JSONValue } from '../typings/JSONValue';
 import type { BaseState } from '../typings/BaseState';
-
-export interface ExecutionResult {
-  stateResult: JSONValue;
-  nextState?: string;
-  isEndState?: boolean;
-}
+import type { ExecutionResult } from '../typings/StateHandlers';
 
 abstract class BaseStateHandler<T extends BaseState | IntermediateState | TerminalState> {
   protected stateDefinition: T;
@@ -16,12 +11,14 @@ abstract class BaseStateHandler<T extends BaseState | IntermediateState | Termin
     this.stateDefinition = stateDefinition;
   }
 
-  protected buildExecutionResult(stateResult: JSONValue) {
-    const executionResult: ExecutionResult = { stateResult };
+  protected buildExecutionResult(stateResult: JSONValue): ExecutionResult {
+    const executionResult: ExecutionResult = { stateResult, nextState: '', isEndState: false };
 
     if ('Next' in this.stateDefinition) {
       executionResult.nextState = this.stateDefinition.Next;
-    } else if ('End' in this.stateDefinition) {
+    }
+
+    if ('End' in this.stateDefinition) {
       executionResult.isEndState = this.stateDefinition.End;
     }
 
