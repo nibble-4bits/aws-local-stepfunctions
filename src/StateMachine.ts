@@ -33,9 +33,9 @@ export class StateMachine {
   private readonly definition: StateMachineDefinition;
 
   /**
-   * A map of functions to handle each type of state.
+   * A map of functions to execute each type of state.
    */
-  private readonly stateHandlers: StateHandler;
+  private readonly stateExecutors: StateHandler;
 
   /**
    * Options to control whether to apply certain validations to the state machine definition.
@@ -60,14 +60,14 @@ export class StateMachine {
     }
 
     this.definition = definition;
-    this.stateHandlers = {
-      Task: this.handleTaskState,
-      Map: this.handleMapState,
-      Pass: this.handlePassState,
-      Wait: this.handleWaitState,
-      Choice: this.handleChoiceState,
-      Succeed: this.handleSucceedState,
-      Fail: this.handleFailState,
+    this.stateExecutors = {
+      Task: this.executeTaskState,
+      Map: this.executeMapState,
+      Pass: this.executePassState,
+      Wait: this.executeWaitState,
+      Choice: this.executeChoiceState,
+      Succeed: this.executeSucceedState,
+      Fail: this.executeFailState,
     };
     this.validationOptions = validationOptions;
   }
@@ -95,7 +95,7 @@ export class StateMachine {
         nextState,
         isEndState,
         // @ts-expect-error Indexing `this.stateHandlers` by non-literal value produces a `never` type for the `stateDefinition` parameter of the handler being called
-      } = await this.stateHandlers[currState.Type](currState, currInput, context, currStateName, options));
+      } = await this.stateExecutors[currState.Type](currState, currInput, context, currStateName, options));
       currResult = this.processResult(currState, currResult, rawInput, context);
 
       rawInput = currResult;
@@ -159,7 +159,7 @@ export class StateMachine {
    * Invokes the Lambda function specified in the `Resource` field
    * and sets the current result of the state machine to the value returned by the Lambda.
    */
-  private async handleTaskState(
+  private async executeTaskState(
     stateDefinition: TaskState,
     input: JSONValue,
     context: Record<string, unknown>,
@@ -181,7 +181,7 @@ export class StateMachine {
    * by the `ItemsPath` field, and then processes each item by passing it
    * as the input to the state machine specified in the `Iterator` field.
    */
-  private async handleMapState(
+  private async executeMapState(
     stateDefinition: MapState,
     input: JSONValue,
     context: Record<string, unknown>,
@@ -203,7 +203,7 @@ export class StateMachine {
    * If the `Result` field is specified, copies `Result` into the current result.
    * Else, copies the current input into the current result.
    */
-  private async handlePassState(
+  private async executePassState(
     stateDefinition: PassState,
     input: JSONValue,
     context: Record<string, unknown>,
@@ -224,7 +224,7 @@ export class StateMachine {
    * Pauses the state machine execution for a certain amount of time
    * based on one of the `Seconds`, `Timestamp`, `SecondsPath` or `TimestampPath` fields.
    */
-  private async handleWaitState(
+  private async executeWaitState(
     stateDefinition: WaitState,
     input: JSONValue,
     context: Record<string, unknown>,
@@ -255,7 +255,7 @@ export class StateMachine {
    * If no rule matches and the `Default` field is not specified, throws a
    * States.NoChoiceMatched error.
    */
-  private async handleChoiceState(
+  private async executeChoiceState(
     stateDefinition: ChoiceState,
     input: JSONValue,
     context: Record<string, unknown>,
@@ -275,7 +275,7 @@ export class StateMachine {
    *
    * Ends the state machine execution successfully.
    */
-  private async handleSucceedState(
+  private async executeSucceedState(
     stateDefinition: SucceedState,
     input: JSONValue,
     context: Record<string, unknown>,
@@ -295,7 +295,7 @@ export class StateMachine {
    *
    * Ends the state machine execution and marks it as a failure.
    */
-  private async handleFailState(
+  private async executeFailState(
     stateDefinition: FailState,
     input: JSONValue,
     context: Record<string, unknown>,
