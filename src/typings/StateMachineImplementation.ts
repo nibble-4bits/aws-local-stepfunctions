@@ -17,6 +17,7 @@ interface Overrides {
 
 export interface RunOptions {
   overrides?: Overrides;
+  noThrowOnAbort?: boolean;
 }
 
 export interface ExecuteOptions {

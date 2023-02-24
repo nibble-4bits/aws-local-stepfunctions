@@ -17,6 +17,7 @@ import { WaitStateHandler } from './stateHandlers/WaitStateHandler';
 import { ChoiceStateHandler } from './stateHandlers/ChoiceStateHandler';
 import { SucceedStateHandler } from './stateHandlers/SucceedStateHandler';
 import { FailStateHandler } from './stateHandlers/FailStateHandler';
+import { ExecutionAbortedError } from './error/ExecutionAbortedError';
 import {
   processInputPath,
   processOutputPath,
@@ -74,14 +75,22 @@ export class StateMachine {
 
   /**
    * Executes the state machine, running through the states specified in the definition.
+   *
+   * By default, if the execution is aborted, the result will throw an `ExecutionAbortedError`. This behavior can be changed by setting
+   * the `noThrowOnAbort` option to `true`, in which case the result will be `null`.
+   *
    * @param input The input to pass to this state machine execution.
    * @param options Miscellaneous options to control certain behaviors of the execution.
    */
   run(input: JSONValue, options?: RunOptions): { abort: () => void; result: Promise<JSONValue> } {
     const abortController = new AbortController();
 
-    const resolveOnAbort = new Promise<null>((resolve) => {
-      abortController.signal.addEventListener('abort', () => resolve(null));
+    const settleOnAbort = new Promise<null>((resolve, reject) => {
+      if (options?.noThrowOnAbort) {
+        abortController.signal.addEventListener('abort', () => resolve(null));
+      } else {
+        abortController.signal.addEventListener('abort', () => reject(new ExecutionAbortedError()));
+      }
     });
 
     const executionResult = this.execute(input, {
@@ -89,7 +98,7 @@ export class StateMachine {
       abortSignal: abortController.signal,
     });
 
-    const result = Promise.race([executionResult, resolveOnAbort]);
+    const result = Promise.race([executionResult, settleOnAbort]);
 
     return {
       abort: () => abortController.abort(),
