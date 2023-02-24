@@ -8,7 +8,7 @@ import type { MapState } from './typings/MapState';
 import type { ChoiceState } from './typings/ChoiceState';
 import type { SucceedState } from './typings/SucceedState';
 import type { FailState } from './typings/FailState';
-import type { RunOptions, StateHandler, ValidationOptions } from './typings/StateMachineImplementation';
+import type { ExecuteOptions, RunOptions, StateHandler, ValidationOptions } from './typings/StateMachineImplementation';
 import type { ExecutionResult } from './typings/StateHandlers';
 import { TaskStateHandler } from './stateHandlers/TaskStateHandler';
 import { MapStateHandler } from './stateHandlers/MapStateHandler';
@@ -73,7 +73,7 @@ export class StateMachine {
   }
 
   /**
-   * Executes the state machine, running through the states specified in the definiton.
+   * Executes the state machine, running through the states specified in the definition.
    * @param input The input to pass to this state machine execution.
    * @param options Miscellaneous options to control certain behaviors of the execution.
    */
@@ -84,7 +84,12 @@ export class StateMachine {
       abortController.signal.addEventListener('abort', () => resolve(null));
     });
 
-    const result = Promise.race([this.execute(input, options), resolveOnAbort]);
+    const executionResult = this.execute(input, {
+      runOptions: options,
+      abortSignal: abortController.signal,
+    });
+
+    const result = Promise.race([executionResult, resolveOnAbort]);
 
     return {
       abort: () => abortController.abort(),
@@ -93,9 +98,9 @@ export class StateMachine {
   }
 
   /**
-   * Executes the state machine, running through the states specified in the definiton.
+   * Helper method that handles the execution of the machine states and the transitions between them.
    */
-  private async execute(input: JSONValue, options?: RunOptions): Promise<JSONValue> {
+  private async execute(input: JSONValue, options: ExecuteOptions): Promise<JSONValue> {
     let currState = this.definition.States[this.definition.StartAt];
     let currStateName = this.definition.StartAt;
     let rawInput = cloneDeep(input);
@@ -121,7 +126,7 @@ export class StateMachine {
 
       currState = this.definition.States[nextState];
       currStateName = nextState;
-    } while (!isEndState);
+    } while (!isEndState && !options.abortSignal.aborted);
 
     return currResult;
   }
@@ -182,9 +187,9 @@ export class StateMachine {
     input: JSONValue,
     context: Record<string, unknown>,
     stateName: string,
-    options?: RunOptions
+    options: ExecuteOptions
   ): Promise<ExecutionResult> {
-    const overrideFn = options?.overrides?.taskResourceLocalHandlers?.[stateName];
+    const overrideFn = options.runOptions?.overrides?.taskResourceLocalHandlers?.[stateName];
 
     const taskStateHandler = new TaskStateHandler(stateDefinition);
     const executionResult = await taskStateHandler.executeState(input, context, { overrideFn });
@@ -204,12 +209,12 @@ export class StateMachine {
     input: JSONValue,
     context: Record<string, unknown>,
     stateName: string,
-    options?: RunOptions
+    options: ExecuteOptions
   ): Promise<ExecutionResult> {
     const mapStateHandler = new MapStateHandler(stateDefinition);
     const executionResult = await mapStateHandler.executeState(input, context, {
       validationOptions: this.validationOptions,
-      runOptions: options,
+      runOptions: options.runOptions,
     });
 
     return executionResult;
@@ -228,7 +233,7 @@ export class StateMachine {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     stateName: string,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    options?: RunOptions
+    options: ExecuteOptions
   ): Promise<ExecutionResult> {
     const passStateHandler = new PassStateHandler(stateDefinition);
     const executionResult = await passStateHandler.executeState(input, context);
@@ -247,9 +252,9 @@ export class StateMachine {
     input: JSONValue,
     context: Record<string, unknown>,
     stateName: string,
-    options?: RunOptions
+    options: ExecuteOptions
   ): Promise<ExecutionResult> {
-    const waitTimeOverrideOption = options?.overrides?.waitTimeOverrides?.[stateName];
+    const waitTimeOverrideOption = options.runOptions?.overrides?.waitTimeOverrides?.[stateName];
 
     const waitStateHandler = new WaitStateHandler(stateDefinition);
     const executionResult = await waitStateHandler.executeState(input, context, {
@@ -280,7 +285,7 @@ export class StateMachine {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     stateName: string,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    options?: RunOptions
+    options: ExecuteOptions
   ): Promise<ExecutionResult> {
     const choiceStateHandler = new ChoiceStateHandler(stateDefinition);
     const executionResult = await choiceStateHandler.executeState(input, context);
@@ -300,7 +305,7 @@ export class StateMachine {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     stateName: string,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    options?: RunOptions
+    options: ExecuteOptions
   ): Promise<ExecutionResult> {
     const succeedStateHandler = new SucceedStateHandler(stateDefinition);
     const executionResult = await succeedStateHandler.executeState(input, context);
@@ -320,7 +325,7 @@ export class StateMachine {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     stateName: string,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    options?: RunOptions
+    options: ExecuteOptions
   ): Promise<ExecutionResult> {
     const failStateHandler = new FailStateHandler(stateDefinition);
     const executionResult = await failStateHandler.executeState(input, context);
