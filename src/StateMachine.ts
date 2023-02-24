@@ -77,7 +77,25 @@ export class StateMachine {
    * @param input The input to pass to this state machine execution.
    * @param options Miscellaneous options to control certain behaviors of the execution.
    */
-  async run(input: JSONValue, options?: RunOptions): Promise<JSONValue> {
+  run(input: JSONValue, options?: RunOptions): { abort: () => void; result: Promise<JSONValue> } {
+    const abortController = new AbortController();
+
+    const resolveOnAbort = new Promise<null>((resolve) => {
+      abortController.signal.addEventListener('abort', () => resolve(null));
+    });
+
+    const result = Promise.race([this.execute(input, options), resolveOnAbort]);
+
+    return {
+      abort: () => abortController.abort(),
+      result,
+    };
+  }
+
+  /**
+   * Executes the state machine, running through the states specified in the definiton.
+   */
+  private async execute(input: JSONValue, options?: RunOptions): Promise<JSONValue> {
     let currState = this.definition.States[this.definition.StartAt];
     let currStateName = this.definition.StartAt;
     let rawInput = cloneDeep(input);

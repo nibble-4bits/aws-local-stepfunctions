@@ -36,7 +36,8 @@ class MapStateHandler extends BaseStateHandler<MapState> {
 
     // Pass the current parameter value if defined, otherwise pass the current item being iterated
     const mapStateMachine = new StateMachine(state.Iterator, options?.validationOptions);
-    return mapStateMachine.run(paramValue ?? item, options?.runOptions);
+    const { result } = mapStateMachine.run(paramValue ?? item, options?.runOptions);
+    return result;
   }
 
   override async executeState(
