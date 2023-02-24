@@ -255,10 +255,12 @@ export class StateMachine {
     options: ExecuteOptions
   ): Promise<ExecutionResult> {
     const waitTimeOverrideOption = options.runOptions?.overrides?.waitTimeOverrides?.[stateName];
+    const abortSignal = options.abortSignal;
 
     const waitStateHandler = new WaitStateHandler(stateDefinition);
     const executionResult = await waitStateHandler.executeState(input, context, {
       waitTimeOverrideOption,
+      abortSignal,
     });
 
     return executionResult;
