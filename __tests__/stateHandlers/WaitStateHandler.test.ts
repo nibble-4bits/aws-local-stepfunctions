@@ -27,7 +27,7 @@ describe('Wait State', () => {
     const waitStateHandler = new WaitStateHandler(definition);
     const { stateResult } = await waitStateHandler.executeState(input, context);
 
-    expect(mockSleepFunction).toHaveBeenCalledWith(10000);
+    expect(mockSleepFunction).toHaveBeenCalledWith(10000, undefined);
     expect(stateResult).toEqual({ prop1: 'test', prop2: 12345 });
   });
 
@@ -43,7 +43,7 @@ describe('Wait State', () => {
     const waitStateHandler = new WaitStateHandler(definition);
     const { stateResult } = await waitStateHandler.executeState(input, context);
 
-    expect(mockSleepFunction).toHaveBeenCalledWith(20700000);
+    expect(mockSleepFunction).toHaveBeenCalledWith(20700000, undefined);
     expect(stateResult).toEqual({ prop1: 'test', prop2: 12345 });
   });
 
@@ -59,7 +59,7 @@ describe('Wait State', () => {
     const waitStateHandler = new WaitStateHandler(definition);
     const { stateResult } = await waitStateHandler.executeState(input, context);
 
-    expect(mockSleepFunction).toHaveBeenCalledWith(10000);
+    expect(mockSleepFunction).toHaveBeenCalledWith(10000, undefined);
     expect(stateResult).toEqual({ waitFor: 10 });
   });
 
@@ -75,7 +75,7 @@ describe('Wait State', () => {
     const waitStateHandler = new WaitStateHandler(definition);
     const { stateResult } = await waitStateHandler.executeState(input, context);
 
-    expect(mockSleepFunction).toHaveBeenCalledWith(20700000);
+    expect(mockSleepFunction).toHaveBeenCalledWith(20700000, undefined);
     expect(stateResult).toEqual({ waitUntil: '2022-12-05T05:45:00Z' });
   });
 
@@ -87,13 +87,14 @@ describe('Wait State', () => {
     };
     const input = { waitUntil: '2022-12-05T05:45:00Z' };
     const context = {};
-    const options = { waitTimeOverrideOption: 1500 };
+    const abortSignal = new AbortController().signal;
+    const options = { waitTimeOverrideOption: 1500, abortSignal };
 
     const waitStateHandler = new WaitStateHandler(definition);
     const { stateResult } = await waitStateHandler.executeState(input, context, options);
 
     expect(mockSleepFunction).toHaveBeenCalledTimes(1);
-    expect(mockSleepFunction).toHaveBeenCalledWith(1500);
+    expect(mockSleepFunction).toHaveBeenCalledWith(1500, abortSignal);
     expect(stateResult).toEqual({ waitUntil: '2022-12-05T05:45:00Z' });
   });
 });
