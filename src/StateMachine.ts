@@ -8,7 +8,12 @@ import type { MapState } from './typings/MapState';
 import type { ChoiceState } from './typings/ChoiceState';
 import type { SucceedState } from './typings/SucceedState';
 import type { FailState } from './typings/FailState';
-import type { ExecuteOptions, RunOptions, StateHandler, ValidationOptions } from './typings/StateMachineImplementation';
+import type {
+  ExecuteOptions,
+  RunOptions,
+  StateExecutors,
+  ValidationOptions,
+} from './typings/StateMachineImplementation';
 import type { ExecutionResult } from './typings/StateHandlers';
 import { TaskStateHandler } from './stateHandlers/TaskStateHandler';
 import { MapStateHandler } from './stateHandlers/MapStateHandler';
@@ -36,7 +41,7 @@ export class StateMachine {
   /**
    * A map of functions to execute each type of state.
    */
-  private readonly stateExecutors: StateHandler;
+  private readonly stateExecutors: StateExecutors;
 
   /**
    * Options to control whether to apply certain validations to the state machine definition.

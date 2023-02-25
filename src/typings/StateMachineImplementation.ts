@@ -25,7 +25,7 @@ export interface ExecuteOptions {
   abortSignal: AbortSignal;
 }
 
-export type StateHandler = {
+export type StateExecutors = {
   [T in AllStates as T['Type']]: (
     stateDefinition: T,
     input: JSONValue,
