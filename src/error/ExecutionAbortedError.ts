@@ -6,6 +6,8 @@ import { CustomError } from './CustomError';
 export class ExecutionAbortedError extends CustomError {
   constructor() {
     super('Execution aborted');
+
+    this.name = 'ExecutionAbortedError';
   }
 
   toString(): string {
