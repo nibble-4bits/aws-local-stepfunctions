@@ -16,7 +16,7 @@ This package lets you run AWS Step Functions locally on your machine!
     - [ES Module](#es-module)
 - [API](#api)
   - [Constructor](#constructor-new-statemachinedefinition-validationoptions)
-  - [StateMachine.run](#async-statemachineruninput-options)
+  - [StateMachine.run](#statemachineruninput-options)
 - [License](#license)
 
 ## Features
@@ -51,6 +51,8 @@ import { StateMachine } from 'aws-local-stepfunctions';
 
 ### Constructor: `new StateMachine(definition[, validationOptions])`
 
+#### Parameters
+
 The constructor takes the following parameters:
 
 - `definition`: The Amazon States Language definition of the state machine.
@@ -60,7 +62,7 @@ The constructor takes the following parameters:
 
 The constructor will attempt to validate the definition by default, unless the `validationOptions` param is specified. If the definition is not valid, an error will be thrown.
 
-Example:
+#### Example
 
 ```js
 import { StateMachine } from 'aws-local-stepfunctions';
@@ -81,19 +83,27 @@ const machineDefinition = {
 const stateMachine = new StateMachine(machineDefinition, { checkPaths: false });
 ```
 
-### `async StateMachine.run(input[, options])`
+### `StateMachine.run(input[, options])`
 
-Runs the state machine with the given `input` parameter and returns the result of the execution. Each execution is independent of all others, meaning that you can concurrently call this method as many times as needed, without worrying about race conditions.
+Runs the state machine with the given `input` parameter and returns an object with the following properties:
 
-It takes the following parameters:
+- `abort`: A function that takes no parameters and doesn't return any value. If called, aborts the execution and throws an `ExecutionAbortedError`, unless the `noThrowOnAbort` option is set.
+- `result`: A `Promise` that resolves with the execution result once it finishes.
+
+Each execution is independent of all others, meaning that you can concurrently call this method as many times as needed, without worrying about race conditions.
+
+#### Parameters
 
 - `input`: The initial input to pass to the state machine. This can be any valid JSON value.
 - `options` (optional):
-  - `overrides`: An object to overrides the behavior of certain states:
+  - `overrides`: An object to override the behavior of certain states:
     - `taskResourceLocalHandlers`: Overrides the resource of the specified `Task` states to run a local function.
     - `waitTimeOverrides`: Overrides the wait duration of the specified `Wait` states. The specifed override duration should be in milliseconds.
+  - `noThrowOnAbort`: If this option is set to `true`, aborting the execution will simply return `null` as result instead of throwing.
 
-Example without `options`:
+#### Examples
+
+##### Example without `options`:
 
 ```js
 import { StateMachine } from 'aws-local-stepfunctions';
@@ -109,14 +119,15 @@ const machineDefinition = {
   },
 };
 
-const stateMachine = new StateMachine(machineDefinition, { checkPaths: false });
+const stateMachine = new StateMachine(machineDefinition);
 const myInput = { value1: 'hello', value2: 123, value3: true };
-const result = await stateMachine.run(myInput); // execute the state machine
+const execution = stateMachine.run(myInput); // execute the state machine
 
+const result = await execution.result; // wait until the execution finishes to get the result
 console.log(result); // log the result of the execution
 ```
 
-Example with `options`:
+##### Example with `options`:
 
 ```js
 import { StateMachine } from 'aws-local-stepfunctions';
@@ -146,9 +157,9 @@ function addNumbersLocal(input) {
   return input.num1 + input.num2;
 }
 
-const stateMachine = new StateMachine(machineDefinition, { checkPaths: false });
+const stateMachine = new StateMachine(machineDefinition);
 const myInput = { value1: 'hello', value2: 123, value3: true };
-const result = await stateMachine.run(myInput, {
+const execution = stateMachine.run(myInput, {
   overrides: {
     taskResourceLocalHandlers: {
       AddNumbers: addNumbersLocal, // call the `addNumbersLocal` function instead of invoking the Lambda function specified for the `AddNumbers` state
@@ -159,7 +170,46 @@ const result = await stateMachine.run(myInput, {
   },
 });
 
-console.log(result); // log the result of the execution
+const result = await execution.result;
+console.log(result);
+```
+
+##### Aborting an execution
+
+```js
+import { StateMachine, ExecutionAbortedError } from 'aws-local-stepfunctions';
+
+const machineDefinition = {
+  StartAt: 'Hello World',
+  States: {
+    'Hello World': {
+      Type: 'Task',
+      Resource: 'arn:aws:lambda:us-east-1:123456789012:function:HelloWorld',
+      End: true,
+    },
+  },
+};
+
+const stateMachine = new StateMachine(machineDefinition);
+const myInput = { value1: 'hello', value2: 123, value3: true };
+const execution = stateMachine.run(myInput);
+
+// abort the execution after 3 seconds
+setTimeout(() => {
+  execution.abort();
+}, 3000);
+
+try {
+  const result = await execution.result;
+  console.log(result);
+} catch (e) {
+  if (e instanceof ExecutionAbortedError) {
+    // since execution was aborted, type of error is `ExecutionAbortedError`
+    console.log('Execution was aborted');
+  } else {
+    console.error('Some other error', e);
+  }
+}
 ```
 
 ## License

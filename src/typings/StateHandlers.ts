@@ -20,6 +20,7 @@ export type PassStateHandlerOptions = Record<string, unknown>;
 
 export type WaitStateHandlerOptions = {
   waitTimeOverrideOption: number | undefined;
+  abortSignal: AbortSignal;
 };
 
 export type ChoiceStateHandlerOptions = Record<string, unknown>;

@@ -1,6 +1,10 @@
 # Feature support
 
-## Fully supported
+## Spec features
+
+The following features all come from the [Amazon States Language specification](https://states-language.net/).
+
+### Fully supported
 
 - Input processing
   - [x] `InputPath`
@@ -18,7 +22,7 @@
     - [x] `ItemsPath`
     - [x] `MaxConcurrency`
 
-## Limited support
+### Limited support
 
 - States
   - Task
@@ -62,10 +66,16 @@
     - [ ] `Cause`
     - [ ] Terminate execution with error
 
-## No support
+### No support
 
 - [ ] Parallel state
 - [ ] Intrinsic functions
 - [ ] Runtime errors
   - [ ] Predefined error codes
 - [ ] Retry/Catch
+
+## Non-spec features
+
+The following features are not defined in the specification, but they have been added for convenience.
+
+- [x] Abort a running execution

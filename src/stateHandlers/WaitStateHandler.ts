@@ -19,28 +19,28 @@ class WaitStateHandler extends BaseStateHandler<WaitState> {
 
     if (options?.waitTimeOverrideOption !== undefined) {
       // If the wait time override is set, sleep for the specified number of milliseconds
-      await sleep(options.waitTimeOverrideOption);
+      await sleep(options.waitTimeOverrideOption, options.abortSignal);
       return this.buildExecutionResult(input);
     }
 
     if (state.Seconds) {
-      await sleep(state.Seconds * 1000);
+      await sleep(state.Seconds * 1000, options?.abortSignal);
     } else if (state.Timestamp) {
       const dateTimestamp = new Date(state.Timestamp);
       const currentTime = Date.now();
       const timeDiff = dateTimestamp.getTime() - currentTime;
 
-      await sleep(timeDiff);
+      await sleep(timeDiff, options?.abortSignal);
     } else if (state.SecondsPath) {
       const seconds = jsonPathQuery<number>(state.SecondsPath, input, context);
-      await sleep(seconds * 1000);
+      await sleep(seconds * 1000, options?.abortSignal);
     } else if (state.TimestampPath) {
       const timestamp = jsonPathQuery<string>(state.TimestampPath, input, context);
       const dateTimestamp = new Date(timestamp);
       const currentTime = Date.now();
       const timeDiff = dateTimestamp.getTime() - currentTime;
 
-      await sleep(timeDiff);
+      await sleep(timeDiff, options?.abortSignal);
     }
 
     return this.buildExecutionResult(input);

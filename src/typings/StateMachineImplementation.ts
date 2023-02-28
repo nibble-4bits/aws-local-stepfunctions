@@ -17,15 +17,21 @@ interface Overrides {
 
 export interface RunOptions {
   overrides?: Overrides;
+  noThrowOnAbort?: boolean;
 }
 
-export type StateHandler = {
+export interface ExecuteOptions {
+  runOptions: RunOptions | undefined;
+  abortSignal: AbortSignal;
+}
+
+export type StateExecutors = {
   [T in AllStates as T['Type']]: (
     stateDefinition: T,
     input: JSONValue,
     context: Record<string, unknown>,
     stateName: string,
-    options?: RunOptions
+    options: ExecuteOptions
   ) => Promise<ExecutionResult>;
 };
 
