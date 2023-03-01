@@ -20,6 +20,8 @@ jobs:
         run: npm ci
       - name: Run tests
         run: npm test
+      - name: Build project
+        run: npm run build
       - name: Publish to NPM
         run: npm publish
         env:
