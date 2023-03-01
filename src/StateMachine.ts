@@ -99,6 +99,7 @@ export class StateMachine {
     });
 
     const executionResult = this.execute(input, {
+      validationOptions: this.validationOptions,
       runOptions: options,
       abortSignal: abortController.signal,
     });
@@ -227,7 +228,7 @@ export class StateMachine {
   ): Promise<ExecutionResult> {
     const mapStateHandler = new MapStateHandler(stateDefinition);
     const executionResult = await mapStateHandler.executeState(input, context, {
-      validationOptions: this.validationOptions,
+      validationOptions: options.validationOptions,
       runOptions: options.runOptions,
     });
 

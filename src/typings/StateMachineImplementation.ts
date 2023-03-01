@@ -15,12 +15,18 @@ interface Overrides {
   waitTimeOverrides?: WaitStateTimeOverride;
 }
 
+export interface ValidationOptions {
+  readonly checkPaths?: boolean;
+  readonly checkArn?: boolean;
+}
+
 export interface RunOptions {
   overrides?: Overrides;
   noThrowOnAbort?: boolean;
 }
 
 export interface ExecuteOptions {
+  validationOptions: ValidationOptions | undefined;
   runOptions: RunOptions | undefined;
   abortSignal: AbortSignal;
 }
@@ -34,8 +40,3 @@ export type StateExecutors = {
     options: ExecuteOptions
   ) => Promise<ExecutionResult>;
 };
-
-export interface ValidationOptions {
-  readonly checkPaths?: boolean;
-  readonly checkArn?: boolean;
-}
