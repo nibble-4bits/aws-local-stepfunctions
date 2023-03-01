@@ -34,7 +34,7 @@
   },
   "scripts": {
     "test": "jest",
-    "build": "bunchee --minify src/main.ts",
+    "build": "tsup",
     "prettier": "prettier --write src/**/*.ts",
     "lint": "eslint src/**/*.ts",
     "lint:fix": "eslint src/**/*.ts --fix"
@@ -47,12 +47,12 @@
     "@types/picomatch": "^2.3.0",
     "@typescript-eslint/eslint-plugin": "^5.22.0",
     "@typescript-eslint/parser": "^5.22.0",
-    "bunchee": "^2.2.0",
     "eslint": "^8.14.0",
     "eslint-config-prettier": "^8.5.0",
     "eslint-plugin-prettier": "^4.0.0",
     "prettier": "^2.6.2",
     "ts-jest": "^29.0.3",
+    "tsup": "^6.6.3",
     "typescript": "^4.6.4"
   },
   "dependencies": {
