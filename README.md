@@ -102,7 +102,7 @@ Each execution is independent of all others, meaning that you can concurrently c
     - `waitTimeOverrides`: Overrides the wait duration of the specified `Wait` states. The specifed override duration should be in milliseconds.
   - `noThrowOnAbort`: If this option is set to `true`, aborting the execution will simply return `null` as result instead of throwing.
 
-#### Example without `options`:
+#### Basic example:
 
 ```js
 import { StateMachine } from 'aws-local-stepfunctions';
@@ -124,53 +124,6 @@ const execution = stateMachine.run(myInput); // execute the state machine
 
 const result = await execution.result; // wait until the execution finishes to get the result
 console.log(result); // log the result of the execution
-```
-
-#### Example with `options`:
-
-```js
-import { StateMachine } from 'aws-local-stepfunctions';
-
-const machineDefinition = {
-  StartAt: 'Hello World',
-  States: {
-    'Hello World': {
-      Type: 'Task',
-      Resource: 'arn:aws:lambda:us-east-1:123456789012:function:HelloWorld',
-      Next: 'AddNumbers',
-    },
-    AddNumbers: {
-      Type: 'Task',
-      Resource: 'arn:aws:lambda:us-east-1:123456789012:function:AddNumbers',
-      Next: 'Wait10Seconds',
-    },
-    Wait10Seconds: {
-      Type: 'Wait',
-      Seconds: 10,
-      End: true,
-    },
-  },
-};
-
-function addNumbersLocal(input) {
-  return input.num1 + input.num2;
-}
-
-const stateMachine = new StateMachine(machineDefinition);
-const myInput = { value1: 'hello', value2: 123, value3: true };
-const execution = stateMachine.run(myInput, {
-  overrides: {
-    taskResourceLocalHandlers: {
-      AddNumbers: addNumbersLocal, // call the `addNumbersLocal` function instead of invoking the Lambda function specified for the `AddNumbers` state
-    },
-    waitTimeOverrides: {
-      Wait10Seconds: 500, // wait for 500 milliseconds instead of the 10 seconds specified in the `Wait10Seconds` state
-    },
-  },
-});
-
-const result = await execution.result;
-console.log(result);
 ```
 
 ## Examples
