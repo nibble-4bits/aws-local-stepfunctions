@@ -78,4 +78,6 @@ The following features all come from the [Amazon States Language specification](
 
 The following features are not defined in the specification, but they have been added for convenience.
 
-- [x] Abort a running execution
+- [x] Override Task state resource with a local function handler ([example](/examples/task-state-local-override.js))
+- [x] Override Wait state duration ([example](/examples/wait-state-local-override.js))
+- [x] Abort a running execution ([example](/examples/abort-execution.js))
