@@ -17,6 +17,7 @@ This package lets you run AWS Step Functions locally on your machine!
 - [API](#api)
   - [Constructor](#constructor-new-statemachinedefinition-validationoptions)
   - [StateMachine.run](#statemachineruninput-options)
+- [Examples](#examples)
 - [License](#license)
 
 ## Features
@@ -101,9 +102,7 @@ Each execution is independent of all others, meaning that you can concurrently c
     - `waitTimeOverrides`: Overrides the wait duration of the specified `Wait` states. The specifed override duration should be in milliseconds.
   - `noThrowOnAbort`: If this option is set to `true`, aborting the execution will simply return `null` as result instead of throwing.
 
-#### Examples
-
-##### Example without `options`:
+#### Example without `options`:
 
 ```js
 import { StateMachine } from 'aws-local-stepfunctions';
@@ -127,7 +126,7 @@ const result = await execution.result; // wait until the execution finishes to g
 console.log(result); // log the result of the execution
 ```
 
-##### Example with `options`:
+#### Example with `options`:
 
 ```js
 import { StateMachine } from 'aws-local-stepfunctions';
@@ -174,42 +173,23 @@ const result = await execution.result;
 console.log(result);
 ```
 
-##### Aborting an execution
+## Examples
 
-```js
-import { StateMachine, ExecutionAbortedError } from 'aws-local-stepfunctions';
+You can check more examples and options usage in the [examples](/examples) directory.
 
-const machineDefinition = {
-  StartAt: 'Hello World',
-  States: {
-    'Hello World': {
-      Type: 'Task',
-      Resource: 'arn:aws:lambda:us-east-1:123456789012:function:HelloWorld',
-      End: true,
-    },
-  },
-};
+To run the examples, clone the repo, install the dependencies and build the project:
 
-const stateMachine = new StateMachine(machineDefinition);
-const myInput = { value1: 'hello', value2: 123, value3: true };
-const execution = stateMachine.run(myInput);
+```sh
+git clone https://github.com/nibble-4bits/aws-local-stepfunctions.git --depth 1
+cd aws-local-stepfunctions
+npm install
+npm run build
+```
 
-// abort the execution after 3 seconds
-setTimeout(() => {
-  execution.abort();
-}, 3000);
+Then run whichever example you want:
 
-try {
-  const result = await execution.result;
-  console.log(result);
-} catch (e) {
-  if (e instanceof ExecutionAbortedError) {
-    // since execution was aborted, type of error is `ExecutionAbortedError`
-    console.log('Execution was aborted');
-  } else {
-    console.error('Some other error', e);
-  }
-}
+```sh
+node examples/abort-execution.js
 ```
 
 ## License
