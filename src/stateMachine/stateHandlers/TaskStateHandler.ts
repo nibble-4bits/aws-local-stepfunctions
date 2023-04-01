@@ -1,9 +1,9 @@
-import type { TaskState } from '../typings/TaskState';
-import type { JSONValue } from '../typings/JSONValue';
-import type { ExecutionResult, TaskStateHandlerOptions } from '../typings/StateHandlers';
+import type { TaskState } from '../../typings/TaskState';
+import type { JSONValue } from '../../typings/JSONValue';
+import type { ExecutionResult, TaskStateHandlerOptions } from '../../typings/StateHandlers';
 import { BaseStateHandler } from './BaseStateHandler';
-import { LambdaClient } from '../aws/LambdaClient';
-import { LambdaExecutionError } from '../error/LambdaExecutionError';
+import { LambdaClient } from '../../aws/LambdaClient';
+import { LambdaExecutionError } from '../../error/LambdaExecutionError';
 
 class TaskStateHandler extends BaseStateHandler<TaskState> {
   constructor(stateDefinition: TaskState) {

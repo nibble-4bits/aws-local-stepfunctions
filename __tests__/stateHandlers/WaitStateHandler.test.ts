@@ -1,5 +1,5 @@
 import type { WaitState } from '../../src/typings/WaitState';
-import { WaitStateHandler } from '../../src/stateHandlers/WaitStateHandler';
+import { WaitStateHandler } from '../../src/stateMachine/stateHandlers/WaitStateHandler';
 import * as utilModule from '../../src/util';
 
 afterEach(() => {

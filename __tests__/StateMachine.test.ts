@@ -1,5 +1,5 @@
 import type { StateMachineDefinition } from '../src/typings/StateMachineDefinition';
-import { StateMachine } from '../src/StateMachine';
+import { StateMachine } from '../src/stateMachine/StateMachine';
 import { ExecutionAbortedError } from '../src/error/ExecutionAbortedError';
 
 afterEach(() => {

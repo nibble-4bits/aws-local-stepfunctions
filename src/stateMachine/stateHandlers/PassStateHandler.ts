@@ -1,6 +1,6 @@
-import type { JSONValue } from '../typings/JSONValue';
-import type { PassState } from '../typings/PassState';
-import type { ExecutionResult, PassStateHandlerOptions } from '../typings/StateHandlers';
+import type { JSONValue } from '../../typings/JSONValue';
+import type { PassState } from '../../typings/PassState';
+import type { ExecutionResult, PassStateHandlerOptions } from '../../typings/StateHandlers';
 import { BaseStateHandler } from './BaseStateHandler';
 
 class PassStateHandler extends BaseStateHandler<PassState> {

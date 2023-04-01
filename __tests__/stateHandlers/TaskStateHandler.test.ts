@@ -1,6 +1,6 @@
 import type { TaskState } from '../../src/typings/TaskState';
 import { LambdaClient } from '../../src/aws/LambdaClient';
-import { TaskStateHandler } from '../../src/stateHandlers/TaskStateHandler';
+import { TaskStateHandler } from '../../src/stateMachine/stateHandlers/TaskStateHandler';
 
 afterEach(() => {
   jest.clearAllMocks();

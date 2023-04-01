@@ -1,6 +1,6 @@
-import type { JSONValue } from '../typings/JSONValue';
-import type { ChoiceState, ChoiceRuleWithoutNext } from '../typings/ChoiceState';
-import type { ChoiceStateHandlerOptions, ExecutionResult } from '../typings/StateHandlers';
+import type { JSONValue } from '../../typings/JSONValue';
+import type { ChoiceState, ChoiceRuleWithoutNext } from '../../typings/ChoiceState';
+import type { ChoiceStateHandlerOptions, ExecutionResult } from '../../typings/StateHandlers';
 import { BaseStateHandler } from './BaseStateHandler';
 import { jsonPathQuery } from '../JsonPath';
 import wcmatch from 'wildcard-match';

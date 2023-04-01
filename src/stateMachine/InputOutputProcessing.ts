@@ -1,6 +1,6 @@
-import type { PayloadTemplate } from './typings/InputOutputProcessing';
-import type { JSONValue } from './typings/JSONValue';
-import { isPlainObj } from './util';
+import type { PayloadTemplate } from '../typings/InputOutputProcessing';
+import type { JSONValue } from '../typings/JSONValue';
+import { isPlainObj } from '../util';
 import { jsonPathQuery } from './JsonPath';
 import cloneDeep from 'lodash/cloneDeep.js';
 import set from 'lodash/set.js';

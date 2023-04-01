@@ -1,5 +1,5 @@
 import type { ChoiceState } from '../../src/typings/ChoiceState';
-import { ChoiceStateHandler } from '../../src/stateHandlers/ChoiceStateHandler';
+import { ChoiceStateHandler } from '../../src/stateMachine/stateHandlers/ChoiceStateHandler';
 
 afterEach(() => {
   jest.clearAllMocks();

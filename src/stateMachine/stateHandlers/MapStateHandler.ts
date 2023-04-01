@@ -1,6 +1,6 @@
-import type { MapState } from '../typings/MapState';
-import type { JSONValue } from '../typings/JSONValue';
-import type { ExecutionResult, MapStateHandlerOptions } from '../typings/StateHandlers';
+import type { MapState } from '../../typings/MapState';
+import type { JSONValue } from '../../typings/JSONValue';
+import type { ExecutionResult, MapStateHandlerOptions } from '../../typings/StateHandlers';
 import { BaseStateHandler } from './BaseStateHandler';
 import { StateMachine } from '../StateMachine';
 import { jsonPathQuery } from '../JsonPath';

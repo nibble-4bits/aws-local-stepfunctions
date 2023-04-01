@@ -1,5 +1,5 @@
 import type { PassState } from '../../src/typings/PassState';
-import { PassStateHandler } from '../../src/stateHandlers/PassStateHandler';
+import { PassStateHandler } from '../../src/stateMachine/stateHandlers/PassStateHandler';
 
 afterEach(() => {
   jest.clearAllMocks();

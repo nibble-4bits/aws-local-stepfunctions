@@ -3,7 +3,7 @@ import {
   processOutputPath,
   processPayloadTemplate,
   processResultPath,
-} from '../src/InputOutputProcessing';
+} from '../src/stateMachine/InputOutputProcessing';
 
 afterEach(() => {
   jest.clearAllMocks();

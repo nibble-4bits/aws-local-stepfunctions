@@ -1,5 +1,5 @@
 import type { SucceedState } from '../../src/typings/SucceedState';
-import { SucceedStateHandler } from '../../src/stateHandlers/SucceedStateHandler';
+import { SucceedStateHandler } from '../../src/stateMachine/stateHandlers/SucceedStateHandler';
 
 afterEach(() => {
   jest.clearAllMocks();

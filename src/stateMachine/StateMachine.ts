@@ -1,20 +1,20 @@
-import type { AllStates } from './typings/AllStates';
-import type { StateMachineDefinition } from './typings/StateMachineDefinition';
-import type { TaskState } from './typings/TaskState';
-import type { JSONValue } from './typings/JSONValue';
-import type { PassState } from './typings/PassState';
-import type { WaitState } from './typings/WaitState';
-import type { MapState } from './typings/MapState';
-import type { ChoiceState } from './typings/ChoiceState';
-import type { SucceedState } from './typings/SucceedState';
-import type { FailState } from './typings/FailState';
+import type { AllStates } from '../typings/AllStates';
+import type { StateMachineDefinition } from '../typings/StateMachineDefinition';
+import type { TaskState } from '../typings/TaskState';
+import type { JSONValue } from '../typings/JSONValue';
+import type { PassState } from '../typings/PassState';
+import type { WaitState } from '../typings/WaitState';
+import type { MapState } from '../typings/MapState';
+import type { ChoiceState } from '../typings/ChoiceState';
+import type { SucceedState } from '../typings/SucceedState';
+import type { FailState } from '../typings/FailState';
 import type {
   ExecuteOptions,
   RunOptions,
   StateExecutors,
   ValidationOptions,
-} from './typings/StateMachineImplementation';
-import type { ExecutionResult } from './typings/StateHandlers';
+} from '../typings/StateMachineImplementation';
+import type { ExecutionResult } from '../typings/StateHandlers';
 import { TaskStateHandler } from './stateHandlers/TaskStateHandler';
 import { MapStateHandler } from './stateHandlers/MapStateHandler';
 import { PassStateHandler } from './stateHandlers/PassStateHandler';
@@ -22,7 +22,7 @@ import { WaitStateHandler } from './stateHandlers/WaitStateHandler';
 import { ChoiceStateHandler } from './stateHandlers/ChoiceStateHandler';
 import { SucceedStateHandler } from './stateHandlers/SucceedStateHandler';
 import { FailStateHandler } from './stateHandlers/FailStateHandler';
-import { ExecutionAbortedError } from './error/ExecutionAbortedError';
+import { ExecutionAbortedError } from '../error/ExecutionAbortedError';
 import {
   processInputPath,
   processOutputPath,

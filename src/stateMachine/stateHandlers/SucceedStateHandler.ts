@@ -1,6 +1,6 @@
-import type { JSONValue } from '../typings/JSONValue';
-import type { ExecutionResult, SucceedStateHandlerOptions } from '../typings/StateHandlers';
-import type { SucceedState } from '../typings/SucceedState';
+import type { JSONValue } from '../../typings/JSONValue';
+import type { ExecutionResult, SucceedStateHandlerOptions } from '../../typings/StateHandlers';
+import type { SucceedState } from '../../typings/SucceedState';
 import { BaseStateHandler } from './BaseStateHandler';
 
 class SucceedStateHandler extends BaseStateHandler<SucceedState> {

@@ -1,5 +1,5 @@
 import type { MapState } from '../../src/typings/MapState';
-import { MapStateHandler } from '../../src/stateHandlers/MapStateHandler';
+import { MapStateHandler } from '../../src/stateMachine/stateHandlers/MapStateHandler';
 
 afterEach(() => {
   jest.clearAllMocks();

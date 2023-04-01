@@ -1,2 +1,2 @@
-export { StateMachine } from './StateMachine';
+export { StateMachine } from './stateMachine/StateMachine';
 export { ExecutionAbortedError } from './error/ExecutionAbortedError';

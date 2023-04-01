@@ -1,5 +1,5 @@
 import type { FailState } from '../../src/typings/FailState';
-import { FailStateHandler } from '../../src/stateHandlers/FailStateHandler';
+import { FailStateHandler } from '../../src/stateMachine/stateHandlers/FailStateHandler';
 
 afterEach(() => {
   jest.clearAllMocks();

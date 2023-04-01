@@ -1,9 +1,9 @@
-import type { JSONValue } from '../typings/JSONValue';
-import type { WaitState } from '../typings/WaitState';
-import type { ExecutionResult, WaitStateHandlerOptions } from '../typings/StateHandlers';
+import type { JSONValue } from '../../typings/JSONValue';
+import type { WaitState } from '../../typings/WaitState';
+import type { ExecutionResult, WaitStateHandlerOptions } from '../../typings/StateHandlers';
 import { BaseStateHandler } from './BaseStateHandler';
 import { jsonPathQuery } from '../JsonPath';
-import { sleep } from '../util';
+import { sleep } from '../../util';
 
 class WaitStateHandler extends BaseStateHandler<WaitState> {
   constructor(stateDefinition: WaitState) {

@@ -1,4 +1,4 @@
-import type { JSONValue } from './typings/JSONValue';
+import type { JSONValue } from '../typings/JSONValue';
 import { JSONPath as jp } from 'jsonpath-plus';
 
 /**

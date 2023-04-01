@@ -1,6 +1,6 @@
-import type { JSONValue } from '../typings/JSONValue';
-import type { FailState } from '../typings/FailState';
-import type { ExecutionResult, FailStateHandlerOptions } from '../typings/StateHandlers';
+import type { JSONValue } from '../../typings/JSONValue';
+import type { FailState } from '../../typings/FailState';
+import type { ExecutionResult, FailStateHandlerOptions } from '../../typings/StateHandlers';
 import { BaseStateHandler } from './BaseStateHandler';
 
 class FailStateHandler extends BaseStateHandler<FailState> {
