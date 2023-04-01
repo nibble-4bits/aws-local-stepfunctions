@@ -19,7 +19,7 @@ export interface CatchableState {
   Catch?: Catcher[];
 }
 
-export interface ErrorOutput {
+export type ErrorOutput = {
   Error: string;
   Cause?: string;
-}
+};

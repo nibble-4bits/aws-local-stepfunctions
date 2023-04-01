@@ -75,7 +75,7 @@ function processResultPath(path: string | null | undefined, rawInput: JSONValue,
   const sanitizedPath = path.replace('$.', '');
 
   if (isPlainObj(rawInput)) {
-    const clonedRawInput = cloneDeep(rawInput) as object;
+    const clonedRawInput = cloneDeep(rawInput);
     return set(clonedRawInput, sanitizedPath, result);
   }
 
