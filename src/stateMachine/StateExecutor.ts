@@ -1,7 +1,8 @@
 import type { AllStates } from '../typings/AllStates';
 import type { ExecutionResult } from '../typings/StateActions';
-import type { StateHandlers } from '../typings/StateExecutor';
+import type { RetryResult, CatchResult, StateHandlers } from '../typings/StateExecutor';
 import type { ExecuteOptions } from '../typings/StateMachineImplementation';
+import type { ErrorOutput } from '../typings/ErrorHandling';
 import type { JSONValue } from '../typings/JSONValue';
 import type { TaskState } from '../typings/TaskState';
 import type { MapState } from '../typings/MapState';
@@ -116,9 +117,15 @@ export class StateExecutor {
 
       return { stateResult: processedResult, nextState, isEndState };
     } catch (error) {
-      const shouldRetry = await this.shouldRetry(error as Error);
-      if (shouldRetry) {
+      const { shouldRetry, waitTimeBeforeRetry } = this.shouldRetry(error as Error);
+      if (shouldRetry && waitTimeBeforeRetry) {
+        await sleep(waitTimeBeforeRetry);
         return this.execute(input, context, options);
+      }
+
+      const { nextState, errorOutput, resultPath } = this.catchError(error as Error);
+      if (nextState && errorOutput) {
+        return { stateResult: processResultPath(resultPath, rawInput, errorOutput), nextState, isEndState: false };
       }
 
       throw error;
@@ -173,9 +180,9 @@ export class StateExecutor {
   /**
    * Decide whether this state should be retried, according to the `Retry` field.
    */
-  async shouldRetry(error: Error): Promise<boolean> {
+  shouldRetry(error: Error): RetryResult {
     if (!('Retry' in this.stateDefinition)) {
-      return false;
+      return { shouldRetry: false };
     }
 
     for (let i = 0; i < this.stateDefinition.Retry.length; i++) {
@@ -183,22 +190,48 @@ export class StateExecutor {
       const maxAttempts = retrier.MaxAttempts ?? DEFAULT_MAX_ATTEMPTS;
       const intervalSeconds = retrier.IntervalSeconds ?? DEFAULT_INTERVAL_SECONDS;
       const backoffRate = retrier.BackoffRate ?? DEFAULT_BACKOFF_RATE;
-      const waitTime = intervalSeconds * Math.pow(backoffRate, this.retrierAttempts[i]) * 1000;
+      const waitTimeBeforeRetry = intervalSeconds * Math.pow(backoffRate, this.retrierAttempts[i]) * 1000;
 
       for (const retrierError of retrier.ErrorEquals) {
         if (retrierError === error.name || retrierError === WILDCARD_ERROR) {
-          if (this.retrierAttempts[i] >= maxAttempts) return false;
+          if (this.retrierAttempts[i] >= maxAttempts) return { shouldRetry: false };
 
           this.retrierAttempts[i]++;
 
-          await sleep(waitTime);
-
-          return true;
+          return { shouldRetry: true, waitTimeBeforeRetry };
         }
       }
     }
 
-    return false;
+    return { shouldRetry: false };
+  }
+
+  /**
+   * Try to match the current error with a catcher, according to the `Catch` field.
+   */
+  catchError(error: Error): CatchResult {
+    if (!('Catch' in this.stateDefinition)) {
+      return { nextState: '' };
+    }
+
+    for (let i = 0; i < this.stateDefinition.Catch.length; i++) {
+      const catcher = this.stateDefinition.Catch[i];
+
+      for (const catcherError of catcher.ErrorEquals) {
+        if (catcherError === error.name || catcherError === WILDCARD_ERROR) {
+          const nextState = catcher.Next;
+          const errorOutput: ErrorOutput = {
+            Error: error.name,
+            Cause: error.toString(),
+          };
+          const resultPath = catcher.ResultPath;
+
+          return { nextState, errorOutput, resultPath };
+        }
+      }
+    }
+
+    return { nextState: '' };
   }
 
   /**
