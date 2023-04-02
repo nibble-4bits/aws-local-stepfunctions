@@ -4,6 +4,7 @@ import type { ChoiceStateActionOptions, ExecutionResult } from '../../typings/St
 import { BaseStateAction } from './BaseStateAction';
 import { jsonPathQuery } from '../JsonPath';
 import wcmatch from 'wildcard-match';
+import { StatesNoChoiceMatchedError } from '../../error/StatesNoChoiceMatchedError';
 
 class ChoiceStateAction extends BaseStateAction<ChoiceState> {
   constructor(stateDefinition: ChoiceState) {
@@ -269,8 +270,7 @@ class ChoiceStateAction extends BaseStateAction<ChoiceState> {
       return { stateResult: input, nextState: state.Default, isEndState: false };
     }
 
-    // TODO: Throw States.NoChoiceMatched error here because all choices failed to match and no `Default` field was specified.
-    throw new Error('States.NoChoiceMatched');
+    throw new StatesNoChoiceMatchedError();
   }
 }
 
