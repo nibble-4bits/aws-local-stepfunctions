@@ -26,6 +26,26 @@ import { sleep } from '../util';
 import cloneDeep from 'lodash/cloneDeep.js';
 
 /**
+ * Default max number of attempts to retry each retrier.
+ */
+const DEFAULT_MAX_ATTEMPTS = 3;
+
+/**
+ * Default amount of seconds to wait before retrying.
+ */
+const DEFAULT_INTERVAL_SECONDS = 1;
+
+/**
+ * Default backoff rate for retry wait.
+ */
+const DEFAULT_BACKOFF_RATE = 2.0;
+
+/**
+ * The wildcard error. This matches all errors caught in the `Retry` or `Catch` fields.
+ */
+const WILDCARD_ERROR = 'States.ALL';
+
+/**
  * This class handles the execution a single state in the state machine.
  * Handling the execution includes:
  *  - Applying input processing
@@ -161,11 +181,6 @@ export class StateExecutor {
       return false;
     }
 
-    const DEFAULT_MAX_ATTEMPTS = 3;
-    const DEFAULT_INTERVAL_SECONDS = 1;
-    const DEFAULT_BACKOFF_RATE = 2.0;
-    const WILDCARD_ERROR = 'States.ALL';
-
     for (let i = 0; i < this.stateDefinition.Retry.length; i++) {
       const retrier = this.stateDefinition.Retry[i];
       const maxAttempts = retrier.MaxAttempts ?? DEFAULT_MAX_ATTEMPTS;
@@ -173,8 +188,8 @@ export class StateExecutor {
       const backoffRate = retrier.BackoffRate ?? DEFAULT_BACKOFF_RATE;
       const waitTime = intervalSeconds * Math.pow(backoffRate, this.retrierAttempts[i]) * 1000;
 
-      for (const possibleErrorName of retrier.ErrorEquals) {
-        if (possibleErrorName === error.name || possibleErrorName === WILDCARD_ERROR) {
+      for (const retrierError of retrier.ErrorEquals) {
+        if (retrierError === error.name || retrierError === WILDCARD_ERROR) {
           if (this.retrierAttempts[i] >= maxAttempts) return false;
 
           this.retrierAttempts[i]++;
