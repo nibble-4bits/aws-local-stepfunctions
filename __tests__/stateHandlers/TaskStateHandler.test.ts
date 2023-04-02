@@ -1,6 +1,6 @@
 import type { TaskState } from '../../src/typings/TaskState';
 import { LambdaClient } from '../../src/aws/LambdaClient';
-import { TaskStateHandler } from '../../src/stateMachine/stateHandlers/TaskStateHandler';
+import { TaskStateAction } from '../../src/stateMachine/stateActions/TaskStateAction';
 
 afterEach(() => {
   jest.clearAllMocks();
@@ -22,8 +22,8 @@ describe('Task State Handler', () => {
     const input = { input1: 'input string', input2: 10 };
     const context = {};
 
-    const taskStateHandler = new TaskStateHandler(definition);
-    await taskStateHandler.executeState(input, context);
+    const taskStateAction = new TaskStateAction(definition);
+    await taskStateAction.execute(input, context);
 
     expect(mockInvokeFunction).toHaveBeenCalledWith('mock-arn', { input1: 'input string', input2: 10 });
   });
@@ -39,8 +39,8 @@ describe('Task State Handler', () => {
 
     mockInvokeFunction.mockReturnValue(input.num1 + input.num2);
 
-    const taskStateHandler = new TaskStateHandler(definition);
-    const { stateResult } = await taskStateHandler.executeState(input, context);
+    const taskStateAction = new TaskStateAction(definition);
+    const { stateResult } = await taskStateAction.execute(input, context);
 
     expect(mockInvokeFunction).toHaveBeenCalledWith('mock-arn', { num1: 5, num2: 3 });
     expect(stateResult).toBe(8);
@@ -58,8 +58,8 @@ describe('Task State Handler', () => {
     const localHandlerFn = jest.fn((event) => event.num1 + event.num2);
     const options = { overrideFn: localHandlerFn };
 
-    const taskStateHandler = new TaskStateHandler(definition);
-    const { stateResult } = await taskStateHandler.executeState(input, context, options);
+    const taskStateAction = new TaskStateAction(definition);
+    const { stateResult } = await taskStateAction.execute(input, context, options);
 
     expect(localHandlerFn).toHaveBeenCalledWith(input);
     expect(mockInvokeFunction).not.toHaveBeenCalled();

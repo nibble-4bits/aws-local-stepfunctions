@@ -1,11 +1,11 @@
 import type { JSONValue } from '../../typings/JSONValue';
 import type { ChoiceState, ChoiceRuleWithoutNext } from '../../typings/ChoiceState';
-import type { ChoiceStateHandlerOptions, ExecutionResult } from '../../typings/StateHandlers';
-import { BaseStateHandler } from './BaseStateHandler';
+import type { ChoiceStateActionOptions, ExecutionResult } from '../../typings/StateActions';
+import { BaseStateAction } from './BaseStateAction';
 import { jsonPathQuery } from '../JsonPath';
 import wcmatch from 'wildcard-match';
 
-class ChoiceStateHandler extends BaseStateHandler<ChoiceState> {
+class ChoiceStateAction extends BaseStateAction<ChoiceState> {
   constructor(stateDefinition: ChoiceState) {
     super(stateDefinition);
   }
@@ -249,12 +249,12 @@ class ChoiceStateHandler extends BaseStateHandler<ChoiceState> {
     return false;
   }
 
-  override async executeState(
+  override async execute(
     input: JSONValue,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     context: Record<string, unknown>,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    options?: ChoiceStateHandlerOptions
+    options?: ChoiceStateActionOptions
   ): Promise<ExecutionResult> {
     const state = this.stateDefinition;
 
@@ -274,4 +274,4 @@ class ChoiceStateHandler extends BaseStateHandler<ChoiceState> {
   }
 }
 
-export { ChoiceStateHandler };
+export { ChoiceStateAction };

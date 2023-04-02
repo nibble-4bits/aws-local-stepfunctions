@@ -88,11 +88,7 @@ export class StateMachine {
 
     do {
       const stateExecutor = new StateExecutor(currStateName, currState);
-      ({
-        stateResult: currResult,
-        nextState,
-        isEndState,
-      } = await stateExecutor.executeState(currInput, context, options));
+      ({ stateResult: currResult, nextState, isEndState } = await stateExecutor.execute(currInput, context, options));
 
       currInput = currResult;
 

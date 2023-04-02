@@ -1,5 +1,5 @@
 import type { FailState } from '../../src/typings/FailState';
-import { FailStateHandler } from '../../src/stateMachine/stateHandlers/FailStateHandler';
+import { FailStateAction } from '../../src/stateMachine/stateActions/FailStateAction';
 
 afterEach(() => {
   jest.clearAllMocks();
@@ -16,8 +16,8 @@ describe('Fail State', () => {
     };
     const context = {};
 
-    const failStateHandler = new FailStateHandler(definition);
-    const { isEndState } = await failStateHandler.executeState(input, context);
+    const failStateAction = new FailStateAction(definition);
+    const { isEndState } = await failStateAction.execute(input, context);
 
     expect(isEndState).toBe(true);
   });

@@ -1,13 +1,13 @@
 import type { MapState } from '../../typings/MapState';
 import type { JSONValue } from '../../typings/JSONValue';
-import type { ExecutionResult, MapStateHandlerOptions } from '../../typings/StateHandlers';
-import { BaseStateHandler } from './BaseStateHandler';
+import type { ExecutionResult, MapStateActionOptions } from '../../typings/StateActions';
+import { BaseStateAction } from './BaseStateAction';
 import { StateMachine } from '../StateMachine';
 import { jsonPathQuery } from '../JsonPath';
 import { processPayloadTemplate } from '../InputOutputProcessing';
 import pLimit from 'p-limit';
 
-class MapStateHandler extends BaseStateHandler<MapState> {
+class MapStateAction extends BaseStateAction<MapState> {
   constructor(stateDefinition: MapState) {
     super(stateDefinition);
   }
@@ -17,7 +17,7 @@ class MapStateHandler extends BaseStateHandler<MapState> {
     input: JSONValue,
     context: Record<string, unknown>,
     index: number,
-    options: MapStateHandlerOptions | undefined
+    options: MapStateActionOptions | undefined
   ): Promise<JSONValue> {
     const state = this.stateDefinition;
 
@@ -40,10 +40,10 @@ class MapStateHandler extends BaseStateHandler<MapState> {
     return result;
   }
 
-  override async executeState(
+  override async execute(
     input: JSONValue,
     context: Record<string, unknown>,
-    options?: MapStateHandlerOptions
+    options?: MapStateActionOptions
   ): Promise<ExecutionResult> {
     const state = this.stateDefinition;
 
@@ -69,4 +69,4 @@ class MapStateHandler extends BaseStateHandler<MapState> {
   }
 }
 
-export { MapStateHandler };
+export { MapStateAction };

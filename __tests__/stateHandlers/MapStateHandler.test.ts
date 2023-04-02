@@ -1,5 +1,5 @@
 import type { MapState } from '../../src/typings/MapState';
-import { MapStateHandler } from '../../src/stateMachine/stateHandlers/MapStateHandler';
+import { MapStateAction } from '../../src/stateMachine/stateActions/MapStateAction';
 
 afterEach(() => {
   jest.clearAllMocks();
@@ -29,8 +29,8 @@ describe('Map State', () => {
     };
     const context = {};
 
-    const mapStateHandler = new MapStateHandler(definition);
-    const { stateResult } = await mapStateHandler.executeState(input, context);
+    const mapStateAction = new MapStateAction(definition);
+    const { stateResult } = await mapStateAction.execute(input, context);
 
     expect(stateResult).toHaveLength(3);
     expect(stateResult).toEqual([
@@ -60,8 +60,8 @@ describe('Map State', () => {
     ];
     const context = {};
 
-    const mapStateHandler = new MapStateHandler(definition);
-    const { stateResult } = await mapStateHandler.executeState(input, context);
+    const mapStateAction = new MapStateAction(definition);
+    const { stateResult } = await mapStateAction.execute(input, context);
 
     expect(stateResult).toHaveLength(3);
     expect(stateResult).toEqual([
@@ -98,8 +98,8 @@ describe('Map State', () => {
     };
     const context = {};
 
-    const mapStateHandler = new MapStateHandler(definition);
-    const { stateResult } = await mapStateHandler.executeState(input, context);
+    const mapStateAction = new MapStateAction(definition);
+    const { stateResult } = await mapStateAction.execute(input, context);
 
     expect(stateResult).toHaveLength(3);
     expect(stateResult).toEqual([

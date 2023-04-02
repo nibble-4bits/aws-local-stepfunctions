@@ -1,19 +1,19 @@
 import type { JSONValue } from '../../typings/JSONValue';
 import type { WaitState } from '../../typings/WaitState';
-import type { ExecutionResult, WaitStateHandlerOptions } from '../../typings/StateHandlers';
-import { BaseStateHandler } from './BaseStateHandler';
+import type { ExecutionResult, WaitStateActionOptions } from '../../typings/StateActions';
+import { BaseStateAction } from './BaseStateAction';
 import { jsonPathQuery } from '../JsonPath';
 import { sleep } from '../../util';
 
-class WaitStateHandler extends BaseStateHandler<WaitState> {
+class WaitStateAction extends BaseStateAction<WaitState> {
   constructor(stateDefinition: WaitState) {
     super(stateDefinition);
   }
 
-  override async executeState(
+  override async execute(
     input: JSONValue,
     context: Record<string, unknown>,
-    options?: WaitStateHandlerOptions
+    options?: WaitStateActionOptions
   ): Promise<ExecutionResult> {
     const state = this.stateDefinition;
 
@@ -47,4 +47,4 @@ class WaitStateHandler extends BaseStateHandler<WaitState> {
   }
 }
 
-export { WaitStateHandler };
+export { WaitStateAction };

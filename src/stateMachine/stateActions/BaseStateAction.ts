@@ -2,9 +2,9 @@ import type { IntermediateState } from '../../typings/IntermediateState';
 import type { TerminalState } from '../../typings/TerminalState';
 import type { JSONValue } from '../../typings/JSONValue';
 import type { BaseState } from '../../typings/BaseState';
-import type { ExecutionResult } from '../../typings/StateHandlers';
+import type { ExecutionResult } from '../../typings/StateActions';
 
-abstract class BaseStateHandler<T extends BaseState | IntermediateState | TerminalState> {
+abstract class BaseStateAction<T extends BaseState | IntermediateState | TerminalState> {
   protected stateDefinition: T;
 
   constructor(stateDefinition: T) {
@@ -25,11 +25,11 @@ abstract class BaseStateHandler<T extends BaseState | IntermediateState | Termin
     return executionResult;
   }
 
-  abstract executeState(
+  abstract execute(
     input: JSONValue,
     context: Record<string, unknown>,
     options?: Record<string, unknown>
   ): Promise<ExecutionResult>;
 }
 
-export { BaseStateHandler };
+export { BaseStateAction };

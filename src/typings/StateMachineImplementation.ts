@@ -1,6 +1,6 @@
 import type { AllStates } from './AllStates';
 import type { JSONValue } from './JSONValue';
-import type { ExecutionResult } from './StateHandlers';
+import type { ExecutionResult } from './StateActions';
 
 type TaskStateResourceLocalHandler = {
   [taskStateName: string]: (input: JSONValue) => Promise<JSONValue>;

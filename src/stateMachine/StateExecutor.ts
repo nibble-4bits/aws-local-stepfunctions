@@ -4,7 +4,7 @@ import type { FailState } from '../typings/FailState';
 import type { JSONValue } from '../typings/JSONValue';
 import type { MapState } from '../typings/MapState';
 import type { PassState } from '../typings/PassState';
-import type { ExecutionResult } from '../typings/StateHandlers';
+import type { ExecutionResult } from '../typings/StateActions';
 import type { ExecuteOptions, StateExecutors } from '../typings/StateMachineImplementation';
 import type { SucceedState } from '../typings/SucceedState';
 import type { TaskState } from '../typings/TaskState';
@@ -15,13 +15,13 @@ import {
   processPayloadTemplate,
   processResultPath,
 } from './InputOutputProcessing';
-import { ChoiceStateHandler } from './stateHandlers/ChoiceStateHandler';
-import { FailStateHandler } from './stateHandlers/FailStateHandler';
-import { MapStateHandler } from './stateHandlers/MapStateHandler';
-import { PassStateHandler } from './stateHandlers/PassStateHandler';
-import { SucceedStateHandler } from './stateHandlers/SucceedStateHandler';
-import { TaskStateHandler } from './stateHandlers/TaskStateHandler';
-import { WaitStateHandler } from './stateHandlers/WaitStateHandler';
+import { ChoiceStateAction } from './stateActions/ChoiceStateAction';
+import { FailStateAction } from './stateActions/FailStateAction';
+import { MapStateAction } from './stateActions/MapStateAction';
+import { PassStateAction } from './stateActions/PassStateAction';
+import { SucceedStateAction } from './stateActions/SucceedStateAction';
+import { TaskStateAction } from './stateActions/TaskStateAction';
+import { WaitStateAction } from './stateActions/WaitStateAction';
 import { sleep } from '../util';
 import cloneDeep from 'lodash/cloneDeep.js';
 
@@ -92,11 +92,7 @@ export class StateExecutor {
   /**
    * Execute the current state.
    */
-  async executeState(
-    input: JSONValue,
-    context: Record<string, unknown>,
-    options: ExecuteOptions
-  ): Promise<ExecutionResult> {
+  async execute(input: JSONValue, context: Record<string, unknown>, options: ExecuteOptions): Promise<ExecutionResult> {
     const rawInput = cloneDeep(input);
 
     try {
@@ -107,7 +103,7 @@ export class StateExecutor {
         nextState,
         isEndState,
       } = await this.stateExecutors[this.stateDefinition.Type](
-        // @ts-expect-error Indexing `this.stateHandlers` by non-literal value produces a `never` type for the `this.stateDefinition` parameter of the handler being called
+        // @ts-expect-error Indexing `this.stateActions` by non-literal value produces a `never` type for the `this.stateDefinition` parameter of the handler being called
         this.stateDefinition,
         processedInput,
         context,
@@ -121,7 +117,7 @@ export class StateExecutor {
     } catch (error) {
       const shouldRetry = await this.shouldRetry(error as Error);
       if (shouldRetry) {
-        return this.executeState(input, context, options);
+        return this.execute(input, context, options);
       }
 
       throw error;
@@ -219,8 +215,8 @@ export class StateExecutor {
   ): Promise<ExecutionResult> {
     const overrideFn = options.runOptions?.overrides?.taskResourceLocalHandlers?.[stateName];
 
-    const taskStateHandler = new TaskStateHandler(stateDefinition);
-    const executionResult = await taskStateHandler.executeState(input, context, { overrideFn });
+    const taskStateAction = new TaskStateAction(stateDefinition);
+    const executionResult = await taskStateAction.execute(input, context, { overrideFn });
 
     return executionResult;
   }
@@ -239,8 +235,8 @@ export class StateExecutor {
     stateName: string,
     options: ExecuteOptions
   ): Promise<ExecutionResult> {
-    const mapStateHandler = new MapStateHandler(stateDefinition);
-    const executionResult = await mapStateHandler.executeState(input, context, {
+    const mapStateAction = new MapStateAction(stateDefinition);
+    const executionResult = await mapStateAction.execute(input, context, {
       validationOptions: options.validationOptions,
       runOptions: options.runOptions,
     });
@@ -263,8 +259,8 @@ export class StateExecutor {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     options: ExecuteOptions
   ): Promise<ExecutionResult> {
-    const passStateHandler = new PassStateHandler(stateDefinition);
-    const executionResult = await passStateHandler.executeState(input, context);
+    const passStateAction = new PassStateAction(stateDefinition);
+    const executionResult = await passStateAction.execute(input, context);
 
     return executionResult;
   }
@@ -285,8 +281,8 @@ export class StateExecutor {
     const waitTimeOverrideOption = options.runOptions?.overrides?.waitTimeOverrides?.[stateName];
     const abortSignal = options.abortSignal;
 
-    const waitStateHandler = new WaitStateHandler(stateDefinition);
-    const executionResult = await waitStateHandler.executeState(input, context, {
+    const waitStateAction = new WaitStateAction(stateDefinition);
+    const executionResult = await waitStateAction.execute(input, context, {
       waitTimeOverrideOption,
       abortSignal,
     });
@@ -317,8 +313,8 @@ export class StateExecutor {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     options: ExecuteOptions
   ): Promise<ExecutionResult> {
-    const choiceStateHandler = new ChoiceStateHandler(stateDefinition);
-    const executionResult = await choiceStateHandler.executeState(input, context);
+    const choiceStateAction = new ChoiceStateAction(stateDefinition);
+    const executionResult = await choiceStateAction.execute(input, context);
 
     return executionResult;
   }
@@ -337,8 +333,8 @@ export class StateExecutor {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     options: ExecuteOptions
   ): Promise<ExecutionResult> {
-    const succeedStateHandler = new SucceedStateHandler(stateDefinition);
-    const executionResult = await succeedStateHandler.executeState(input, context);
+    const succeedStateAction = new SucceedStateAction(stateDefinition);
+    const executionResult = await succeedStateAction.execute(input, context);
 
     return executionResult;
   }
@@ -357,8 +353,8 @@ export class StateExecutor {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     options: ExecuteOptions
   ): Promise<ExecutionResult> {
-    const failStateHandler = new FailStateHandler(stateDefinition);
-    const executionResult = await failStateHandler.executeState(input, context);
+    const failStateAction = new FailStateAction(stateDefinition);
+    const executionResult = await failStateAction.execute(input, context);
 
     return executionResult;
   }

@@ -1,19 +1,19 @@
 import type { TaskState } from '../../typings/TaskState';
 import type { JSONValue } from '../../typings/JSONValue';
-import type { ExecutionResult, TaskStateHandlerOptions } from '../../typings/StateHandlers';
-import { BaseStateHandler } from './BaseStateHandler';
+import type { ExecutionResult, TaskStateActionOptions } from '../../typings/StateActions';
+import { BaseStateAction } from './BaseStateAction';
 import { LambdaClient } from '../../aws/LambdaClient';
 import { LambdaExecutionError } from '../../error/LambdaExecutionError';
 
-class TaskStateHandler extends BaseStateHandler<TaskState> {
+class TaskStateAction extends BaseStateAction<TaskState> {
   constructor(stateDefinition: TaskState) {
     super(stateDefinition);
   }
 
-  override async executeState(
+  override async execute(
     input: JSONValue,
     context: Record<string, unknown>,
-    options?: TaskStateHandlerOptions
+    options?: TaskStateActionOptions
   ): Promise<ExecutionResult> {
     const state = this.stateDefinition;
     const lambdaClient = new LambdaClient();
@@ -39,4 +39,4 @@ class TaskStateHandler extends BaseStateHandler<TaskState> {
   }
 }
 
-export { TaskStateHandler };
+export { TaskStateAction };
