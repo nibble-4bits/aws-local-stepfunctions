@@ -219,7 +219,7 @@ export class StateExecutor {
           const nextState = catcher.Next;
           const errorOutput: ErrorOutput = {
             Error: error.name,
-            Cause: error.toString(),
+            Cause: error.message,
           };
           const resultPath = catcher.ResultPath;
 
