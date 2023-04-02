@@ -1,14 +1,15 @@
 import type { AllStates } from '../typings/AllStates';
-import type { ChoiceState } from '../typings/ChoiceState';
-import type { FailState } from '../typings/FailState';
+import type { ExecutionResult } from '../typings/StateActions';
+import type { StateHandlers } from '../typings/StateExecutor';
+import type { ExecuteOptions } from '../typings/StateMachineImplementation';
 import type { JSONValue } from '../typings/JSONValue';
+import type { TaskState } from '../typings/TaskState';
 import type { MapState } from '../typings/MapState';
 import type { PassState } from '../typings/PassState';
-import type { ExecutionResult } from '../typings/StateActions';
-import type { ExecuteOptions, StateExecutors } from '../typings/StateMachineImplementation';
-import type { SucceedState } from '../typings/SucceedState';
-import type { TaskState } from '../typings/TaskState';
 import type { WaitState } from '../typings/WaitState';
+import type { ChoiceState } from '../typings/ChoiceState';
+import type { FailState } from '../typings/FailState';
+import type { SucceedState } from '../typings/SucceedState';
 import {
   processInputPath,
   processOutputPath,
@@ -72,13 +73,13 @@ export class StateExecutor {
   /**
    * A map of functions to execute each type of state.
    */
-  private readonly stateExecutors: StateExecutors;
+  private readonly stateHandlers: StateHandlers;
 
   constructor(stateName: string, stateDefinition: AllStates) {
     this.stateName = stateName;
     this.stateDefinition = stateDefinition;
     this.retrierAttempts = 'Retry' in this.stateDefinition ? new Array(this.stateDefinition.Retry.length).fill(0) : [];
-    this.stateExecutors = {
+    this.stateHandlers = {
       Task: this.executeTaskState,
       Map: this.executeMapState,
       Pass: this.executePassState,
@@ -102,7 +103,7 @@ export class StateExecutor {
         stateResult: currResult,
         nextState,
         isEndState,
-      } = await this.stateExecutors[this.stateDefinition.Type](
+      } = await this.stateHandlers[this.stateDefinition.Type](
         // @ts-expect-error Indexing `this.stateActions` by non-literal value produces a `never` type for the `this.stateDefinition` parameter of the handler being called
         this.stateDefinition,
         processedInput,

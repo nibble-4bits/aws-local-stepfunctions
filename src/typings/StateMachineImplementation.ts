@@ -1,6 +1,4 @@
-import type { AllStates } from './AllStates';
 import type { JSONValue } from './JSONValue';
-import type { ExecutionResult } from './StateActions';
 
 type TaskStateResourceLocalHandler = {
   [taskStateName: string]: (input: JSONValue) => Promise<JSONValue>;
@@ -30,13 +28,3 @@ export interface ExecuteOptions {
   runOptions: RunOptions | undefined;
   abortSignal: AbortSignal;
 }
-
-export type StateExecutors = {
-  [T in AllStates as T['Type']]: (
-    stateDefinition: T,
-    input: JSONValue,
-    context: Record<string, unknown>,
-    stateName: string,
-    options: ExecuteOptions
-  ) => Promise<ExecutionResult>;
-};
