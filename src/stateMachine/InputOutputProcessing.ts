@@ -2,6 +2,7 @@ import type { PayloadTemplate } from '../typings/InputOutputProcessing';
 import type { JSONValue } from '../typings/JSONValue';
 import { isPlainObj } from '../util';
 import { jsonPathQuery } from './JsonPath';
+import { StatesResultPathMatchFailureError } from '../error/StatesResultPathMatchFailureError';
 import cloneDeep from 'lodash/cloneDeep.js';
 import set from 'lodash/set.js';
 
@@ -79,9 +80,9 @@ function processResultPath(path: string | null | undefined, rawInput: JSONValue,
   if (isPlainObj(rawInput)) {
     const clonedRawInput = cloneDeep(rawInput) as object;
     return set(clonedRawInput, sanitizedPath, result);
-  } else {
-    throw new Error('TODO: Change this error message for a more descriptive one');
   }
+
+  throw new StatesResultPathMatchFailureError();
 }
 
 /**
