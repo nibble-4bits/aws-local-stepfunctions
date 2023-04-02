@@ -98,7 +98,7 @@ export class StateExecutor {
     const rawInput = cloneDeep(input);
 
     try {
-      const processedInput = this.processInput(this.stateDefinition, input, context);
+      const processedInput = this.processInput(input, context);
 
       const {
         stateResult: currResult,
@@ -113,16 +113,18 @@ export class StateExecutor {
         options
       );
 
-      const processedResult = this.processResult(this.stateDefinition, currResult, rawInput, context);
+      const processedResult = this.processResult(currResult, rawInput, context);
 
       return { stateResult: processedResult, nextState, isEndState };
     } catch (error) {
+      // Handle `Retry` logic
       const { shouldRetry, waitTimeBeforeRetry } = this.shouldRetry(error as Error);
       if (shouldRetry && waitTimeBeforeRetry) {
         await sleep(waitTimeBeforeRetry);
         return this.execute(input, context, options);
       }
 
+      // Handle `Catch` logic
       const { nextState, errorOutput, resultPath } = this.catchError(error as Error);
       if (nextState && errorOutput) {
         return { stateResult: processResultPath(resultPath, rawInput, errorOutput), nextState, isEndState: false };
@@ -135,17 +137,17 @@ export class StateExecutor {
   /**
    * Process the current input according to the `InputPath` and `Parameters` fields.
    */
-  private processInput(currentState: AllStates, input: JSONValue, context: Record<string, unknown>): JSONValue {
+  private processInput(input: JSONValue, context: Record<string, unknown>): JSONValue {
     let processedInput = input;
 
-    if ('InputPath' in currentState) {
-      processedInput = processInputPath(currentState.InputPath, processedInput, context);
+    if ('InputPath' in this.stateDefinition) {
+      processedInput = processInputPath(this.stateDefinition.InputPath, processedInput, context);
     }
 
-    if ('Parameters' in currentState && currentState.Type !== 'Map') {
+    if ('Parameters' in this.stateDefinition && this.stateDefinition.Type !== 'Map') {
       // `Parameters` field is handled differently in the `Map` state,
       // hence why we omit processing it here.
-      processedInput = processPayloadTemplate(currentState.Parameters, processedInput, context);
+      processedInput = processPayloadTemplate(this.stateDefinition.Parameters, processedInput, context);
     }
 
     return processedInput;
@@ -154,24 +156,19 @@ export class StateExecutor {
   /**
    * Process the current result according to the `ResultSelector`, `ResultPath` and `OutputPath` fields.
    */
-  private processResult(
-    currentState: AllStates,
-    result: JSONValue,
-    rawInput: JSONValue,
-    context: Record<string, unknown>
-  ): JSONValue {
+  private processResult(result: JSONValue, rawInput: JSONValue, context: Record<string, unknown>): JSONValue {
     let processedResult = result;
 
-    if ('ResultSelector' in currentState) {
-      processedResult = processPayloadTemplate(currentState.ResultSelector, processedResult, context);
+    if ('ResultSelector' in this.stateDefinition) {
+      processedResult = processPayloadTemplate(this.stateDefinition.ResultSelector, processedResult, context);
     }
 
-    if ('ResultPath' in currentState) {
-      processedResult = processResultPath(currentState.ResultPath, rawInput, processedResult);
+    if ('ResultPath' in this.stateDefinition) {
+      processedResult = processResultPath(this.stateDefinition.ResultPath, rawInput, processedResult);
     }
 
-    if ('OutputPath' in currentState) {
-      processedResult = processOutputPath(currentState.OutputPath, processedResult, context);
+    if ('OutputPath' in this.stateDefinition) {
+      processedResult = processOutputPath(this.stateDefinition.OutputPath, processedResult, context);
     }
 
     return processedResult;
