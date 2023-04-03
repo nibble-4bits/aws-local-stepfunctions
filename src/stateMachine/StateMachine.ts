@@ -2,6 +2,7 @@ import type { StateMachineDefinition } from '../typings/StateMachineDefinition';
 import type { JSONValue } from '../typings/JSONValue';
 import type { ExecuteOptions, RunOptions, ValidationOptions } from '../typings/StateMachineImplementation';
 import { ExecutionAbortedError } from '../error/ExecutionAbortedError';
+import { ExecutionError } from '../error/ExecutionError';
 import { StateExecutor } from './StateExecutor';
 import aslValidator from 'asl-validator';
 import cloneDeep from 'lodash/cloneDeep.js';
@@ -86,15 +87,19 @@ export class StateMachine {
     // eslint-disable-next-line prefer-const
     let context: Record<string, unknown> = {};
 
-    do {
-      const stateExecutor = new StateExecutor(currStateName, currState);
-      ({ stateResult: currResult, nextState, isEndState } = await stateExecutor.execute(currInput, context, options));
+    try {
+      do {
+        const stateExecutor = new StateExecutor(currStateName, currState);
+        ({ stateResult: currResult, nextState, isEndState } = await stateExecutor.execute(currInput, context, options));
 
-      currInput = currResult;
+        currInput = currResult;
 
-      currState = this.definition.States[nextState];
-      currStateName = nextState;
-    } while (!isEndState && !options.abortSignal.aborted);
+        currState = this.definition.States[nextState];
+        currStateName = nextState;
+      } while (!isEndState && !options.abortSignal.aborted);
+    } catch (error) {
+      throw new ExecutionError(error as Error);
+    }
 
     return currResult;
   }
