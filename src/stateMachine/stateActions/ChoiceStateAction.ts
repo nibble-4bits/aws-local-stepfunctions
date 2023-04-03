@@ -3,8 +3,8 @@ import type { ChoiceState, ChoiceRuleWithoutNext } from '../../typings/ChoiceSta
 import type { ChoiceStateActionOptions, ExecutionResult } from '../../typings/StateActions';
 import { BaseStateAction } from './BaseStateAction';
 import { jsonPathQuery } from '../JsonPath';
+import { StatesNoChoiceMatchedError } from '../../error/predefined/StatesNoChoiceMatchedError';
 import wcmatch from 'wildcard-match';
-import { StatesNoChoiceMatchedError } from '../../error/StatesNoChoiceMatchedError';
 
 class ChoiceStateAction extends BaseStateAction<ChoiceState> {
   constructor(stateDefinition: ChoiceState) {

@@ -5,7 +5,7 @@ import { BaseStateAction } from './BaseStateAction';
 import { StateMachine } from '../StateMachine';
 import { jsonPathQuery } from '../JsonPath';
 import { processPayloadTemplate } from '../InputOutputProcessing';
-import { StatesRuntimeError } from '../../error/StatesRuntimeError';
+import { StatesRuntimeError } from '../../error/predefined/StatesRuntimeError';
 import pLimit from 'p-limit';
 
 class MapStateAction extends BaseStateAction<MapState> {
