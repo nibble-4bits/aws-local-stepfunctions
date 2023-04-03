@@ -5,6 +5,7 @@ import { BaseStateAction } from './BaseStateAction';
 import { StateMachine } from '../StateMachine';
 import { jsonPathQuery } from '../JsonPath';
 import { processPayloadTemplate } from '../InputOutputProcessing';
+import { StatesRuntimeError } from '../../error/StatesRuntimeError';
 import pLimit from 'p-limit';
 
 class MapStateAction extends BaseStateAction<MapState> {
@@ -53,8 +54,7 @@ class MapStateAction extends BaseStateAction<MapState> {
     }
 
     if (!Array.isArray(items)) {
-      // TODO: throw error instead of returning, because current input is not an array.
-      return this.buildExecutionResult([]);
+      throw new StatesRuntimeError('Input of Map state must be an array or ItemsPath property must point to an array');
     }
 
     const DEFAULT_MAX_CONCURRENCY = 40; // If `MaxConcurrency` is 0 or not specified, default to running 40 iterations concurrently
