@@ -1,4 +1,6 @@
-export class StatesParameterPathFailureError extends Error {
+import { RuntimeError } from '../RuntimeError';
+
+export class StatesParameterPathFailureError extends RuntimeError {
   constructor() {
     super('States.ParameterPathFailure');
 

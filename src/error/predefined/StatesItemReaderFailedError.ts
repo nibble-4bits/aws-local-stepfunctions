@@ -1,4 +1,6 @@
-export class StatesItemReaderFailedError extends Error {
+import { RuntimeError } from '../RuntimeError';
+
+export class StatesItemReaderFailedError extends RuntimeError {
   constructor() {
     super('States.ItemReaderFailed');
 

@@ -1,4 +1,6 @@
-export class StatesResultWriterFailedError extends Error {
+import { RuntimeError } from '../RuntimeError';
+
+export class StatesResultWriterFailedError extends RuntimeError {
   constructor() {
     super('States.ResultWriterFailed');
 

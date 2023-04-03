@@ -1,4 +1,6 @@
-export class StatesHeartbeatTimeoutError extends Error {
+import { RuntimeError } from '../RuntimeError';
+
+export class StatesHeartbeatTimeoutError extends RuntimeError {
   constructor() {
     super('States.HeartbeatTimeout');
 

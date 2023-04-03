@@ -1,4 +1,6 @@
-export class StatesPermissionsError extends Error {
+import { RuntimeError } from '../RuntimeError';
+
+export class StatesPermissionsError extends RuntimeError {
   constructor() {
     super('States.Permissions');
 

@@ -1,4 +1,6 @@
-export class StatesTaskFailedError extends Error {
+import { RuntimeError } from '../RuntimeError';
+
+export class StatesTaskFailedError extends RuntimeError {
   constructor() {
     super('States.TaskFailed');
 

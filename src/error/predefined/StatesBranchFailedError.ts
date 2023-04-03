@@ -1,4 +1,6 @@
-export class StatesBranchFailedError extends Error {
+import { RuntimeError } from '../RuntimeError';
+
+export class StatesBranchFailedError extends RuntimeError {
   constructor() {
     super('States.BranchFailed');
 
