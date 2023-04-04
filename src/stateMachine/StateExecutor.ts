@@ -178,7 +178,7 @@ export class StateExecutor {
   /**
    * Decide whether this state should be retried, according to the `Retry` field.
    */
-  shouldRetry(error: RuntimeError): RetryResult {
+  private shouldRetry(error: RuntimeError): RetryResult {
     if (!('Retry' in this.stateDefinition)) {
       return { shouldRetry: false };
     }
@@ -207,7 +207,7 @@ export class StateExecutor {
   /**
    * Try to match the current error with a catcher, according to the `Catch` field.
    */
-  catchError(error: RuntimeError): CatchResult {
+  private catchError(error: RuntimeError): CatchResult {
     if (!('Catch' in this.stateDefinition)) {
       return { nextState: '' };
     }
