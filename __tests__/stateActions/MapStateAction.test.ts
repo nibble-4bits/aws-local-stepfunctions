@@ -169,4 +169,26 @@ describe('Map State', () => {
       'Input of Map state must be an array or ItemsPath property must point to an array'
     );
   });
+
+  test('should throw an error if a single iteration fails', async () => {
+    const definition: MapState = {
+      Type: 'Map',
+      Iterator: {
+        StartAt: 'EntryIterationState',
+        States: {
+          EntryIterationState: {
+            Type: 'Fail',
+          },
+        },
+      },
+      End: true,
+    };
+    const input = [1, 2, 3];
+    const context = {};
+
+    const mapStateAction = new MapStateAction(definition);
+    const mapStateResult = mapStateAction.execute(input, context);
+
+    await expect(mapStateResult).rejects.toThrow();
+  });
 });
