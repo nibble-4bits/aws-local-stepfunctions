@@ -49,12 +49,12 @@ const DEFAULT_BACKOFF_RATE = 2.0;
 const WILDCARD_ERROR = 'States.ALL';
 
 /**
- * This class handles the execution a single state in the state machine.
- * Handling the execution includes:
- *  - Applying input processing
- *  - Executing the state itself
- *  - Applying output processing
- *  - If state is retryable, run the retry attempts
+ * This class handles the execution of a single state in the state machine, which includes:
+ *  - Applying input processing.
+ *  - Executing the state action itself.
+ *  - Applying output processing.
+ *  - If state is retryable, run the retry attempts.
+ *  - If state is catchable, transition to next state.
  */
 export class StateExecutor {
   /**
