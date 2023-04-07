@@ -6,14 +6,25 @@ import { StateMachine } from '../StateMachine';
 import { jsonPathQuery } from '../JsonPath';
 import { processPayloadTemplate } from '../InputOutputProcessing';
 import { StatesRuntimeError } from '../../error/predefined/StatesRuntimeError';
+import { ExecutionError } from '../../error/ExecutionError';
 import pLimit from 'p-limit';
 
+/**
+ * Default number of iterations to run concurrently.
+ */
+const DEFAULT_MAX_CONCURRENCY = 40;
+
 class MapStateAction extends BaseStateAction<MapState> {
+  private abortController: AbortController;
+
   constructor(stateDefinition: MapState) {
     super(stateDefinition);
+
+    this.abortController = new AbortController();
   }
 
   private processItem(
+    stateMachine: StateMachine,
     item: JSONValue,
     input: JSONValue,
     context: Record<string, unknown>,
@@ -36,9 +47,11 @@ class MapStateAction extends BaseStateAction<MapState> {
     }
 
     // Pass the current parameter value if defined, otherwise pass the current item being iterated
-    const mapStateMachine = new StateMachine(state.Iterator, options?.validationOptions);
-    const { result } = mapStateMachine.run(paramValue ?? item, options?.runOptions);
-    return result;
+    const execution = stateMachine.run(paramValue ?? item, options?.runOptions);
+
+    this.abortController.signal.addEventListener('abort', execution.abort);
+
+    return execution.result;
   }
 
   override async execute(
@@ -57,15 +70,27 @@ class MapStateAction extends BaseStateAction<MapState> {
       throw new StatesRuntimeError('Input of Map state must be an array or ItemsPath property must point to an array');
     }
 
-    const DEFAULT_MAX_CONCURRENCY = 40; // If `MaxConcurrency` is 0 or not specified, default to running 40 iterations concurrently
+    const iteratorStateMachine = new StateMachine(state.Iterator, options?.validationOptions);
     const limit = pLimit(state.MaxConcurrency || DEFAULT_MAX_CONCURRENCY);
     const processedItemsPromise = items.map((item, i) =>
-      limit(() => this.processItem(item, input, context, i, options))
+      limit(() => this.processItem(iteratorStateMachine, item, input, context, i, options))
     );
-    const result = await Promise.all(processedItemsPromise);
 
-    delete context['Map'];
-    return this.buildExecutionResult(result);
+    try {
+      const result = await Promise.all(processedItemsPromise);
+
+      return this.buildExecutionResult(result);
+    } catch (error) {
+      this.abortController.abort();
+
+      if (error instanceof ExecutionError) {
+        throw error.getWrappedError;
+      }
+
+      throw error;
+    } finally {
+      delete context['Map'];
+    }
   }
 }
 
