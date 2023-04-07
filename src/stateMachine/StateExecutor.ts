@@ -189,9 +189,10 @@ export class StateExecutor {
       const intervalSeconds = retrier.IntervalSeconds ?? DEFAULT_INTERVAL_SECONDS;
       const backoffRate = retrier.BackoffRate ?? DEFAULT_BACKOFF_RATE;
       const waitTimeBeforeRetry = intervalSeconds * Math.pow(backoffRate, this.retrierAttempts[i]) * 1000;
+      const retryable = error.isRetryable ?? true;
 
       for (const retrierError of retrier.ErrorEquals) {
-        if (error.isRetryable && (retrierError === error.name || retrierError === WILDCARD_ERROR)) {
+        if (retryable && (retrierError === error.name || retrierError === WILDCARD_ERROR)) {
           if (this.retrierAttempts[i] >= maxAttempts) return { shouldRetry: false };
 
           this.retrierAttempts[i]++;
@@ -214,9 +215,10 @@ export class StateExecutor {
 
     for (let i = 0; i < this.stateDefinition.Catch.length; i++) {
       const catcher = this.stateDefinition.Catch[i];
+      const catchable = error.isCatchable ?? true;
 
       for (const catcherError of catcher.ErrorEquals) {
-        if (error.isCatchable && (catcherError === error.name || catcherError === WILDCARD_ERROR)) {
+        if (catchable && (catcherError === error.name || catcherError === WILDCARD_ERROR)) {
           const nextState = catcher.Next;
           const errorOutput: ErrorOutput = {
             Error: error.name,
