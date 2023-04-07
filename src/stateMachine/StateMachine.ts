@@ -42,6 +42,8 @@ export class StateMachine {
 
   /**
    * Executes the state machine, running through the states specified in the definition.
+   * If the execution fails, the result will throw an `ExecutionError` explaining why the
+   * execution failed.
    *
    * By default, if the execution is aborted, the result will throw an `ExecutionAbortedError`. This behavior can be changed by setting
    * the `noThrowOnAbort` option to `true`, in which case the result will be `null`.
