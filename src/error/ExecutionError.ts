@@ -1,3 +1,6 @@
+/**
+ * Represents the failure of a state machine execution.
+ */
 export class ExecutionError extends Error {
   #wrappedError: Error;
 
