@@ -6,7 +6,7 @@ afterEach(() => {
   jest.clearAllMocks();
 });
 
-describe('Task State Handler', () => {
+describe('Task State', () => {
   const mockInvokeFunction = jest.fn();
 
   beforeEach(() => {
