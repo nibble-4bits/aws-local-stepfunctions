@@ -25,6 +25,7 @@ import { PassStateAction } from './stateActions/PassStateAction';
 import { SucceedStateAction } from './stateActions/SucceedStateAction';
 import { TaskStateAction } from './stateActions/TaskStateAction';
 import { WaitStateAction } from './stateActions/WaitStateAction';
+import { StatesTimeoutError } from '../error/predefined/StatesTimeoutError';
 import { sleep } from '../util';
 import cloneDeep from 'lodash/cloneDeep.js';
 
@@ -44,9 +45,14 @@ const DEFAULT_INTERVAL_SECONDS = 1;
 const DEFAULT_BACKOFF_RATE = 2.0;
 
 /**
- * The wildcard error. This matches all errors caught in the `Retry` or `Catch` fields.
+ * The wildcard error. This matches all thrown errors.
  */
 const WILDCARD_ERROR = 'States.ALL';
+
+/**
+ * The wildcard error for task state failures. This matches all errors thrown by a Task state, except for `States.Timeout`.
+ */
+const TASK_STATE_WILDCARD_ERROR = 'States.TaskFailed';
 
 /**
  * This class handles the execution of a single state in the state machine, which includes:
@@ -192,7 +198,15 @@ export class StateExecutor {
       const retryable = error.isRetryable ?? true;
 
       for (const retrierError of retrier.ErrorEquals) {
-        if (retryable && (retrierError === error.name || retrierError === WILDCARD_ERROR)) {
+        const isErrorMatch = retrierError === error.name;
+        const isErrorWildcard = retrierError === WILDCARD_ERROR;
+        const isErrorTaskWildcard =
+          retrierError === TASK_STATE_WILDCARD_ERROR &&
+          this.stateDefinition.Type === 'Task' &&
+          !(error instanceof StatesTimeoutError);
+
+        const maybeShouldRetry = retryable && (isErrorMatch || isErrorWildcard || isErrorTaskWildcard);
+        if (maybeShouldRetry) {
           if (this.retrierAttempts[i] >= maxAttempts) return { shouldRetry: false };
 
           this.retrierAttempts[i]++;
@@ -218,7 +232,15 @@ export class StateExecutor {
       const catchable = error.isCatchable ?? true;
 
       for (const catcherError of catcher.ErrorEquals) {
-        if (catchable && (catcherError === error.name || catcherError === WILDCARD_ERROR)) {
+        const isErrorMatch = catcherError === error.name;
+        const isErrorWildcard = catcherError === WILDCARD_ERROR;
+        const isErrorTaskWildcard =
+          catcherError === TASK_STATE_WILDCARD_ERROR &&
+          this.stateDefinition.Type === 'Task' &&
+          !(error instanceof StatesTimeoutError);
+
+        const shouldCatch = catchable && (isErrorMatch || isErrorWildcard || isErrorTaskWildcard);
+        if (shouldCatch) {
           const nextState = catcher.Next;
           const errorOutput: ErrorOutput = {
             Error: error.name,
