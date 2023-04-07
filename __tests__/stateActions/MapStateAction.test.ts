@@ -1,5 +1,6 @@
 import type { MapState } from '../../src/typings/MapState';
 import { MapStateAction } from '../../src/stateMachine/stateActions/MapStateAction';
+import { StatesRuntimeError } from '../../src/error/predefined/StatesRuntimeError';
 
 afterEach(() => {
   jest.clearAllMocks();
@@ -116,5 +117,56 @@ describe('Map State', () => {
         index: 2,
       },
     ]);
+  });
+
+  test('should throw a runtime error if input is not an array', async () => {
+    const definition: MapState = {
+      Type: 'Map',
+      Iterator: {
+        StartAt: 'EntryIterationState',
+        States: {
+          EntryIterationState: {
+            Type: 'Succeed',
+          },
+        },
+      },
+      End: true,
+    };
+    const input = 'not an array';
+    const context = {};
+
+    const mapStateAction = new MapStateAction(definition);
+    const mapStateResult = mapStateAction.execute(input, context);
+
+    await expect(mapStateResult).rejects.toThrow(StatesRuntimeError);
+    await expect(mapStateResult).rejects.toThrow(
+      'Input of Map state must be an array or ItemsPath property must point to an array'
+    );
+  });
+
+  test('should throw a runtime error if `ItemsPath` field does not reference an array', async () => {
+    const definition: MapState = {
+      Type: 'Map',
+      ItemsPath: '$.items',
+      Iterator: {
+        StartAt: 'EntryIterationState',
+        States: {
+          EntryIterationState: {
+            Type: 'Succeed',
+          },
+        },
+      },
+      End: true,
+    };
+    const input = { items: 'not an array' };
+    const context = {};
+
+    const mapStateAction = new MapStateAction(definition);
+    const mapStateResult = mapStateAction.execute(input, context);
+
+    await expect(mapStateResult).rejects.toThrow(StatesRuntimeError);
+    await expect(mapStateResult).rejects.toThrow(
+      'Input of Map state must be an array or ItemsPath property must point to an array'
+    );
   });
 });
