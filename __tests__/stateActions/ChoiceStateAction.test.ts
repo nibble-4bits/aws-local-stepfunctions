@@ -1,5 +1,6 @@
 import type { ChoiceState } from '../../src/typings/ChoiceState';
 import { ChoiceStateAction } from '../../src/stateMachine/stateActions/ChoiceStateAction';
+import { StatesNoChoiceMatchedError } from '../../src/error/predefined/StatesNoChoiceMatchedError';
 
 afterEach(() => {
   jest.clearAllMocks();
@@ -825,5 +826,30 @@ describe('Choice State', () => {
 
     expect(stateResult).toEqual({ testNumberValue: 50, testStringValue: 'test' });
     expect(nextState).toEqual('DefaultChoice');
+  });
+
+  test('should throw `StatesNoChoiceMatchedError` if none of the choices match and `Default` field is not specified', async () => {
+    const definition: ChoiceState = {
+      Type: 'Choice',
+      Choices: [
+        {
+          Variable: '$.testNumberValue',
+          NumericEquals: 20,
+          Next: 'FailState',
+        },
+        {
+          Variable: '$.testStringValue',
+          StringEquals: 'not test',
+          Next: 'FailState',
+        },
+      ],
+    };
+    const input = { testNumberValue: 50, testStringValue: 'test' };
+    const context = {};
+
+    const choiceStateAction = new ChoiceStateAction(definition);
+    const choiceStateResult = choiceStateAction.execute(input, context);
+
+    await expect(choiceStateResult).rejects.toThrow(StatesNoChoiceMatchedError);
   });
 });
