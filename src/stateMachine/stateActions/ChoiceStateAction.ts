@@ -1,6 +1,7 @@
 import type { JSONValue } from '../../typings/JSONValue';
 import type { ChoiceState, ChoiceRuleWithoutNext } from '../../typings/ChoiceState';
 import type { ChoiceStateActionOptions, ExecutionResult } from '../../typings/StateActions';
+import type { Context } from '../../typings/Context';
 import { BaseStateAction } from './BaseStateAction';
 import { jsonPathQuery } from '../JsonPath';
 import { StatesNoChoiceMatchedError } from '../../error/predefined/StatesNoChoiceMatchedError';
@@ -253,7 +254,7 @@ class ChoiceStateAction extends BaseStateAction<ChoiceState> {
   override async execute(
     input: JSONValue,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    context: Record<string, unknown>,
+    context: Context,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     options?: ChoiceStateActionOptions
   ): Promise<ExecutionResult> {

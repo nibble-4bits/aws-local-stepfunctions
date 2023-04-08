@@ -12,6 +12,7 @@ import type { ChoiceState } from '../typings/ChoiceState';
 import type { FailState } from '../typings/FailState';
 import type { SucceedState } from '../typings/SucceedState';
 import type { RuntimeError } from '../error/RuntimeError';
+import type { Context } from '../typings/Context';
 import {
   processInputPath,
   processOutputPath,
@@ -101,7 +102,7 @@ export class StateExecutor {
   /**
    * Execute the current state.
    */
-  async execute(input: JSONValue, context: Record<string, unknown>, options: ExecuteOptions): Promise<ExecutionResult> {
+  async execute(input: JSONValue, context: Context, options: ExecuteOptions): Promise<ExecutionResult> {
     const rawInput = cloneDeep(input);
 
     try {
@@ -144,7 +145,7 @@ export class StateExecutor {
   /**
    * Process the current input according to the `InputPath` and `Parameters` fields.
    */
-  private processInput(input: JSONValue, context: Record<string, unknown>): JSONValue {
+  private processInput(input: JSONValue, context: Context): JSONValue {
     let processedInput = input;
 
     if ('InputPath' in this.stateDefinition) {
@@ -163,7 +164,7 @@ export class StateExecutor {
   /**
    * Process the current result according to the `ResultSelector`, `ResultPath` and `OutputPath` fields.
    */
-  private processResult(result: JSONValue, rawInput: JSONValue, context: Record<string, unknown>): JSONValue {
+  private processResult(result: JSONValue, rawInput: JSONValue, context: Context): JSONValue {
     let processedResult = result;
 
     if ('ResultSelector' in this.stateDefinition) {
@@ -265,7 +266,7 @@ export class StateExecutor {
   private async executeTaskState(
     stateDefinition: TaskState,
     input: JSONValue,
-    context: Record<string, unknown>,
+    context: Context,
     stateName: string,
     options: ExecuteOptions
   ): Promise<ExecutionResult> {
@@ -287,7 +288,7 @@ export class StateExecutor {
   private async executeMapState(
     stateDefinition: MapState,
     input: JSONValue,
-    context: Record<string, unknown>,
+    context: Context,
     stateName: string,
     options: ExecuteOptions
   ): Promise<ExecutionResult> {
@@ -309,7 +310,7 @@ export class StateExecutor {
   private async executePassState(
     stateDefinition: PassState,
     input: JSONValue,
-    context: Record<string, unknown>,
+    context: Context,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     stateName: string,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -330,7 +331,7 @@ export class StateExecutor {
   private async executeWaitState(
     stateDefinition: WaitState,
     input: JSONValue,
-    context: Record<string, unknown>,
+    context: Context,
     stateName: string,
     options: ExecuteOptions
   ): Promise<ExecutionResult> {
@@ -363,7 +364,7 @@ export class StateExecutor {
   private async executeChoiceState(
     stateDefinition: ChoiceState,
     input: JSONValue,
-    context: Record<string, unknown>,
+    context: Context,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     stateName: string,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -383,7 +384,7 @@ export class StateExecutor {
   private async executeSucceedState(
     stateDefinition: SucceedState,
     input: JSONValue,
-    context: Record<string, unknown>,
+    context: Context,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     stateName: string,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -403,7 +404,7 @@ export class StateExecutor {
   private async executeFailState(
     stateDefinition: FailState,
     input: JSONValue,
-    context: Record<string, unknown>,
+    context: Context,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     stateName: string,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars

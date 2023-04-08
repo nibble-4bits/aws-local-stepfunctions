@@ -1,6 +1,7 @@
 import type { TaskState } from '../../typings/TaskState';
 import type { JSONValue } from '../../typings/JSONValue';
 import type { ExecutionResult, TaskStateActionOptions } from '../../typings/StateActions';
+import type { Context } from '../../typings/Context';
 import { BaseStateAction } from './BaseStateAction';
 import { LambdaClient } from '../../aws/LambdaClient';
 
@@ -11,7 +12,7 @@ class TaskStateAction extends BaseStateAction<TaskState> {
 
   override async execute(
     input: JSONValue,
-    context: Record<string, unknown>,
+    context: Context,
     options?: TaskStateActionOptions
   ): Promise<ExecutionResult> {
     const state = this.stateDefinition;

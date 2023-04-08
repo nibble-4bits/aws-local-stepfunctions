@@ -1,6 +1,7 @@
 import type { MapState } from '../../typings/MapState';
 import type { JSONValue } from '../../typings/JSONValue';
 import type { ExecutionResult, MapStateActionOptions } from '../../typings/StateActions';
+import type { Context } from '../../typings/Context';
 import { BaseStateAction } from './BaseStateAction';
 import { StateMachine } from '../StateMachine';
 import { jsonPathQuery } from '../JsonPath';
@@ -27,7 +28,7 @@ class MapStateAction extends BaseStateAction<MapState> {
     stateMachine: StateMachine,
     item: JSONValue,
     input: JSONValue,
-    context: Record<string, unknown>,
+    context: Context,
     index: number,
     options: MapStateActionOptions | undefined
   ): Promise<JSONValue> {
@@ -56,7 +57,7 @@ class MapStateAction extends BaseStateAction<MapState> {
 
   override async execute(
     input: JSONValue,
-    context: Record<string, unknown>,
+    context: Context,
     options?: MapStateActionOptions
   ): Promise<ExecutionResult> {
     const state = this.stateDefinition;

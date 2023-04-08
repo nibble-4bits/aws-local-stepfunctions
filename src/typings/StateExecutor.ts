@@ -1,4 +1,5 @@
 import type { AllStates } from './AllStates';
+import type { Context } from './Context';
 import type { ErrorOutput } from './ErrorHandling';
 import type { JSONValue } from './JSONValue';
 import type { ExecutionResult } from './StateActions';
@@ -8,7 +9,7 @@ export type StateHandlers = {
   [T in AllStates as T['Type']]: (
     stateDefinition: T,
     input: JSONValue,
-    context: Record<string, unknown>,
+    context: Context,
     stateName: string,
     options: ExecuteOptions
   ) => Promise<ExecutionResult>;

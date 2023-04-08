@@ -1,4 +1,5 @@
 import type { JSONValue } from '../typings/JSONValue';
+import type { Context } from '../typings/Context';
 import { JSONPath as jp } from 'jsonpath-plus';
 
 /**
@@ -8,7 +9,7 @@ import { JSONPath as jp } from 'jsonpath-plus';
  * @param context The context object to evaluate, if the path expression starts with `$$`.
  * @returns The value of the property that was queried for, if found. Otherwise returns `undefined`.
  */
-function jsonPathQuery<T>(pathExpression: string, json: JSONValue, context?: JSONValue): T {
+function jsonPathQuery<T>(pathExpression: string, json: JSONValue, context?: Context): T {
   // If the expression starts with double `$$`, evaluate the path in the context object.
   if (pathExpression.startsWith('$$')) {
     return jp({ path: pathExpression.slice(1), json: context ?? null, wrap: false });

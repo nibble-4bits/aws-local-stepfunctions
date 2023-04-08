@@ -1,6 +1,7 @@
 import type { JSONValue } from '../../typings/JSONValue';
 import type { WaitState } from '../../typings/WaitState';
 import type { ExecutionResult, WaitStateActionOptions } from '../../typings/StateActions';
+import type { Context } from '../../typings/Context';
 import { BaseStateAction } from './BaseStateAction';
 import { jsonPathQuery } from '../JsonPath';
 import { sleep } from '../../util';
@@ -12,7 +13,7 @@ class WaitStateAction extends BaseStateAction<WaitState> {
 
   override async execute(
     input: JSONValue,
-    context: Record<string, unknown>,
+    context: Context,
     options?: WaitStateActionOptions
   ): Promise<ExecutionResult> {
     const state = this.stateDefinition;

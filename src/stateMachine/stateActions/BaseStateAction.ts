@@ -3,6 +3,7 @@ import type { TerminalState } from '../../typings/TerminalState';
 import type { JSONValue } from '../../typings/JSONValue';
 import type { BaseState } from '../../typings/BaseState';
 import type { ExecutionResult } from '../../typings/StateActions';
+import type { Context } from '../../typings/Context';
 
 abstract class BaseStateAction<T extends BaseState | IntermediateState | TerminalState> {
   protected stateDefinition: T;
@@ -25,11 +26,7 @@ abstract class BaseStateAction<T extends BaseState | IntermediateState | Termina
     return executionResult;
   }
 
-  abstract execute(
-    input: JSONValue,
-    context: Record<string, unknown>,
-    options?: Record<string, unknown>
-  ): Promise<ExecutionResult>;
+  abstract execute(input: JSONValue, context: Context, options?: Record<string, unknown>): Promise<ExecutionResult>;
 }
 
 export { BaseStateAction };
