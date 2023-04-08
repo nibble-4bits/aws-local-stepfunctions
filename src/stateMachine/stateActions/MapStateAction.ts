@@ -15,12 +15,12 @@ import pLimit from 'p-limit';
 const DEFAULT_MAX_CONCURRENCY = 40;
 
 class MapStateAction extends BaseStateAction<MapState> {
-  private abortController: AbortController;
+  private executionAbortFuncs: (() => void)[];
 
   constructor(stateDefinition: MapState) {
     super(stateDefinition);
 
-    this.abortController = new AbortController();
+    this.executionAbortFuncs = [];
   }
 
   private processItem(
@@ -49,7 +49,7 @@ class MapStateAction extends BaseStateAction<MapState> {
     // Pass the current parameter value if defined, otherwise pass the current item being iterated
     const execution = stateMachine.run(paramValue ?? item, options?.runOptions);
 
-    this.abortController.signal.addEventListener('abort', execution.abort);
+    this.executionAbortFuncs.push(execution.abort);
 
     return execution.result;
   }
@@ -81,7 +81,7 @@ class MapStateAction extends BaseStateAction<MapState> {
 
       return this.buildExecutionResult(result);
     } catch (error) {
-      this.abortController.abort();
+      this.executionAbortFuncs.forEach((abort) => abort());
 
       if (error instanceof ExecutionError) {
         throw error.getWrappedError;
