@@ -1,5 +1,5 @@
 import type { PassState } from '../../src/typings/PassState';
-import { PassStateHandler } from '../../src/stateHandlers/PassStateHandler';
+import { PassStateAction } from '../../src/stateMachine/stateActions/PassStateAction';
 
 afterEach(() => {
   jest.clearAllMocks();
@@ -17,8 +17,8 @@ describe('Pass State', () => {
     };
     const context = {};
 
-    const passStateHandler = new PassStateHandler(definition);
-    const { stateResult } = await passStateHandler.executeState(input, context);
+    const passStateAction = new PassStateAction(definition);
+    const { stateResult } = await passStateAction.execute(input, context);
 
     expect(stateResult).toEqual({
       prop1: 'test',
@@ -41,8 +41,8 @@ describe('Pass State', () => {
     };
     const context = {};
 
-    const passStateHandler = new PassStateHandler(definition);
-    const { stateResult } = await passStateHandler.executeState(input, context);
+    const passStateAction = new PassStateAction(definition);
+    const { stateResult } = await passStateAction.execute(input, context);
 
     expect(stateResult).toEqual({
       result1: 'result1',

@@ -1,11 +1,17 @@
 import type { Credentials } from '@aws-sdk/types/dist-types/credentials';
 import type { JSONValue } from '../typings/JSONValue';
 import { LambdaClient as AWSLambdaClient, InvokeCommand } from '@aws-sdk/client-lambda';
-import { LambdaExecutionError } from '../error/LambdaExecutionError';
+import { FailStateError } from '../error/FailStateError';
 
 interface LambdaClientConfig {
   region: string;
   credentials: Credentials;
+}
+
+interface LambdaErrorResult {
+  errorType: string;
+  errorMessage: string;
+  trace: string[];
 }
 
 /**
@@ -35,7 +41,10 @@ export class LambdaClient {
     }
 
     if (invocationResult.FunctionError) {
-      throw new LambdaExecutionError(resultValue, funcNameOrArn);
+      const errorResult = resultValue as LambdaErrorResult;
+      // Even though this is not a Fail State, we can take advantage of the `FailStateError`
+      // to throw an error with a custom name and message.
+      throw new FailStateError(errorResult.errorType, `Execution of Lambda function "${funcNameOrArn}" failed`);
     }
 
     return resultValue;

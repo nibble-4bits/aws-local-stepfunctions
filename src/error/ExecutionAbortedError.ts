@@ -1,16 +1,10 @@
-import { CustomError } from './CustomError';
-
 /**
  * Represents the abortion of a state machine execution.
  */
-export class ExecutionAbortedError extends CustomError {
+export class ExecutionAbortedError extends Error {
   constructor() {
     super('Execution aborted');
 
     this.name = 'ExecutionAbortedError';
-  }
-
-  toString(): string {
-    return 'Execution aborted';
   }
 }

@@ -1,6 +1,7 @@
 import type { StateMachineDefinition } from '../src/typings/StateMachineDefinition';
-import { StateMachine } from '../src/StateMachine';
+import { StateMachine } from '../src/stateMachine/StateMachine';
 import { ExecutionAbortedError } from '../src/error/ExecutionAbortedError';
+import { ExecutionError } from '../src/error/ExecutionError';
 
 afterEach(() => {
   jest.clearAllMocks();
@@ -105,7 +106,7 @@ describe('State Machine', () => {
       await expect(() => execution.result).rejects.toThrow(ExecutionAbortedError);
     });
 
-    test('should not throw on abort and return `null` if `noThrowOnAbort` option is passed', async () => {
+    test('should return `null` if `noThrowOnAbort` option is passed', async () => {
       const input = {};
 
       const stateMachine = new StateMachine(machineDefinition);
@@ -114,6 +115,25 @@ describe('State Machine', () => {
       execution.abort();
 
       await expect(execution.result).resolves.toBe(null);
+    });
+
+    test('should throw an `ExecutionError` if execution fails', async () => {
+      const machineDefinition: StateMachineDefinition = {
+        StartAt: 'FailState',
+        States: {
+          FailState: {
+            Type: 'Fail',
+            Error: 'Failure',
+            Cause: 'This is the cause of the error',
+          },
+        },
+      };
+      const input = {};
+
+      const stateMachine = new StateMachine(machineDefinition);
+      const execution = stateMachine.run(input);
+
+      await expect(execution.result).rejects.toThrow(ExecutionError);
     });
 
     test('should return result of last state as execution result', async () => {

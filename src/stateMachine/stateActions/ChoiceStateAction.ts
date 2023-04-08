@@ -1,11 +1,12 @@
-import type { JSONValue } from '../typings/JSONValue';
-import type { ChoiceState, ChoiceRuleWithoutNext } from '../typings/ChoiceState';
-import type { ChoiceStateHandlerOptions, ExecutionResult } from '../typings/StateHandlers';
-import { BaseStateHandler } from './BaseStateHandler';
+import type { JSONValue } from '../../typings/JSONValue';
+import type { ChoiceState, ChoiceRuleWithoutNext } from '../../typings/ChoiceState';
+import type { ChoiceStateActionOptions, ExecutionResult } from '../../typings/StateActions';
+import { BaseStateAction } from './BaseStateAction';
 import { jsonPathQuery } from '../JsonPath';
+import { StatesNoChoiceMatchedError } from '../../error/predefined/StatesNoChoiceMatchedError';
 import wcmatch from 'wildcard-match';
 
-class ChoiceStateHandler extends BaseStateHandler<ChoiceState> {
+class ChoiceStateAction extends BaseStateAction<ChoiceState> {
   constructor(stateDefinition: ChoiceState) {
     super(stateDefinition);
   }
@@ -249,12 +250,12 @@ class ChoiceStateHandler extends BaseStateHandler<ChoiceState> {
     return false;
   }
 
-  override async executeState(
+  override async execute(
     input: JSONValue,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     context: Record<string, unknown>,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    options?: ChoiceStateHandlerOptions
+    options?: ChoiceStateActionOptions
   ): Promise<ExecutionResult> {
     const state = this.stateDefinition;
 
@@ -269,9 +270,8 @@ class ChoiceStateHandler extends BaseStateHandler<ChoiceState> {
       return { stateResult: input, nextState: state.Default, isEndState: false };
     }
 
-    // TODO: Throw States.NoChoiceMatched error here because all choices failed to match and no `Default` field was specified.
-    throw new Error('States.NoChoiceMatched');
+    throw new StatesNoChoiceMatchedError();
   }
 }
 
-export { ChoiceStateHandler };
+export { ChoiceStateAction };

@@ -1,9 +1,10 @@
+import { StatesResultPathMatchFailureError } from '../src/error/predefined/StatesResultPathMatchFailureError';
 import {
   processInputPath,
   processOutputPath,
   processPayloadTemplate,
   processResultPath,
-} from '../src/InputOutputProcessing';
+} from '../src/stateMachine/InputOutputProcessing';
 
 afterEach(() => {
   jest.clearAllMocks();
@@ -477,6 +478,17 @@ describe('Output processing', () => {
           lastUpdated: '2020-05-27T08:00:00Z',
         },
       });
+    });
+
+    test('should throw `StatesResultPathMatchFailureError` if raw input is not a plain object', () => {
+      const input = 'not a plain object';
+      const result = 10;
+
+      function processResultPathWrapper() {
+        processResultPath('$.path', input, result);
+      }
+
+      expect(processResultPathWrapper).toThrow(StatesResultPathMatchFailureError);
     });
   });
 

@@ -1,4 +1,5 @@
 import type { BaseState } from './BaseState';
+import type { CatchableState, RetryableState } from './ErrorHandling';
 import type {
   CanHaveInputPath,
   CanHaveOutputPath,
@@ -15,7 +16,9 @@ interface BaseTaskState
     CanHaveParameters,
     CanHaveResultSelector,
     CanHaveResultPath,
-    CanHaveOutputPath {
+    CanHaveOutputPath,
+    RetryableState,
+    CatchableState {
   Type: 'Task';
   Resource: string;
 }

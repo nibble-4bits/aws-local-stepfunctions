@@ -1,5 +1,5 @@
 import type { SucceedState } from '../../src/typings/SucceedState';
-import { SucceedStateHandler } from '../../src/stateHandlers/SucceedStateHandler';
+import { SucceedStateAction } from '../../src/stateMachine/stateActions/SucceedStateAction';
 
 afterEach(() => {
   jest.clearAllMocks();
@@ -16,8 +16,8 @@ describe('Succeed State', () => {
     };
     const context = {};
 
-    const succeedStateHandler = new SucceedStateHandler(definition);
-    const { stateResult } = await succeedStateHandler.executeState(input, context);
+    const succeedStateAction = new SucceedStateAction(definition);
+    const { stateResult } = await succeedStateAction.execute(input, context);
 
     expect(stateResult).toEqual({
       prop1: 'test',
@@ -35,8 +35,8 @@ describe('Succeed State', () => {
     };
     const context = {};
 
-    const succeedStateHandler = new SucceedStateHandler(definition);
-    const { isEndState } = await succeedStateHandler.executeState(input, context);
+    const succeedStateAction = new SucceedStateAction(definition);
+    const { isEndState } = await succeedStateAction.execute(input, context);
 
     expect(isEndState).toBe(true);
   });
