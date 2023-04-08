@@ -9,7 +9,6 @@ export default defineConfig({
     return { js: `.${format}.js` };
   },
   dts: true,
-  minify: true,
   clean: true,
   splitting: false,
 });
