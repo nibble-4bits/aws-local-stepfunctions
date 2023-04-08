@@ -1,6 +1,6 @@
 # AWS Local Step Functions
 
-A Node.js implementation of the [Amazon States Language specification](https://states-language.net/spec.html).
+A TypeScript implementation of the [Amazon States Language specification](https://states-language.net/spec.html).
 
 This package lets you run AWS Step Functions locally on your machine!
 
