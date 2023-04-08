@@ -14,24 +14,23 @@ The following features all come from the [Amazon States Language specification](
   - [x] `ResultPath`
   - [x] `OutputPath`
 - States
-  - [x] Pass
-  - [x] Wait
   - [x] Succeed
+  - [x] Pass
+    - [x] `Result`
+  - [x] Wait
+    - [x] `Seconds`
+    - [x] `SecondsPath`
+    - [x] `Timestamp`
+    - [x] `TimestampPath`
   - [x] Map
     - [x] `Iterator`
     - [x] `ItemsPath`
     - [x] `MaxConcurrency`
-
-### Limited support
-
-- States
-  - Task
-    - [x] `Resource` (only Lambda functions supported)
-    - [ ] `TimeoutSeconds`
-    - [ ] `HeartbeatSeconds`
-    - [ ] `TimeoutSecondsPath`
-    - [ ] `HeartbeatSecondsPath`
-  - Choice
+  - [x] Fail
+    - [x] `Error`
+    - [x] `Cause`
+    - [x] Terminate execution with error
+  - [x] Choice
     - Boolean expressions
       - [x] `And`
       - [x] `Or`
@@ -60,19 +59,26 @@ The following features all come from the [Amazon States Language specification](
       - [x] `IsString`
       - [x] `IsBoolean`
       - [x] `IsTimestamp`
-    - [ ] Throw `States.NoChoiceMatched` error if no choice rule was matched and `Default`
-  - Fail
-    - [ ] `Error`
-    - [ ] `Cause`
-    - [ ] Terminate execution with error
+    - [x] Throw `States.NoChoiceMatched` error if no choice rule was matched and `Default`
+- Errors
+  - [x] Runtime errors
+    - [x] Predefined error codes
+  - [x] Retry/Catch
+
+### Limited support
+
+- States
+  - Task
+    - [x] `Resource` (only Lambda functions supported)
+    - [ ] `TimeoutSeconds`
+    - [ ] `HeartbeatSeconds`
+    - [ ] `TimeoutSecondsPath`
+    - [ ] `HeartbeatSecondsPath`
 
 ### No support
 
 - [ ] Parallel state
 - [ ] Intrinsic functions
-- [ ] Runtime errors
-  - [ ] Predefined error codes
-- [ ] Retry/Catch
 
 ## Non-spec features
 
