@@ -25,12 +25,15 @@
     "build"
   ],
   "type": "module",
-  "main": "build/main.cjs",
   "types": "build/main.d.ts",
+  "main": "build/main.node.cjs",
+  "module": "build/main.node.esm.js",
+  "browser": "build/main.browser.esm.js",
   "exports": {
-    "require": "./build/main.cjs",
-    "import": "./build/main.esm.js",
-    "default": "./build/main.esm.js"
+    "import": "./build/main.node.esm.js",
+    "require": "./build/main.node.cjs",
+    "browser": "./build/main.browser.esm.js",
+    "default": "./build/main.browser.esm.js"
   },
   "scripts": {
     "test": "jest",
