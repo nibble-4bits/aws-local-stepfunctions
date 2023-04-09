@@ -16,7 +16,6 @@ class TaskStateAction extends BaseStateAction<TaskState> {
     options?: TaskStateActionOptions
   ): Promise<ExecutionResult> {
     const state = this.stateDefinition;
-    const lambdaClient = new LambdaClient();
 
     // If local override for task resource is defined, use that
     if (options?.overrideFn) {
@@ -24,6 +23,7 @@ class TaskStateAction extends BaseStateAction<TaskState> {
       return this.buildExecutionResult(result);
     }
 
+    const lambdaClient = new LambdaClient();
     const result = await lambdaClient.invokeFunction(state.Resource, input);
     return this.buildExecutionResult(result);
   }
