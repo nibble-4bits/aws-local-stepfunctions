@@ -1,14 +1,28 @@
-import { defineConfig } from 'tsup';
+import { defineConfig, Options } from 'tsup';
 
-export default defineConfig({
-  entry: ['src/main.ts'],
-  format: ['cjs', 'esm'],
-  outDir: 'build',
-  outExtension({ format }) {
-    if (format === 'cjs') return { js: `.${format}` };
-    return { js: `.${format}.js` };
+function getCommonConfig(platform: 'node' | 'browser'): Options {
+  return {
+    entry: ['src/main.ts'],
+    outDir: 'build',
+    splitting: false,
+    outExtension({ format }) {
+      if (format === 'cjs') return { js: `.${platform}.${format}` };
+      return { js: `.${platform}.${format}.js` };
+    },
+  };
+}
+
+export default defineConfig([
+  {
+    ...getCommonConfig('node'),
+    format: ['cjs', 'esm'],
+    dts: true,
+    clean: true,
   },
-  dts: true,
-  clean: true,
-  splitting: false,
-});
+  {
+    ...getCommonConfig('browser'),
+    format: ['esm'],
+    platform: 'browser',
+    noExternal: [/./],
+  },
+]);
