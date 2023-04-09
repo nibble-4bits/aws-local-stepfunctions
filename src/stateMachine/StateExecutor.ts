@@ -128,7 +128,7 @@ export class StateExecutor {
       // Handle `Retry` logic
       const { shouldRetry, waitTimeBeforeRetry } = this.shouldRetry(error as RuntimeError);
       if (shouldRetry && waitTimeBeforeRetry) {
-        await sleep(waitTimeBeforeRetry);
+        await sleep(waitTimeBeforeRetry, options.abortSignal);
         return this.execute(input, context, options);
       }
 
