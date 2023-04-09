@@ -50,7 +50,7 @@ export class LambdaClient {
   }
 
   async invokeFunction(funcNameOrArn: string, payload: JSONValue) {
-    const payloadBuffer = Buffer.from(JSON.stringify(payload));
+    const payloadBuffer = new TextEncoder().encode(JSON.stringify(payload));
 
     const invokeCommand = new InvokeCommand({
       FunctionName: funcNameOrArn,
@@ -61,7 +61,7 @@ export class LambdaClient {
 
     let resultValue = null;
     if (invocationResult.Payload) {
-      resultValue = Buffer.from(invocationResult.Payload).toString();
+      resultValue = new TextDecoder().decode(invocationResult.Payload);
       resultValue = JSON.parse(resultValue);
     }
 
