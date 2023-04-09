@@ -1,5 +1,6 @@
 import type { PayloadTemplate } from '../typings/InputOutputProcessing';
 import type { JSONValue } from '../typings/JSONValue';
+import type { Context } from '../typings/Context';
 import { isPlainObj } from '../util';
 import { jsonPathQuery } from './JsonPath';
 import { StatesResultPathMatchFailureError } from '../error/predefined/StatesResultPathMatchFailureError';
@@ -13,7 +14,7 @@ import set from 'lodash/set.js';
  * * If `InputPath` is `null`, returns an empty object (`{}`).
  * * If `InputPath` is a string, it's considered a JSONPath and the selected portion of the current input is returned.
  */
-function processInputPath(path: string | null | undefined, input: JSONValue, context?: JSONValue): JSONValue {
+function processInputPath(path: string | null | undefined, input: JSONValue, context?: Context): JSONValue {
   if (path === undefined) {
     return input;
   }
@@ -32,11 +33,7 @@ function processInputPath(path: string | null | undefined, input: JSONValue, con
  * @param context The context object to evaluate, if the path expression starts with `$$`.
  * @returns The processed payload template.
  */
-function processPayloadTemplate(
-  payloadTemplate: PayloadTemplate,
-  json: JSONValue,
-  context?: JSONValue
-): PayloadTemplate {
+function processPayloadTemplate(payloadTemplate: PayloadTemplate, json: JSONValue, context?: Context): PayloadTemplate {
   const resolvedProperties = Object.entries(payloadTemplate).map(([key, value]) => {
     let sanitizedKey = key;
     let resolvedValue = value;
@@ -78,7 +75,7 @@ function processResultPath(path: string | null | undefined, rawInput: JSONValue,
   const sanitizedPath = path.replace('$.', '');
 
   if (isPlainObj(rawInput)) {
-    const clonedRawInput = cloneDeep(rawInput) as object;
+    const clonedRawInput = cloneDeep(rawInput);
     return set(clonedRawInput, sanitizedPath, result);
   }
 
@@ -92,7 +89,7 @@ function processResultPath(path: string | null | undefined, rawInput: JSONValue,
  * * If `OutputPath` is `null`, returns an empty object (`{}`).
  * * If `OutputPath` is a string, it's considered a JSONPath and the selected portion of the current result is returned.
  */
-function processOutputPath(path: string | null | undefined, result: JSONValue, context?: JSONValue): JSONValue {
+function processOutputPath(path: string | null | undefined, result: JSONValue, context?: Context): JSONValue {
   if (path === undefined) {
     return result;
   }

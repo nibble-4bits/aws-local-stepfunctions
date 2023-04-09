@@ -1,9 +1,11 @@
+import type { JSONObject } from '../typings/JSONValue';
+
 /**
  * Determines if a value is a plain object, i.e. one declared using the `{}` notation or constructed with `new Object()`.
  * @param value The value to test if it's a plain object or not.
  * @returns `true` if `value` is a plain object, `false` if not.
  */
-export function isPlainObj(value: unknown): boolean {
+export function isPlainObj(value: unknown): value is JSONObject {
   return !!value && Object.getPrototypeOf(value) === Object.prototype;
 }
 
@@ -18,7 +20,7 @@ export function sleep(ms: number, abortSignal?: AbortSignal) {
     const timeout = setTimeout(resolve, ms);
 
     abortSignal?.addEventListener('abort', () => {
-      timeout.unref();
+      clearTimeout(timeout);
     });
   });
 }

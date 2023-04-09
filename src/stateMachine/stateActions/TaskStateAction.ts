@@ -1,6 +1,7 @@
 import type { TaskState } from '../../typings/TaskState';
 import type { JSONValue } from '../../typings/JSONValue';
 import type { ExecutionResult, TaskStateActionOptions } from '../../typings/StateActions';
+import type { Context } from '../../typings/Context';
 import { BaseStateAction } from './BaseStateAction';
 import { LambdaClient } from '../../aws/LambdaClient';
 
@@ -11,11 +12,10 @@ class TaskStateAction extends BaseStateAction<TaskState> {
 
   override async execute(
     input: JSONValue,
-    context: Record<string, unknown>,
+    context: Context,
     options?: TaskStateActionOptions
   ): Promise<ExecutionResult> {
     const state = this.stateDefinition;
-    const lambdaClient = new LambdaClient();
 
     // If local override for task resource is defined, use that
     if (options?.overrideFn) {
@@ -23,6 +23,7 @@ class TaskStateAction extends BaseStateAction<TaskState> {
       return this.buildExecutionResult(result);
     }
 
+    const lambdaClient = new LambdaClient();
     const result = await lambdaClient.invokeFunction(state.Resource, input);
     return this.buildExecutionResult(result);
   }

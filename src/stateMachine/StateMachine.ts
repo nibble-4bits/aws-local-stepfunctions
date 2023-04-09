@@ -1,6 +1,7 @@
 import type { StateMachineDefinition } from '../typings/StateMachineDefinition';
 import type { JSONValue } from '../typings/JSONValue';
 import type { ExecuteOptions, RunOptions, ValidationOptions } from '../typings/StateMachineImplementation';
+import type { Context } from '../typings/Context';
 import { ExecutionAbortedError } from '../error/ExecutionAbortedError';
 import { ExecutionError } from '../error/ExecutionError';
 import { StateExecutor } from './StateExecutor';
@@ -87,7 +88,7 @@ export class StateMachine {
     let nextState = '';
     let isEndState = false;
     // eslint-disable-next-line prefer-const
-    let context: Record<string, unknown> = {};
+    let context: Context = {};
 
     try {
       do {

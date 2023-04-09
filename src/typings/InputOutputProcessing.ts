@@ -1,4 +1,6 @@
-export type PayloadTemplate = object;
+import type { JSONObject } from './JSONValue';
+
+export type PayloadTemplate = JSONObject;
 
 export interface CanHaveInputPath {
   InputPath?: string | null;

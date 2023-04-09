@@ -2,7 +2,6 @@
   "extends": "@tsconfig/node16-strictest/tsconfig.json",
   "compilerOptions": {
     "outDir": "build",
-    "target": "ES2015",
     "declaration": true,
     "noUncheckedIndexedAccess": false,
     "noUnusedParameters": false
