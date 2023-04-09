@@ -20,7 +20,7 @@ export function sleep(ms: number, abortSignal?: AbortSignal) {
     const timeout = setTimeout(resolve, ms);
 
     abortSignal?.addEventListener('abort', () => {
-      timeout.unref();
+      clearTimeout(timeout);
     });
   });
 }
