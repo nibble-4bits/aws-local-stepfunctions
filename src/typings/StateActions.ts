@@ -11,6 +11,11 @@ export type TaskStateActionOptions = {
   overrideFn: ((input: JSONValue) => Promise<JSONValue>) | undefined;
 };
 
+export type ParallelStateActionOptions = {
+  validationOptions: ValidationOptions | undefined;
+  runOptions: RunOptions | undefined;
+};
+
 export type MapStateActionOptions = {
   validationOptions: ValidationOptions | undefined;
   runOptions: RunOptions | undefined;
