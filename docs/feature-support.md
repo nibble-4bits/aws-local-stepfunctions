@@ -22,6 +22,8 @@ The following features all come from the [Amazon States Language specification](
     - [x] `SecondsPath`
     - [x] `Timestamp`
     - [x] `TimestampPath`
+  - [x] Parallel
+    - [x] `Branches`
   - [x] Map
     - [x] `Iterator`
     - [x] `ItemsPath`
@@ -77,7 +79,6 @@ The following features all come from the [Amazon States Language specification](
 
 ### No support
 
-- [ ] Parallel state
 - [ ] Intrinsic functions
 
 ## Non-spec features
