@@ -5,6 +5,7 @@ import type { ExecuteOptions } from '../typings/StateMachineImplementation';
 import type { ErrorOutput } from '../typings/ErrorHandling';
 import type { JSONValue } from '../typings/JSONValue';
 import type { TaskState } from '../typings/TaskState';
+import type { ParallelState } from '../typings/ParallelState';
 import type { MapState } from '../typings/MapState';
 import type { PassState } from '../typings/PassState';
 import type { WaitState } from '../typings/WaitState';
@@ -22,6 +23,7 @@ import {
 import { ChoiceStateAction } from './stateActions/ChoiceStateAction';
 import { FailStateAction } from './stateActions/FailStateAction';
 import { MapStateAction } from './stateActions/MapStateAction';
+import { ParallelStateAction } from './stateActions/ParallelStateAction';
 import { PassStateAction } from './stateActions/PassStateAction';
 import { SucceedStateAction } from './stateActions/SucceedStateAction';
 import { TaskStateAction } from './stateActions/TaskStateAction';
@@ -90,6 +92,7 @@ export class StateExecutor {
     this.retrierAttempts = 'Retry' in this.stateDefinition ? new Array(this.stateDefinition.Retry.length).fill(0) : [];
     this.stateHandlers = {
       Task: this.executeTaskState,
+      Parallel: this.executeParallelState,
       Map: this.executeMapState,
       Pass: this.executePassState,
       Wait: this.executeWaitState,
@@ -274,6 +277,28 @@ export class StateExecutor {
 
     const taskStateAction = new TaskStateAction(stateDefinition);
     const executionResult = await taskStateAction.execute(input, context, { overrideFn });
+
+    return executionResult;
+  }
+
+  /**
+   * Handler for parallel states.
+   *
+   * Creates a new state machine for each of the branches specified in the `Branches` field,
+   * and then executes each branch state machine by passing them the Parallel state input.
+   */
+  private async executeParallelState(
+    stateDefinition: ParallelState,
+    input: JSONValue,
+    context: Context,
+    stateName: string,
+    options: ExecuteOptions
+  ): Promise<ExecutionResult> {
+    const parallelStateAction = new ParallelStateAction(stateDefinition);
+    const executionResult = await parallelStateAction.execute(input, context, {
+      validationOptions: options.validationOptions,
+      runOptions: options.runOptions,
+    });
 
     return executionResult;
   }
