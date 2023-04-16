@@ -274,9 +274,10 @@ export class StateExecutor {
     options: ExecuteOptions
   ): Promise<ExecutionResult> {
     const overrideFn = options.runOptions?.overrides?.taskResourceLocalHandlers?.[stateName];
+    const awsConfig = options.stateMachineOptions?.awsConfig;
 
     const taskStateAction = new TaskStateAction(stateDefinition);
-    const executionResult = await taskStateAction.execute(input, context, { overrideFn });
+    const executionResult = await taskStateAction.execute(input, context, { overrideFn, awsConfig });
 
     return executionResult;
   }

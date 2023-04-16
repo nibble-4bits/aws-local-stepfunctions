@@ -1,12 +1,8 @@
-import type { Credentials } from '@aws-sdk/types/dist-types/credentials';
 import type { JSONValue } from '../typings/JSONValue';
+import type { AWSConfig } from '../typings/StateMachineImplementation';
 import { LambdaClient as AWSLambdaClient, InvokeCommand } from '@aws-sdk/client-lambda';
+import { fromCognitoIdentityPool } from '@aws-sdk/credential-providers';
 import { FailStateError } from '../error/FailStateError';
-
-interface LambdaClientConfig {
-  region: string;
-  credentials: Credentials;
-}
 
 interface LambdaErrorResult {
   errorType: string;
@@ -18,10 +14,28 @@ interface LambdaErrorResult {
  * Wrapper class around the Lambda AWS SDK client
  */
 export class LambdaClient {
-  private client: AWSLambdaClient;
+  private readonly client: AWSLambdaClient;
 
-  constructor(config?: LambdaClientConfig) {
-    this.client = new AWSLambdaClient(config ?? {});
+  constructor(config: AWSConfig | undefined) {
+    this.client = new AWSLambdaClient({});
+
+    if (config) {
+      if (!config.region) {
+        throw new Error('`awsConfig` option was specified for state machine, but `region` property is not set');
+      }
+
+      if (config.credentials?.cognitoIdentityPool) {
+        this.client = new AWSLambdaClient({
+          region: config.region,
+          credentials: fromCognitoIdentityPool({
+            ...config.credentials.cognitoIdentityPool,
+            clientConfig: { region: config.region },
+          }),
+        });
+      } else if (config.credentials?.accessKeys) {
+        this.client = new AWSLambdaClient({ region: config.region, credentials: config.credentials.accessKeys });
+      }
+    }
   }
 
   async invokeFunction(funcNameOrArn: string, payload: JSONValue) {

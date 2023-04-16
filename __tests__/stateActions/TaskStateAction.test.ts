@@ -56,7 +56,7 @@ describe('Task State', () => {
     const context = {};
 
     const localHandlerFn = jest.fn((event) => event.num1 + event.num2);
-    const options = { overrideFn: localHandlerFn };
+    const options = { overrideFn: localHandlerFn, awsConfig: undefined };
 
     const taskStateAction = new TaskStateAction(definition);
     const { stateResult } = await taskStateAction.execute(input, context, options);
