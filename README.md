@@ -15,7 +15,7 @@ This package lets you run AWS Step Functions locally on your machine!
     - [CommonJS](#commonjs)
     - [ES Module](#es-module)
 - [API](#api)
-  - [Constructor](#constructor-new-statemachinedefinition-validationoptions)
+  - [Constructor](#constructor-new-statemachinedefinition-statemachineoptions)
   - [StateMachine.run](#statemachineruninput-options)
 - [Examples](#examples)
 - [License](#license)
@@ -50,18 +50,24 @@ import { StateMachine } from 'aws-local-stepfunctions';
 
 ## API
 
-### Constructor: `new StateMachine(definition[, validationOptions])`
+### Constructor: `new StateMachine(definition[, stateMachineOptions])`
 
 #### Parameters
 
 The constructor takes the following parameters:
 
 - `definition`: The Amazon States Language definition of the state machine.
-- `validationOptions` (optional): An object that specifies how the definition should be validated.
-  - `checkPaths`: If set to `false`, won't validate JSONPaths.
-  - `checkArn`: If set to `false`, won't validate ARN syntax in `Task` states.
+- `stateMachineOptions?`:
+  - `validationOptions?`: An object that specifies how the definition should be validated.
+    - `checkPaths`: If set to `false`, won't validate JSONPaths.
+    - `checkArn`: If set to `false`, won't validate ARN syntax in `Task` states.
+  - `awsConfig?`: An object that specifies the AWS region and credentials to use when invoking a Lambda function in a `Task` state. If not set, the AWS config will be resolved based on the [credentials provider chain](https://docs.aws.amazon.com/sdk-for-javascript/v3/developer-guide/setting-credentials-node.html) of the AWS SDK for JavaScript V3. You don't need to use this option if you have a [shared config/credentials file](https://docs.aws.amazon.com/sdkref/latest/guide/file-format.html) (for example, if you have the [AWS CLI](https://aws.amazon.com/cli/) installed) or if you use a local override for all of your `Task` states.
+    - `region`: The AWS region where the Lambda functions are created.
+    - `credentials`: An object that specifies which type of credentials to use.
+      - `cognitoIdentityPool`: An object that specifies the Cognito Identity Pool to use for requesting credentials.
+      - `accessKeys`: An object that specifies the [Access Key ID and Secret Access Key](https://docs.aws.amazon.com/IAM/latest/UserGuide/security-creds.html#sec-access-keys-and-secret-access-keys) to use as credentials.
 
-The constructor will attempt to validate the definition by default, unless the `validationOptions` param is specified. If the definition is not valid, an error will be thrown.
+The constructor will attempt to validate the definition by default, unless the `validationOptions` property is specified. If the definition is not valid, an error will be thrown.
 
 #### Example
 
@@ -81,7 +87,9 @@ const machineDefinition = {
 };
 
 // Instantiate a new state machine with the given definition and don't validate JSONPaths.
-const stateMachine = new StateMachine(machineDefinition, { checkPaths: false });
+const stateMachine = new StateMachine(machineDefinition, {
+  validationOptions: { checkPaths: false },
+});
 ```
 
 ### `StateMachine.run(input[, options])`
@@ -96,11 +104,11 @@ Each execution is independent of all others, meaning that you can concurrently c
 #### Parameters
 
 - `input`: The initial input to pass to the state machine. This can be any valid JSON value.
-- `options` (optional):
-  - `overrides`: An object to override the behavior of certain states:
-    - `taskResourceLocalHandlers`: Overrides the resource of the specified `Task` states to run a local function.
-    - `waitTimeOverrides`: Overrides the wait duration of the specified `Wait` states. The specifed override duration should be in milliseconds.
-  - `noThrowOnAbort`: If this option is set to `true`, aborting the execution will simply return `null` as result instead of throwing.
+- `options?`:
+  - `overrides?`: An object to override the behavior of certain states:
+    - `taskResourceLocalHandlers?`: Overrides the resource of the specified `Task` states to run a local function.
+    - `waitTimeOverrides?`: Overrides the wait duration of the specified `Wait` states. The specifed override duration should be in milliseconds.
+  - `noThrowOnAbort?`: If this option is set to `true`, aborting the execution will simply return `null` as result instead of throwing.
 
 #### Basic example:
 
