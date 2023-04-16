@@ -56,10 +56,10 @@ describe('State Machine', () => {
           },
         },
       };
-      const validationOptions = { checkArn: false };
+      const stateMachineOptions = { validationOptions: { checkArn: false } };
 
       expect(() => {
-        new StateMachine(stateMachineDefinition, validationOptions);
+        new StateMachine(stateMachineDefinition, stateMachineOptions);
       }).not.toThrow();
     });
 
@@ -76,10 +76,10 @@ describe('State Machine', () => {
           },
         },
       };
-      const validationOptions = { checkPaths: false };
+      const stateMachineOptions = { validationOptions: { checkPaths: false } };
 
       expect(() => {
-        new StateMachine(stateMachineDefinition, validationOptions);
+        new StateMachine(stateMachineDefinition, stateMachineOptions);
       }).not.toThrow();
     });
   });

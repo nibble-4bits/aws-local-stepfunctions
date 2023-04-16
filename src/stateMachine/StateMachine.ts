@@ -1,6 +1,6 @@
 import type { StateMachineDefinition } from '../typings/StateMachineDefinition';
 import type { JSONValue } from '../typings/JSONValue';
-import type { ExecuteOptions, RunOptions, ValidationOptions } from '../typings/StateMachineImplementation';
+import type { ExecuteOptions, RunOptions, StateMachineOptions } from '../typings/StateMachineImplementation';
 import type { Context } from '../typings/Context';
 import { ExecutionAbortedError } from '../error/ExecutionAbortedError';
 import { ExecutionError } from '../error/ExecutionError';
@@ -15,21 +15,21 @@ export class StateMachine {
   private readonly definition: StateMachineDefinition;
 
   /**
-   * Options to control whether to apply certain validations to the state machine definition.
+   * Options to control certain settings of the state machine.
    */
-  private readonly validationOptions: ValidationOptions | undefined;
+  private readonly stateMachineOptions: StateMachineOptions | undefined;
 
   /**
    * Constructs a new state machine.
    * @param definition The state machine definition defined using the Amazon States Language (https://states-language.net/spec.html).
-   * @param validationOptions Options to control whether to apply certain validations to the definition.
-   * These options also apply to state machines defined in  the `Iterator` field of `Map` states.
+   * @param stateMachineOptions Options to control certain settings of the state machine.
+   * These options also apply to state machines defined in the `Iterator` field of `Map` states and in the `Branches` field of `Parallel` states.
    */
-  constructor(definition: StateMachineDefinition, validationOptions?: ValidationOptions) {
+  constructor(definition: StateMachineDefinition, stateMachineOptions?: StateMachineOptions) {
     const { isValid, errorsText } = aslValidator(definition, {
       checkArn: true,
       checkPaths: true,
-      ...validationOptions,
+      ...stateMachineOptions?.validationOptions,
     });
 
     if (!isValid) {
@@ -37,8 +37,7 @@ export class StateMachine {
     }
 
     this.definition = definition;
-
-    this.validationOptions = validationOptions;
+    this.stateMachineOptions = stateMachineOptions;
   }
 
   /**
@@ -64,7 +63,7 @@ export class StateMachine {
     });
 
     const executionResult = this.execute(input, {
-      validationOptions: this.validationOptions,
+      stateMachineOptions: this.stateMachineOptions,
       runOptions: options,
       abortSignal: abortController.signal,
     });

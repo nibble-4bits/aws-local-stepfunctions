@@ -39,7 +39,7 @@ describe('State Executor', () => {
       const stateExecutor = new StateExecutor('TaskState', stateDefinition);
       const { stateResult } = await stateExecutor.execute(input, context, {
         abortSignal: new AbortController().signal,
-        validationOptions: undefined,
+        stateMachineOptions: undefined,
         runOptions: {
           overrides: {
             taskResourceLocalHandlers: {
@@ -77,7 +77,7 @@ describe('State Executor', () => {
       const stateExecutor = new StateExecutor('TaskState', stateDefinition);
       const { stateResult } = await stateExecutor.execute(input, context, {
         abortSignal: new AbortController().signal,
-        validationOptions: undefined,
+        stateMachineOptions: undefined,
         runOptions: {
           overrides: {
             taskResourceLocalHandlers: {
@@ -116,7 +116,7 @@ describe('State Executor', () => {
       const stateExecutor = new StateExecutor('TaskState', stateDefinition);
       const executorResult = stateExecutor.execute(input, context, {
         abortSignal: new AbortController().signal,
-        validationOptions: undefined,
+        stateMachineOptions: undefined,
         runOptions: {
           overrides: {
             taskResourceLocalHandlers: {
@@ -160,7 +160,7 @@ describe('State Executor', () => {
       const stateExecutor = new StateExecutor('TaskState', stateDefinition);
       const executorResult = stateExecutor.execute(input, context, {
         abortSignal: new AbortController().signal,
-        validationOptions: undefined,
+        stateMachineOptions: undefined,
         runOptions: {
           overrides: {
             taskResourceLocalHandlers: {
@@ -199,7 +199,7 @@ describe('State Executor', () => {
         const stateExecutor = new StateExecutor('TaskState', stateDefinition);
         const { stateResult } = await stateExecutor.execute(input, context, {
           abortSignal: new AbortController().signal,
-          validationOptions: undefined,
+          stateMachineOptions: undefined,
           runOptions: {
             overrides: {
               taskResourceLocalHandlers: {
@@ -240,7 +240,7 @@ describe('State Executor', () => {
       const stateExecutor = new StateExecutor('TaskState', stateDefinition);
       const { stateResult, nextState } = await stateExecutor.execute(input, context, {
         abortSignal: new AbortController().signal,
-        validationOptions: undefined,
+        stateMachineOptions: undefined,
         runOptions: {
           overrides: {
             taskResourceLocalHandlers: {
@@ -277,7 +277,7 @@ describe('State Executor', () => {
       const stateExecutor = new StateExecutor('TaskState', stateDefinition);
       const { stateResult, nextState } = await stateExecutor.execute(input, context, {
         abortSignal: new AbortController().signal,
-        validationOptions: undefined,
+        stateMachineOptions: undefined,
         runOptions: {
           overrides: {
             taskResourceLocalHandlers: {
@@ -315,7 +315,7 @@ describe('State Executor', () => {
       const stateExecutor = new StateExecutor('TaskState', stateDefinition);
       const { stateResult, nextState } = await stateExecutor.execute(input, context, {
         abortSignal: new AbortController().signal,
-        validationOptions: undefined,
+        stateMachineOptions: undefined,
         runOptions: {
           overrides: {
             taskResourceLocalHandlers: {
@@ -364,7 +364,7 @@ describe('State Executor', () => {
       const stateExecutor = new StateExecutor('TaskState', stateDefinition);
       const executorResult = stateExecutor.execute(input, context, {
         abortSignal: new AbortController().signal,
-        validationOptions: undefined,
+        stateMachineOptions: undefined,
         runOptions: {
           overrides: {
             taskResourceLocalHandlers: {
@@ -398,7 +398,7 @@ describe('State Executor', () => {
         const stateExecutor = new StateExecutor('TaskState', stateDefinition);
         const { stateResult, nextState } = await stateExecutor.execute(input, context, {
           abortSignal: new AbortController().signal,
-          validationOptions: undefined,
+          stateMachineOptions: undefined,
           runOptions: {
             overrides: {
               taskResourceLocalHandlers: {

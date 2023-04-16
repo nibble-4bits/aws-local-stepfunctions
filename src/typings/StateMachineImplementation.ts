@@ -18,13 +18,17 @@ export interface ValidationOptions {
   readonly checkArn?: boolean;
 }
 
+export interface StateMachineOptions {
+  validationOptions: ValidationOptions;
+}
+
 export interface RunOptions {
   overrides?: Overrides;
   noThrowOnAbort?: boolean;
 }
 
 export interface ExecuteOptions {
-  validationOptions: ValidationOptions | undefined;
+  stateMachineOptions: StateMachineOptions | undefined;
   runOptions: RunOptions | undefined;
   abortSignal: AbortSignal;
 }
