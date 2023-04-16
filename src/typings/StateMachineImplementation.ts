@@ -1,4 +1,6 @@
 import type { JSONValue } from './JSONValue';
+import type { FromCognitoIdentityPoolParameters } from '@aws-sdk/credential-provider-cognito-identity/dist-types/fromCognitoIdentityPool';
+import type { Credentials as AWSCredentials } from '@aws-sdk/types/dist-types/credentials';
 
 type TaskStateResourceLocalHandler = {
   [taskStateName: string]: (input: JSONValue) => Promise<JSONValue>;
@@ -18,8 +20,17 @@ export interface ValidationOptions {
   readonly checkArn?: boolean;
 }
 
+export interface AWSConfig {
+  region: string;
+  credentials?: {
+    cognitoIdentityPool?: FromCognitoIdentityPoolParameters;
+    accessKeys?: Omit<AWSCredentials, 'expiration'>;
+  };
+}
+
 export interface StateMachineOptions {
-  validationOptions: ValidationOptions;
+  validationOptions?: ValidationOptions;
+  awsConfig?: AWSConfig;
 }
 
 export interface RunOptions {
