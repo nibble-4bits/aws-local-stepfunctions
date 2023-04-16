@@ -24,6 +24,17 @@ export class LambdaClient {
         throw new Error('`awsConfig` option was specified for state machine, but `region` property is not set');
       }
 
+      // Check if multiple types of credentials were passed. Passing more than one type is an error.
+      if (config.credentials) {
+        const credentialsTypes = Object.keys(config.credentials);
+        const credentialsNames = credentialsTypes.map((name) => `\`${name}\``).join(', ');
+        if (credentialsTypes.length > 1) {
+          throw new Error(
+            `More than one type of AWS credentials were specified: ${credentialsNames}. Only one type may be specified`
+          );
+        }
+      }
+
       if (config.credentials?.cognitoIdentityPool) {
         this.client = new AWSLambdaClient({
           region: config.region,
