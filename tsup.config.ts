@@ -2,6 +2,7 @@ import { defineConfig, Options } from 'tsup';
 
 function getCommonConfig(platform: 'node' | 'browser'): Options {
   return {
+    name: platform,
     entry: ['src/main.ts'],
     outDir: 'build',
     splitting: false,
