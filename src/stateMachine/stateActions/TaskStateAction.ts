@@ -23,7 +23,7 @@ class TaskStateAction extends BaseStateAction<TaskState> {
       return this.buildExecutionResult(result);
     }
 
-    const lambdaClient = new LambdaClient();
+    const lambdaClient = new LambdaClient(options?.awsConfig);
     const result = await lambdaClient.invokeFunction(state.Resource, input);
     return this.buildExecutionResult(result);
   }

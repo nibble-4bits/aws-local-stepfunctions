@@ -71,7 +71,7 @@ class MapStateAction extends BaseStateAction<MapState> {
       throw new StatesRuntimeError('Input of Map state must be an array or ItemsPath property must point to an array');
     }
 
-    const iteratorStateMachine = new StateMachine(state.Iterator, options?.validationOptions);
+    const iteratorStateMachine = new StateMachine(state.Iterator, options?.stateMachineOptions);
     const limit = pLimit(state.MaxConcurrency || DEFAULT_MAX_CONCURRENCY);
     const processedItemsPromise = items.map((item, i) =>
       limit(() => this.processItem(iteratorStateMachine, item, input, context, i, options))

@@ -15,8 +15,10 @@ const machineDefinition = {
 
 // Construct a new state machine with the given definition and don't validate ARNs nor JSONPaths
 const stateMachine = new StateMachine(machineDefinition, {
-  checkArn: false,
-  checkPaths: false,
+  validationOptions: {
+    checkArn: false,
+    checkPaths: false,
+  },
 });
 
 // The following log is printed because no error was thrown by the constructor

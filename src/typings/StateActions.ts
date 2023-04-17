@@ -1,5 +1,5 @@
 import type { JSONValue } from './JSONValue';
-import type { RunOptions, ValidationOptions } from './StateMachineImplementation';
+import type { AWSConfig, RunOptions, StateMachineOptions } from './StateMachineImplementation';
 
 export interface ExecutionResult {
   stateResult: JSONValue;
@@ -9,15 +9,16 @@ export interface ExecutionResult {
 
 export type TaskStateActionOptions = {
   overrideFn: ((input: JSONValue) => Promise<JSONValue>) | undefined;
+  awsConfig: AWSConfig | undefined;
 };
 
 export type ParallelStateActionOptions = {
-  validationOptions: ValidationOptions | undefined;
+  stateMachineOptions: StateMachineOptions | undefined;
   runOptions: RunOptions | undefined;
 };
 
 export type MapStateActionOptions = {
-  validationOptions: ValidationOptions | undefined;
+  stateMachineOptions: StateMachineOptions | undefined;
   runOptions: RunOptions | undefined;
 };
 

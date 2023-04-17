@@ -274,9 +274,10 @@ export class StateExecutor {
     options: ExecuteOptions
   ): Promise<ExecutionResult> {
     const overrideFn = options.runOptions?.overrides?.taskResourceLocalHandlers?.[stateName];
+    const awsConfig = options.stateMachineOptions?.awsConfig;
 
     const taskStateAction = new TaskStateAction(stateDefinition);
-    const executionResult = await taskStateAction.execute(input, context, { overrideFn });
+    const executionResult = await taskStateAction.execute(input, context, { overrideFn, awsConfig });
 
     return executionResult;
   }
@@ -296,7 +297,7 @@ export class StateExecutor {
   ): Promise<ExecutionResult> {
     const parallelStateAction = new ParallelStateAction(stateDefinition);
     const executionResult = await parallelStateAction.execute(input, context, {
-      validationOptions: options.validationOptions,
+      stateMachineOptions: options.stateMachineOptions,
       runOptions: options.runOptions,
     });
 
@@ -319,7 +320,7 @@ export class StateExecutor {
   ): Promise<ExecutionResult> {
     const mapStateAction = new MapStateAction(stateDefinition);
     const executionResult = await mapStateAction.execute(input, context, {
-      validationOptions: options.validationOptions,
+      stateMachineOptions: options.stateMachineOptions,
       runOptions: options.runOptions,
     });
 
