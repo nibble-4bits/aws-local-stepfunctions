@@ -22,7 +22,7 @@ class ParallelStateAction extends BaseStateAction<ParallelState> {
   }
 
   private processBranch(
-    branch: typeof this.stateDefinition.Branches[number],
+    branch: (typeof this.stateDefinition.Branches)[number],
     input: JSONValue,
     context: Context,
     options: ParallelStateActionOptions | undefined
