@@ -38,9 +38,10 @@
   "scripts": {
     "test": "jest",
     "build": "tsup",
-    "prettier": "prettier --write src/**/*.ts",
-    "lint": "eslint src/**/*.ts",
-    "lint:fix": "eslint src/**/*.ts --fix"
+    "prettier": "prettier --check \"src/**/*.ts\"",
+    "prettier:fix": "prettier --write \"src/**/*.ts\"",
+    "lint": "eslint \"src/**/*.ts\"",
+    "lint:fix": "eslint --fix \"src/**/*.ts\""
   },
   "devDependencies": {
     "@tsconfig/node16-strictest": "^1.0.4",
