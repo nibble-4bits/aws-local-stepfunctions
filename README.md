@@ -2,7 +2,7 @@
 
 A TypeScript implementation of the [Amazon States Language specification](https://states-language.net/spec.html).
 
-This package lets you run AWS Step Functions locally on your machine!
+This package lets you run AWS Step Functions locally, both in Node.js and in the browser!
 
 > NOTE: This is a work in progress. Some features defined in the specification might not be supported at all yet or might have limited support.
 
@@ -14,6 +14,7 @@ This package lets you run AWS Step Functions locally on your machine!
   - [Node.js](#nodejs)
     - [CommonJS](#commonjs)
     - [ES Module](#es-module)
+  - [Browser](#browser)
 - [API](#api)
   - [Constructor](#constructor-new-statemachinedefinition-statemachineoptions)
   - [StateMachine.run](#statemachineruninput-options)
@@ -32,8 +33,6 @@ npm install aws-local-stepfunctions
 
 ## Importing
 
-Currently, the only supported environment to import the package is Node.js. Browser support is not available yet.
-
 ### Node.js
 
 #### CommonJS
@@ -46,6 +45,24 @@ const { StateMachine } = require('aws-local-stepfunctions');
 
 ```js
 import { StateMachine } from 'aws-local-stepfunctions';
+```
+
+### Browser
+
+You can import the bundled package directly into a browser script as an ES module, from one of the following CDNs:
+
+> NOTE: The following examples will import the latest package version. Refer to the CDNs websites to know about other ways in which you can specify the package URL (for example, to import a specific version).
+
+#### [unpkg](https://unpkg.com/)
+
+```js
+import { StateMachine } from 'https://unpkg.com/aws-local-stepfunctions';
+```
+
+#### [jsDelivr](https://www.jsdelivr.com/)
+
+```js
+import { StateMachine } from 'https://cdn.jsdelivr.net/npm/aws-local-stepfunctions/build/main.browser.esm.js';
 ```
 
 ## API
