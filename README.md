@@ -51,13 +51,15 @@ import { StateMachine } from 'aws-local-stepfunctions';
 
 You can import the bundled package directly into a browser script as an ES module, from one of the following CDNs:
 
-#### unpkg
+> NOTE: The following examples will import the latest package version. Refer to the CDNs websites to know about other ways in which you can specify the package URL (for example, to import a specific version).
+
+#### [unpkg](https://unpkg.com/)
 
 ```js
 import { StateMachine } from 'https://unpkg.com/aws-local-stepfunctions';
 ```
 
-#### jsDelivr
+#### [jsDelivr](https://www.jsdelivr.com/)
 
 ```js
 import { StateMachine } from 'https://cdn.jsdelivr.net/npm/aws-local-stepfunctions/build/main.browser.esm.js';
