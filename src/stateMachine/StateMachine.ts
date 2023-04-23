@@ -3,6 +3,7 @@ import type { JSONValue } from '../typings/JSONValue';
 import type { ExecuteOptions, RunOptions, StateMachineOptions } from '../typings/StateMachineImplementation';
 import type { Context } from '../typings/Context';
 import { ExecutionAbortedError } from '../error/ExecutionAbortedError';
+import { StatesTimeoutError } from '../error/predefined/StatesTimeoutError';
 import { ExecutionError } from '../error/ExecutionError';
 import { StateExecutor } from './StateExecutor';
 import aslValidator from 'asl-validator';
@@ -54,13 +55,28 @@ export class StateMachine {
   run(input: JSONValue, options?: RunOptions): { abort: () => void; result: Promise<JSONValue> } {
     const abortController = new AbortController();
 
+    let onAbortHandler: () => void;
     const settleOnAbort = new Promise<null>((resolve, reject) => {
       if (options?.noThrowOnAbort) {
-        abortController.signal.addEventListener('abort', () => resolve(null));
+        onAbortHandler = () => resolve(null);
       } else {
-        abortController.signal.addEventListener('abort', () => reject(new ExecutionAbortedError()));
+        onAbortHandler = () => reject(new ExecutionAbortedError());
       }
+      abortController.signal.addEventListener('abort', onAbortHandler);
     });
+
+    let rejectOnTimeout: Promise<null> | null = null;
+    if (this.definition.TimeoutSeconds) {
+      rejectOnTimeout = new Promise<null>((_, reject) => {
+        setTimeout(() => {
+          // Handle timeout by removing the abort handler from the abort signal listener
+          abortController.signal.removeEventListener('abort', onAbortHandler);
+          // Then we simply reuse the abort controller to abort the execution on timeout
+          abortController.abort();
+          reject(new StatesTimeoutError());
+        }, this.definition.TimeoutSeconds! * 1000);
+      });
+    }
 
     const executionResult = this.execute(input, {
       stateMachineOptions: this.stateMachineOptions,
@@ -68,7 +84,13 @@ export class StateMachine {
       abortSignal: abortController.signal,
     });
 
-    const result = Promise.race([executionResult, settleOnAbort]);
+    const racingPromises = [executionResult, settleOnAbort];
+
+    if (rejectOnTimeout) {
+      racingPromises.push(rejectOnTimeout);
+    }
+
+    const result = Promise.race(racingPromises);
 
     return {
       abort: () => abortController.abort(),
