@@ -1,6 +1,7 @@
 import type { StateMachineDefinition } from '../src/typings/StateMachineDefinition';
 import { StateMachine } from '../src/stateMachine/StateMachine';
 import { ExecutionAbortedError } from '../src/error/ExecutionAbortedError';
+import { StatesTimeoutError } from '../src/error/predefined/StatesTimeoutError';
 import { ExecutionError } from '../src/error/ExecutionError';
 
 afterEach(() => {
@@ -115,6 +116,26 @@ describe('State Machine', () => {
       execution.abort();
 
       await expect(execution.result).resolves.toBe(null);
+    });
+
+    test('should throw an `States.Timeout` error if execution times out', async () => {
+      const machineDefinition: StateMachineDefinition = {
+        StartAt: 'WaitState',
+        TimeoutSeconds: 1,
+        States: {
+          WaitState: {
+            Type: 'Wait',
+            Seconds: 3,
+            End: true,
+          },
+        },
+      };
+      const input = {};
+
+      const stateMachine = new StateMachine(machineDefinition);
+      const execution = stateMachine.run(input);
+
+      await expect(() => execution.result).rejects.toThrow(StatesTimeoutError);
     });
 
     test('should throw an `ExecutionError` if execution fails', async () => {
