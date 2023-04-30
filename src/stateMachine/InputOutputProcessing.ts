@@ -4,6 +4,7 @@ import type { Context } from '../typings/Context';
 import { isPlainObj } from '../util';
 import { jsonPathQuery } from './JsonPath';
 import { StatesResultPathMatchFailureError } from '../error/predefined/StatesResultPathMatchFailureError';
+import { evaluateIntrinsicFunction } from './IntrinsicFunctionEvaluation';
 import cloneDeep from 'lodash/cloneDeep.js';
 import set from 'lodash/set.js';
 
@@ -46,7 +47,15 @@ function processPayloadTemplate(payloadTemplate: PayloadTemplate, json: JSONValu
     // Only resolve value if key ends with `.$` and value is a string
     if (key.endsWith('.$') && typeof value === 'string') {
       sanitizedKey = key.replace('.$', '');
-      resolvedValue = jsonPathQuery(value, json, context);
+
+      // If value starts with `$`, it must be a JSONPath
+      if (value.startsWith('$')) {
+        resolvedValue = jsonPathQuery(value, json, context);
+      }
+      // Otherwise, it must be an intrinsic function
+      else {
+        resolvedValue = evaluateIntrinsicFunction(value, json, context);
+      }
     }
 
     return [sanitizedKey, resolvedValue];
