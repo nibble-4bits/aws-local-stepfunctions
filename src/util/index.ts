@@ -24,3 +24,5 @@ export function sleep(ms: number, abortSignal?: AbortSignal) {
     });
   });
 }
+
+export { getRandomNumber, sfc32, cyrb128 } from './random';
