@@ -25,4 +25,13 @@ export function sleep(ms: number, abortSignal?: AbortSignal) {
   });
 }
 
+/**
+ * Converts a byte (0-255) to its two-digit hexadecimal representation.
+ * @param byte A number between 0 and 255.
+ * @returns The two-digit hex representation of `byte`.
+ */
+export function byteToHex(byte: number) {
+  return byte.toString(16).padStart(2, '0');
+}
+
 export { getRandomNumber, sfc32, cyrb128 } from './random';
