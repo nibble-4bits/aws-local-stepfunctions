@@ -1,6 +1,7 @@
 import type { IntrinsicFunctionDefinition } from '../../typings/IntrinsicFunctionsImplementation';
 import type { JSONValue, JSONPrimitiveValue } from '../../typings/JSONValue';
 import { BaseIntrinsicFunction } from './BaseIntrinsicFunction';
+import { StatesRuntimeError } from '../../error/predefined/StatesRuntimeError';
 
 class StatesFormat extends BaseIntrinsicFunction {
   protected readonly funcDefinition: IntrinsicFunctionDefinition;
@@ -25,7 +26,9 @@ class StatesFormat extends BaseIntrinsicFunction {
   protected execute(templateStr: string, ...placeholderValues: JSONPrimitiveValue[]): JSONValue {
     const placeholdersNumber = templateStr.match(/\{\}/g)?.length ?? 0;
     if (placeholdersNumber !== placeholderValues.length) {
-      throw new Error(`Number of arguments in ${this.funcDefinition.name} do not match the occurrences of {}`);
+      throw new StatesRuntimeError(
+        `Number of arguments in ${this.funcDefinition.name} do not match the occurrences of {}`
+      );
     }
 
     let i = 0;

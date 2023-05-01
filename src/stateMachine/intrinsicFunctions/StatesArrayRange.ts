@@ -1,6 +1,7 @@
 import type { IntrinsicFunctionDefinition } from '../../typings/IntrinsicFunctionsImplementation';
 import type { JSONValue } from '../../typings/JSONValue';
 import { BaseIntrinsicFunction } from './BaseIntrinsicFunction';
+import { StatesRuntimeError } from '../../error/predefined/StatesRuntimeError';
 
 class StatesArrayRange extends BaseIntrinsicFunction {
   protected readonly funcDefinition: IntrinsicFunctionDefinition;
@@ -36,7 +37,9 @@ class StatesArrayRange extends BaseIntrinsicFunction {
 
     const arrLength = Math.floor(slots) + 1;
     if (arrLength > 1000) {
-      throw new Error(`Result of intrinsic function ${this.funcDefinition.name} cannot contain more than 1000 items`);
+      throw new StatesRuntimeError(
+        `Result of intrinsic function ${this.funcDefinition.name} cannot contain more than 1000 items`
+      );
     }
 
     const range = Array.from({ length: arrLength }).map((_, i) => start + step * i);
