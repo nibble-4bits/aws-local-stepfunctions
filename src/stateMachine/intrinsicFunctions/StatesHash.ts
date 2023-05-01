@@ -36,6 +36,14 @@ class StatesHash extends BaseIntrinsicFunction {
       );
     }
 
+    const algorithms: HashingAlgorithm[] = ['MD5', 'SHA-1', 'SHA-256', 'SHA-384', 'SHA-512'];
+    const supportedAlgorithms = algorithms.join(', ');
+    if (!algorithms.includes(algorithm)) {
+      throw new StatesRuntimeError(
+        `Unsupported hashing algorithm provided to intrinsic function ${this.funcDefinition.name}. The supported algorithms are: ${supportedAlgorithms}`
+      );
+    }
+
     switch (algorithm) {
       case 'MD5':
         return md5(str).toString();
