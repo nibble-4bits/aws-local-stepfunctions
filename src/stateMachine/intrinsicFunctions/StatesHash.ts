@@ -1,6 +1,7 @@
 import type { IntrinsicFunctionDefinition } from '../../typings/IntrinsicFunctionsImplementation';
 import type { HashingAlgorithm } from '../../typings/IntrinsicFunctions';
 import type { JSONValue } from '../../typings/JSONValue';
+import { StatesRuntimeError } from '../../error/predefined/StatesRuntimeError';
 import { BaseIntrinsicFunction } from './BaseIntrinsicFunction';
 import md5 from 'crypto-js/md5.js';
 import sha1 from 'crypto-js/sha1.js';
@@ -29,6 +30,12 @@ class StatesHash extends BaseIntrinsicFunction {
   }
 
   protected execute(str: string, algorithm: HashingAlgorithm): JSONValue {
+    if (str.length > 10000) {
+      throw new StatesRuntimeError(
+        `Intrinsic function ${this.funcDefinition.name} cannot hash a string with more than 10,000 characters`
+      );
+    }
+
     switch (algorithm) {
       case 'MD5':
         return md5(str).toString();
