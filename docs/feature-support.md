@@ -22,6 +22,8 @@ The following features all come from the [Amazon States Language specification](
     - [x] `SecondsPath`
     - [x] `Timestamp`
     - [x] `TimestampPath`
+  - [x] Task
+    - [x] `Resource` (only Lambda functions supported)
   - [x] Parallel
     - [x] `Branches`
   - [x] Map
@@ -86,17 +88,25 @@ The following features all come from the [Amazon States Language specification](
     - [x] Predefined error codes
   - [x] Retry/Catch
 
-### Limited support
+### No support
 
 - States
   - Task
-    - [x] `Resource` (only Lambda functions supported)
     - [ ] `TimeoutSeconds`
     - [ ] `HeartbeatSeconds`
     - [ ] `TimeoutSecondsPath`
     - [ ] `HeartbeatSecondsPath`
-
-### No support
+    - [ ] `Credentials`
+  - Map
+    - [ ] Distributed mode
+    - [ ] `ItemProcessor`
+    - [ ] `ItemReader`
+    - [ ] `ItemSelector`
+    - [ ] `ItemBatcher`
+    - [ ] `ResultWriter`
+    - [ ] `MaxConcurrencyPath`
+    - [ ] `ToleratedFailurePercentage`
+    - [ ] `ToleratedFailureCount`
 
 ## Non-spec features
 
