@@ -165,6 +165,61 @@ describe('Input processing', () => {
       });
     });
 
+    test('should return `Parameters` payload with values replaced according to intrinsic functions', () => {
+      const parameters = {
+        field1: 50,
+        'field2.$': "States.Array(1, 'hello', true, false, null, $.movies[1], $.metadata.lastUpdated)",
+        field3: false,
+        field4: {
+          'field5.$': 'States.ArrayPartition(States.ArrayRange(1, 20, 1), 4)',
+          field6: [1, 2, 3],
+        },
+      };
+      const input = {
+        movies: [
+          {
+            director: 'Quentin Tarantino',
+            title: 'Reservoir Dogs',
+            year: 1992,
+          },
+          {
+            director: 'Brian De Palma',
+            title: 'Mission: Impossible',
+            year: 1996,
+          },
+        ],
+        metadata: {
+          lastUpdated: '2020-05-27T08:00:00Z',
+        },
+      };
+
+      const result = processPayloadTemplate(parameters, input);
+
+      expect(result).toEqual({
+        field1: 50,
+        field2: [
+          1,
+          'hello',
+          true,
+          false,
+          null,
+          { director: 'Brian De Palma', title: 'Mission: Impossible', year: 1996 },
+          '2020-05-27T08:00:00Z',
+        ],
+        field3: false,
+        field4: {
+          field5: [
+            [1, 2, 3, 4],
+            [5, 6, 7, 8],
+            [9, 10, 11, 12],
+            [13, 14, 15, 16],
+            [17, 18, 19, 20],
+          ],
+          field6: [1, 2, 3],
+        },
+      });
+    });
+
     test('should return `Parameters` payload with path values unmodified if field name does not end with `.$` suffix', () => {
       const parameters = {
         field1: 50,
@@ -276,6 +331,61 @@ describe('Output processing', () => {
           field5: {
             lastUpdated: '2020-05-27T08:00:00Z',
           },
+          field6: [1, 2, 3],
+        },
+      });
+    });
+
+    test('should return `ResultSelector` payload with values replaced according to intrinsic functions', () => {
+      const resultSelector = {
+        field1: 50,
+        'field2.$': "States.Array(1, 'hello', true, false, null, $.movies[1], $.metadata.lastUpdated)",
+        field3: false,
+        field4: {
+          'field5.$': 'States.ArrayPartition(States.ArrayRange(1, 20, 1), 4)',
+          field6: [1, 2, 3],
+        },
+      };
+      const input = {
+        movies: [
+          {
+            director: 'Quentin Tarantino',
+            title: 'Reservoir Dogs',
+            year: 1992,
+          },
+          {
+            director: 'Brian De Palma',
+            title: 'Mission: Impossible',
+            year: 1996,
+          },
+        ],
+        metadata: {
+          lastUpdated: '2020-05-27T08:00:00Z',
+        },
+      };
+
+      const result = processPayloadTemplate(resultSelector, input);
+
+      expect(result).toEqual({
+        field1: 50,
+        field2: [
+          1,
+          'hello',
+          true,
+          false,
+          null,
+          { director: 'Brian De Palma', title: 'Mission: Impossible', year: 1996 },
+          '2020-05-27T08:00:00Z',
+        ],
+        field3: false,
+        field4: {
+          field5: [
+            [1, 2, 3, 4],
+            [5, 6, 7, 8],
+            [9, 10, 11, 12],
+            [13, 14, 15, 16],
+            [17, 18, 19, 20],
+          ],
           field6: [1, 2, 3],
         },
       });

@@ -62,6 +62,25 @@ The following features all come from the [Amazon States Language specification](
       - [x] `IsBoolean`
       - [x] `IsTimestamp`
     - [x] Throw `States.NoChoiceMatched` error if no choice rule was matched and `Default`
+- Intrinsic functions
+  - [x] `States.Format`
+  - [x] `States.StringToJson`
+  - [x] `States.JsonToString`
+  - [x] `States.Array`
+  - [x] `States.ArrayPartition`
+  - [x] `States.ArrayContains`
+  - [x] `States.ArrayRange`
+  - [x] `States.ArrayGetItem`
+  - [x] `States.ArrayLength`
+  - [x] `States.ArrayUnique`
+  - [x] `States.Base64Encode`
+  - [x] `States.Base64Decode`
+  - [x] `States.Hash`
+  - [x] `States.JsonMerge`
+  - [x] `States.MathRandom`
+  - [x] `States.MathAdd`
+  - [x] `States.StringSplit`
+  - [x] `States.UUID`
 - Errors
   - [x] Runtime errors
     - [x] Predefined error codes
@@ -78,8 +97,6 @@ The following features all come from the [Amazon States Language specification](
     - [ ] `HeartbeatSecondsPath`
 
 ### No support
-
-- [ ] Intrinsic functions
 
 ## Non-spec features
 
