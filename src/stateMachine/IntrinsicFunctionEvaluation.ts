@@ -43,7 +43,7 @@ const functions: Record<IntrinsicFunctionName, BaseIntrinsicFunction> = {
 };
 
 /**
- * Recursively evaluate an intrinsic function.
+ * Evaluate an intrinsic function. Any nested (however deeply) intrinsic functions also get evaluated.
  * @returns The result of the intrinsic function evaluation.
  */
 export function evaluateIntrinsicFunction(intrinsicFunction: string, input: JSONValue, context?: Context): JSONValue {
