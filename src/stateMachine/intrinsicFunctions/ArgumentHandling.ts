@@ -54,7 +54,7 @@ function validateArgumentConstraints(
     for (const constraint of argConstraints) {
       switch (constraint) {
         case 'ZERO':
-          matchesAllConstraints = funcArg !== 0;
+          matchesAllConstraints = funcArg === 0;
           break;
         case 'POSITIVE_INTEGER':
           matchesAllConstraints = Number.isInteger(funcArg) && (funcArg as number) > 0;
