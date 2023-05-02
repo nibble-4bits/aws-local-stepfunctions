@@ -4,8 +4,6 @@ A TypeScript implementation of the [Amazon States Language specification](https:
 
 This package lets you run AWS Step Functions locally, both in Node.js and in the browser!
 
-> NOTE: This is a work in progress. Some features defined in the specification might not be supported at all yet or might have limited support.
-
 ## Table of Contents
 
 - [Features](#features)
@@ -23,7 +21,7 @@ This package lets you run AWS Step Functions locally, both in Node.js and in the
 
 ## Features
 
-To see a list of features that have full support, partial support, or no support, refer to [this document](/docs/feature-support.md).
+To see the list of features defined in the specification that have full support, partial support, or no support, refer to [this document](/docs/feature-support.md).
 
 ## Installation
 
