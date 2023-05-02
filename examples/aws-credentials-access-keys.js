@@ -27,6 +27,11 @@ const stateMachine = new StateMachine(machineDefinition, {
         accessKeyId: 'AKIAIOSFODNN7EXAMPLE',
         secretAccessKey: 'wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY',
       },
+      // WARNING: You shouldn't commit the `accessKeys` option, as that will expose your keys to other people in the repository.
+      // Ideally, on Node your access keys should be loaded from one of the following two settings:
+      //  - the `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY` environment variables: https://docs.aws.amazon.com/sdk-for-javascript/v3/developer-guide/loading-node-credentials-environment.html
+      //  - the shared `credentials` file: https://docs.aws.amazon.com/sdk-for-javascript/v3/developer-guide/loading-node-credentials-shared.html
+      // The `accessKeys` option is meant for browser use, where the two settings above are not available as they have no web platform equivalent.
     },
   },
 });
