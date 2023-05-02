@@ -102,6 +102,9 @@ The following features all come from the [Amazon States Language specification](
 
 The following features are not defined in the specification, but they have been added for convenience.
 
-- [x] Override Task state resource with a local function handler ([example](/examples/task-state-local-override.js))
-- [x] Override Wait state duration ([example](/examples/wait-state-local-override.js))
+- [x] Override `Task` state resource with a local function handler ([example](/examples/task-state-local-override.js))
+- [x] Override `Wait` state duration ([example](/examples/wait-state-local-override.js))
 - [x] Abort a running execution ([example](/examples/abort-execution.js))
+- [x] Providing AWS credentials to execute Lambda functions specified in `Task` states:
+  - [x] Specifying access key ID and secret access key ([example](/examples/aws-credentials-access-keys.js))
+  - [x] Specifying a Cognito Identity Pool ([example](/examples/aws-credentials-cognito.js))
