@@ -2,11 +2,9 @@
 
 A TypeScript implementation of the [Amazon States Language specification](https://states-language.net/spec.html).
 
-This package lets you run AWS Step Functions locally, both in Node.js and in the browser!
+This package lets you run AWS Step Functions completely locally, both in Node.js and in the browser!
 
-> NOTE: This is a work in progress. Some features defined in the specification might not be supported at all yet or might have limited support.
-
-## Table of Contents
+## Table of contents
 
 - [Features](#features)
 - [Installation](#installation)
@@ -23,7 +21,7 @@ This package lets you run AWS Step Functions locally, both in Node.js and in the
 
 ## Features
 
-To see a list of features that have full support, partial support, or no support, refer to [this document](/docs/feature-support.md).
+To see the list of features defined in the specification that have full support, partial support, or no support, refer to [this document](/docs/feature-support.md).
 
 ## Installation
 
@@ -78,11 +76,11 @@ The constructor takes the following parameters:
   - `validationOptions?`: An object that specifies how the definition should be validated.
     - `checkPaths`: If set to `false`, won't validate JSONPaths.
     - `checkArn`: If set to `false`, won't validate ARN syntax in `Task` states.
-  - `awsConfig?`: An object that specifies the AWS region and credentials to use when invoking a Lambda function in a `Task` state. If not set, the AWS config will be resolved based on the [credentials provider chain](https://docs.aws.amazon.com/sdk-for-javascript/v3/developer-guide/setting-credentials-node.html) of the AWS SDK for JavaScript V3. You don't need to use this option if you have a [shared config/credentials file](https://docs.aws.amazon.com/sdkref/latest/guide/file-format.html) (for example, if you have the [AWS CLI](https://aws.amazon.com/cli/) installed) or if you use a local override for all of your `Task` states.
+  - `awsConfig?`: An object that specifies the [AWS region and credentials](/docs/feature-support.md#providing-aws-credentials-and-region-to-execute-lambda-functions-specified-in-task-states) to use when invoking a Lambda function in a `Task` state. If not set, the AWS config will be resolved based on the [credentials provider chain](https://docs.aws.amazon.com/sdk-for-javascript/v3/developer-guide/setting-credentials-node.html) of the AWS SDK for JavaScript V3. You don't need to use this option if you have a [shared config/credentials file](https://docs.aws.amazon.com/sdkref/latest/guide/file-format.html) (for example, if you have the [AWS CLI](https://aws.amazon.com/cli/) installed) or if you use a local override for all of your `Task` states.
     - `region`: The AWS region where the Lambda functions are created.
     - `credentials`: An object that specifies which type of credentials to use.
-      - `cognitoIdentityPool`: An object that specifies the Cognito Identity Pool to use for requesting credentials.
-      - `accessKeys`: An object that specifies the [Access Key ID and Secret Access Key](https://docs.aws.amazon.com/IAM/latest/UserGuide/security-creds.html#sec-access-keys-and-secret-access-keys) to use as credentials.
+      - `cognitoIdentityPool`: An object that specifies the Cognito Identity Pool ID to use for requesting credentials.
+      - `accessKeys`: An object that specifies the Access Key ID and Secret Access Key to use as credentials.
 
 The constructor will attempt to validate the definition by default, unless the `validationOptions` property is specified. If the definition is not valid, an error will be thrown.
 
@@ -113,7 +111,7 @@ const stateMachine = new StateMachine(machineDefinition, {
 
 Runs the state machine with the given `input` parameter and returns an object with the following properties:
 
-- `abort`: A function that takes no parameters and doesn't return any value. If called, aborts the execution and throws an `ExecutionAbortedError`, unless the `noThrowOnAbort` option is set.
+- `abort`: A function that takes no parameters and doesn't return any value. If called, [aborts the execution](/docs/feature-support.md#abort-a-running-execution) and throws an `ExecutionAbortedError`, unless the `noThrowOnAbort` option is set.
 - `result`: A `Promise` that resolves with the execution result once it finishes.
 
 Each execution is independent of all others, meaning that you can concurrently call this method as many times as needed, without worrying about race conditions.
@@ -123,8 +121,8 @@ Each execution is independent of all others, meaning that you can concurrently c
 - `input`: The initial input to pass to the state machine. This can be any valid JSON value.
 - `options?`:
   - `overrides?`: An object to override the behavior of certain states:
-    - `taskResourceLocalHandlers?`: Overrides the resource of the specified `Task` states to run a local function.
-    - `waitTimeOverrides?`: Overrides the wait duration of the specified `Wait` states. The specifed override duration should be in milliseconds.
+    - `taskResourceLocalHandlers?`: An [object that overrides](/docs/feature-support.md#task-state-resource-override) the resource of the specified `Task` states to run a local function.
+    - `waitTimeOverrides?`: An [object that overrides](/docs/feature-support.md#wait-state-duration-override) the wait duration of the specified `Wait` states. The specifed override duration should be in milliseconds.
   - `noThrowOnAbort?`: If this option is set to `true`, aborting the execution will simply return `null` as result instead of throwing.
 
 #### Basic example:

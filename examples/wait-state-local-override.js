@@ -18,6 +18,7 @@ const execution = stateMachine.run(myInput, {
     // Property `waitTimeOverrides` lets you override any number of Wait states,
     // by specifying the Wait state name as the key and the duration override as value (represented in milliseconds):
     waitTimeOverrides: {
+      // Note that the key is the name of the `Wait` state that we want to override.
       Wait10Seconds: 500, // wait for 500 milliseconds instead of the 10 seconds specified in the `Wait10Seconds` state
     },
   },

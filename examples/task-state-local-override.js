@@ -25,6 +25,7 @@ const execution = stateMachine.run(myInput, {
     // by specifying the Task state name as the key and the local function as value, as in the example below:
     taskResourceLocalHandlers: {
       // Call the `addNumbersLocal` function instead of invoking the Lambda function specified for the `AddNumbers` state.
+      // Note that the key is the name of the `Task` state that we want to override.
       AddNumbers: addNumbersLocal,
     },
   },

@@ -1,4 +1,4 @@
-import { StateMachine, StatesTimeoutError } from 'aws-local-stepfunctions';
+import { StateMachine, ExecutionTimeoutError } from 'aws-local-stepfunctions';
 
 const machineDefinition = {
   StartAt: 'WaitState',
@@ -21,8 +21,8 @@ try {
   const result = await execution.result;
   console.log(result);
 } catch (error) {
-  // When execution times out, type of error is `StatesTimeoutError`
-  if (error instanceof StatesTimeoutError) {
+  // When execution times out, type of error is `ExecutionTimeoutError`
+  if (error instanceof ExecutionTimeoutError) {
     console.error('The execution has timed out');
   }
 }
