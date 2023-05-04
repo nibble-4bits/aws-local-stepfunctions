@@ -80,7 +80,7 @@ The constructor takes the following parameters:
     - `region`: The AWS region where the Lambda functions are created.
     - `credentials`: An object that specifies which type of credentials to use.
       - `cognitoIdentityPool`: An object that specifies the Cognito Identity Pool ID to use for requesting credentials.
-      - `accessKeys`: An object that specifies the [Access Key ID and Secret Access Key](https://docs.aws.amazon.com/IAM/latest/UserGuide/security-creds.html#sec-access-keys-and-secret-access-keys) to use as credentials.
+      - `accessKeys`: An object that specifies the Access Key ID and Secret Access Key to use as credentials.
 
 The constructor will attempt to validate the definition by default, unless the `validationOptions` property is specified. If the definition is not valid, an error will be thrown.
 
