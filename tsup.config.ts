@@ -24,7 +24,7 @@ function getCLIConfig(): Options {
   return {
     ...getCommonConfig(),
     name: 'cli',
-    entry: ['src/cli/cli.ts'],
+    entry: ['src/cli/CLI.ts'],
     format: ['cjs'],
     external: ['./main.node.cjs'],
   };

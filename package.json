@@ -36,7 +36,7 @@
     "default": "./build/main.browser.esm.js"
   },
   "bin": {
-    "local-sfn": "./build/cli.cjs"
+    "local-sfn": "./build/CLI.cjs"
   },
   "scripts": {
     "test": "jest",
