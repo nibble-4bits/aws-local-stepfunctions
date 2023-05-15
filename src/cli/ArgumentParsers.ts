@@ -20,6 +20,11 @@ function parseOverrideTaskOption(
 
   previous[taskStateName] = (input) => {
     const spawnResult = spawnSync(scriptPath, [JSON.stringify(input)]);
+
+    if (spawnResult.status !== 0) {
+      throw new Error(spawnResult.stderr.toString());
+    }
+
     return JSON.parse(spawnResult.stdout.toString());
   };
 
