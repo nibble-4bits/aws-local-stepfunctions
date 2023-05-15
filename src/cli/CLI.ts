@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 
+import readline from 'readline';
 import { program, Option } from 'commander';
 import { version as packageVersion } from '../../package.json';
 import {
@@ -41,5 +42,19 @@ program
 
 // Parse arguments and invoke command
 (async function () {
-  await program.parseAsync();
+  if (process.stdin.isTTY) {
+    await program.parseAsync();
+  } else {
+    // If piping into command or using input redirection, read the standard input
+    const rl = readline.createInterface({
+      input: process.stdin,
+    });
+
+    const stdin: string[] = [];
+    for await (const line of rl) {
+      stdin.push(line);
+    }
+
+    await program.parseAsync([...process.argv, ...stdin.filter((line) => line)]);
+  }
 })();
