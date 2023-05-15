@@ -25,13 +25,13 @@ program
       .argParser(parseDefinitionFileOption)
   )
   .addOption(
-    new Option('--override-task <mapping>', 'override a Task state to run an executable file or script').argParser(
+    new Option('-t, --override-task <mapping>', 'override a Task state to run an executable file or script').argParser(
       parseOverrideTaskOption
     )
   )
   .addOption(
     new Option(
-      '--override-wait <mapping>',
+      '-w, --override-wait <mapping>',
       'override a Wait state to pause for the specified amount of milliseconds'
     ).argParser(parseOverrideWaitOption)
   )
