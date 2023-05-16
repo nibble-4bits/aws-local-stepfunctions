@@ -5,7 +5,12 @@ import { Command, program } from 'commander';
 import { StateMachine } from './main.node.cjs';
 
 async function commandAction(inputs: JSONValue[], options: ParsedCommandOptions) {
-  const stateMachine = new StateMachine(options.definition ?? options.definitionFile);
+  const stateMachine = new StateMachine(options.definition ?? options.definitionFile, {
+    validationOptions: {
+      checkPaths: options.jsonpathValidation,
+      checkArn: options.arnValidation,
+    },
+  });
 
   const resultsPromises = inputs.map<JSONValue>((input) => {
     const { result } = stateMachine.run(input, {

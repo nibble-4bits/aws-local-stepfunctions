@@ -6,4 +6,6 @@ export type ParsedCommandOptions = {
   definitionFile: StateMachineDefinition;
   overrideTask: TaskStateResourceLocalHandler;
   overrideWait: WaitStateTimeOverride;
+  jsonpathValidation: boolean;
+  arnValidation: boolean;
 };

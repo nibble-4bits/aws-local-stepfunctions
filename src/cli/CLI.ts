@@ -36,6 +36,10 @@ program
       'override a Wait state to pause for the specified amount of milliseconds'
     ).argParser(parseOverrideWaitOption)
   )
+  .addOption(
+    new Option('--no-jsonpath-validation', 'disable validation of JSONPath paths in the state machine definition')
+  )
+  .addOption(new Option('--no-arn-validation', 'disable validation of ARNs in the state machine definition'))
   .argument('<inputs...>', 'input data for the execution', parseInputArguments)
   .hook('preAction', preActionHook)
   .action(commandAction);
