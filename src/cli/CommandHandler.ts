@@ -24,7 +24,8 @@ async function commandAction(inputs: JSONValue[], options: ParsedCommandOptions)
     if (result.status === 'fulfilled') {
       console.log(result.value);
     } else {
-      console.log(result.reason.message);
+      const reason = result.reason as Error;
+      console.log(reason.message.trim());
     }
   }
 }
