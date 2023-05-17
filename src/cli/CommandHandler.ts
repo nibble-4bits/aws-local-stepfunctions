@@ -3,7 +3,7 @@ import type { JSONValue } from '../typings/JSONValue';
 import { ExitCodes } from '../typings/CLI';
 import { Command, program } from 'commander';
 // @ts-expect-error Import path doesn't exist when used here, but it works once transpiled file is output to build/ dir
-import { StateMachine } from './main.node.cjs';
+import { StateMachine, ExecutionTimeoutError } from './main.node.cjs';
 
 async function commandAction(inputs: JSONValue[], options: ParsedCommandOptions) {
   let stateMachine: StateMachine;
@@ -35,8 +35,12 @@ async function commandAction(inputs: JSONValue[], options: ParsedCommandOptions)
     if (result.status === 'fulfilled') {
       console.log(result.value);
     } else {
-      const reason = result.reason as Error;
-      console.log(reason.message.trim());
+      let msg = (result.reason as Error).message;
+      if (result.reason instanceof ExecutionTimeoutError) {
+        msg = 'Execution timed out';
+      }
+
+      console.log(msg.trim());
     }
   }
 }
