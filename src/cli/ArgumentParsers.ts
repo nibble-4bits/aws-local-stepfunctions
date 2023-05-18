@@ -11,9 +11,12 @@ function parseDefinitionOption(definition: string): StateMachineDefinition {
   const jsonOrError = tryJSONParse<StateMachineDefinition>(definition);
 
   if (jsonOrError instanceof Error) {
-    program.error(`error: parsing of state machine definition failed: ${jsonOrError.message}`, {
-      exitCode: ExitCodes.PreExecutionFailure,
-    });
+    program.error(
+      `error: parsing of state machine definition passed in option '-d, --definition <definition>' failed: ${jsonOrError.message}`,
+      {
+        exitCode: ExitCodes.PreExecutionFailure,
+      }
+    );
   }
 
   return jsonOrError;
