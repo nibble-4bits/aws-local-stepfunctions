@@ -31,10 +31,14 @@ async function commandAction(inputs: JSONValue[], options: ParsedCommandOptions)
 
   const results = await Promise.allSettled(resultsPromises);
 
+  let exitCode = ExitCodes.Success;
   for (const result of results) {
     if (result.status === 'fulfilled') {
       console.log(result.value);
     } else {
+      // If at least one execution fails, set the execution failure exit code
+      exitCode = ExitCodes.StateMachineExecutionFailure;
+
       let msg = (result.reason as Error).message;
       if (result.reason instanceof ExecutionTimeoutError) {
         msg = 'Execution timed out';
@@ -43,6 +47,8 @@ async function commandAction(inputs: JSONValue[], options: ParsedCommandOptions)
       console.log(msg.trim());
     }
   }
+
+  process.exitCode = exitCode;
 }
 
 function preActionHook(thisCommand: Command) {
