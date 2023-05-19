@@ -54,6 +54,10 @@ async function commandAction(inputs: JSONValue[], options: ParsedCommandOptions)
 function preActionHook(thisCommand: Command) {
   const options = thisCommand.opts();
 
+  if (thisCommand.args.length === 0) {
+    program.help();
+  }
+
   if (!options['definition'] && !options['definitionFile']) {
     program.error(
       "error: missing either option '-d, --definition <definition>' or option '-f, --definition-file <path>'",
