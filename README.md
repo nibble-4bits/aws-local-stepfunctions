@@ -57,7 +57,7 @@ import { StateMachine } from 'aws-local-stepfunctions';
 
 You can import the bundled package directly into a browser script as an ES module, from one of the following CDNs:
 
-> NOTE: The following examples will import the latest package version. Refer to the CDNs websites to know about other ways in which you can specify the package URL (for example, to import a specific version).
+> NOTE: The following examples will import the latest package version. Refer to the CDNs websites to know about other ways in which you can specify the package URL (for example, to import a specific version or a minified version).
 
 #### [unpkg](https://unpkg.com/)
 
@@ -130,7 +130,7 @@ Each execution is independent of all others, meaning that you can concurrently c
 - `options?`:
   - `overrides?`: An object to override the behavior of certain states:
     - `taskResourceLocalHandlers?`: An [object that overrides](/docs/feature-support.md#task-state-resource-override) the resource of the specified `Task` states to run a local function.
-    - `waitTimeOverrides?`: An [object that overrides](/docs/feature-support.md#wait-state-duration-override) the wait duration of the specified `Wait` states. The specifed override duration should be in milliseconds.
+    - `waitTimeOverrides?`: An [object that overrides](/docs/feature-support.md#wait-state-duration-override) the wait duration of the specified `Wait` states. The specified override duration should be in milliseconds.
   - `noThrowOnAbort?`: If this option is set to `true`, aborting the execution will simply return `null` as result instead of throwing.
 
 #### Basic example:
@@ -244,7 +244,7 @@ To override a `Task` state, pass the `-t, --override-task` option. This option t
 
 Using the same [state machine definition](#cli-state-machine) as before, if you wanted to override the `AddNumbers` state to run a custom script, you can do it like this:
 
-```
+```sh
 local-sfn -f state-machine.json -t AddNumbers:./override.sh '{ "num1": 1, "num2": 2 }'
 ```
 
@@ -259,7 +259,20 @@ TASK_INPUT=$1 # First argument is the input to the overridden Task state
 echo "$TASK_INPUT" | jq '.num1 + .num2' # Use jq to add "num1" and "num2", and print result to stdout
 ```
 
-When overriding a `Task` state, the overriding script/program will be passed the input to the `Task` state as first argument, which can then be used to compute the task result. Similarly, the overriding script/program must print the task result as a JSON value to the standard output.
+When overriding a `Task` state, the overriding script/program will be passed the input to the `Task` state as first argument, which can then be used to compute the task result. Similarly, the overriding script/program must print the task result as a JSON value to the standard output, so `local-sfn` can then read stdout and use the value as the result of the `Task` state.
+
+Additionally, you can pass the `-t, --override-task` option multiple times, to override more than one `Task` state. For example:
+
+```sh
+local-sfn
+  -f state-machine.json \
+  -t AddNumbers:./override.sh \
+  -t SendRequest:./request.py \
+  -t ProcessImage:./proc_image \
+  '{ "num1": 1, "num2": 2 }'
+```
+
+This command would execute the state machine, and override `Task` states `AddNumbers`, `SendRequest`, and `ProcessImage` to run the `override.sh` shell script, the `request.py` Python script, and the `proc_image` program, respectively.
 
 #### Wait state override
 
@@ -267,11 +280,24 @@ To override the duration of a `Wait` state, pass the `-w, --override-wait` optio
 
 For example:
 
-```
+```sh
 local-sfn -f state-machine.json -w WaitResponse:1500 '{ "num1": 1, "num2": 2 }'
 ```
 
 This command would execute the state machine, and when entering the `WaitResponse` `Wait` state, the execution would be paused for 1500 milliseconds (1.5 seconds), disregarding the `Seconds`, `Timestamp`, `SecondsPath`, or `TimestampPath` fields that could've been specified in the definition of `WaitResponse`.
+
+In the same way as the `-t, --override-task` option, you can pass the `-w, --override-wait` option multiple times, to override more than one `Wait` state. For example:
+
+```sh
+local-sfn \
+  -f state-machine.json \
+  -w WaitResponse:1500 \
+  -w PauseUntilSignal:250 \
+  -w Delay:0 \
+  '{ "num1": 1, "num2": 2 }'
+```
+
+This command would execute the state machine, and override `Wait` states `WaitResponse` and `PauseUntilSignal` to pause the execution for 1500 and 250 milliseconds, respectively. The `Delay` state wouldn't be paused at all, since the override value is set to 0.
 
 ### Disabling ASL validations
 
