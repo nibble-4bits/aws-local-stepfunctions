@@ -164,7 +164,7 @@ In addition to the JavaScript API, `aws-local-stepfunctions` also provides a com
 To use the CLI as a global shell command, you need to install the package globally:
 
 ```sh
-npm -g install aws-local-stepfunctions
+npm install -g aws-local-stepfunctions
 ```
 
 After installing the package, the command `local-sfn` will be available in your shell.
