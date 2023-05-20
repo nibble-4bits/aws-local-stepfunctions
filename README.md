@@ -171,7 +171,7 @@ After installing the package, the command `local-sfn` will be available in your 
 
 ### Basic usage
 
-The simplest way to use the CLI is by passing either the `-d, --definition` or the `-f, --definition file` option, along with the input(s) for the state machine. For example:
+The simplest way to use the CLI is by passing either the `-d, --definition` or the `-f, --definition-file` option, along with the input(s) for the state machine. For example:
 
 ```sh
 local-sfn \
