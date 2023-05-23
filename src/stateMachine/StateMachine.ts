@@ -9,6 +9,14 @@ import { StateExecutor } from './StateExecutor';
 import aslValidator from 'asl-validator';
 import cloneDeep from 'lodash/cloneDeep.js';
 
+/**
+ * Default max amount of seconds that an execution is allowed to run before timing out.
+ * This value corresponds to `2^31 - 1` seconds (about 24 days, 20 hours, 31 minutes, and 24 seconds),
+ * since browsers store the delay as a 32-bit signed integer.
+ * @see https://developer.mozilla.org/en-US/docs/Web/API/setTimeout#maximum_delay_value
+ */
+const DEFAULT_MAX_EXECUTION_TIMEOUT = 2147483.647;
+
 export class StateMachine {
   /**
    * The structure of the State Machine as represented by the Amazon States Language.
@@ -54,6 +62,7 @@ export class StateMachine {
    */
   run(input: JSONValue, options?: RunOptions): { abort: () => void; result: Promise<JSONValue> } {
     const abortController = new AbortController();
+    const timeoutSeconds = this.definition.TimeoutSeconds ?? DEFAULT_MAX_EXECUTION_TIMEOUT;
 
     let onAbortHandler: () => void;
     const settleOnAbort = new Promise<null>((resolve, reject) => {
@@ -65,31 +74,31 @@ export class StateMachine {
       abortController.signal.addEventListener('abort', onAbortHandler);
     });
 
-    let rejectOnTimeout: Promise<null> | null = null;
-    if (this.definition.TimeoutSeconds) {
-      rejectOnTimeout = new Promise<null>((_, reject) => {
-        setTimeout(() => {
-          // Handle timeout by removing the abort handler from the abort signal listener
-          abortController.signal.removeEventListener('abort', onAbortHandler);
-          // Then we simply reuse the abort controller to abort the execution on timeout
-          abortController.abort();
-          reject(new StatesTimeoutError());
-        }, this.definition.TimeoutSeconds! * 1000);
-      });
-    }
-
-    const executionResult = this.execute(input, {
-      stateMachineOptions: this.stateMachineOptions,
-      runOptions: options,
-      abortSignal: abortController.signal,
+    let timeoutId: NodeJS.Timeout;
+    const rejectOnTimeout = new Promise<null>((_, reject) => {
+      timeoutId = setTimeout(() => {
+        // Handle timeout by removing the abort handler from the abort signal listener
+        abortController.signal.removeEventListener('abort', onAbortHandler);
+        // Then we simply reuse the abort controller to abort the execution on timeout
+        abortController.abort();
+        reject(new StatesTimeoutError());
+      }, timeoutSeconds * 1000);
     });
 
-    const racingPromises = [executionResult, settleOnAbort];
+    const executionResult = this.execute(
+      input,
+      {
+        stateMachineOptions: this.stateMachineOptions,
+        runOptions: options,
+        abortSignal: abortController.signal,
+      },
+      () => {
+        abortController.signal.removeEventListener('abort', onAbortHandler);
+        clearTimeout(timeoutId);
+      }
+    );
 
-    if (rejectOnTimeout) {
-      racingPromises.push(rejectOnTimeout);
-    }
-
+    const racingPromises = [executionResult, settleOnAbort, rejectOnTimeout];
     const result = Promise.race(racingPromises);
 
     return {
@@ -101,7 +110,7 @@ export class StateMachine {
   /**
    * Helper method that handles the execution of the machine states and the transitions between them.
    */
-  private async execute(input: JSONValue, options: ExecuteOptions): Promise<JSONValue> {
+  private async execute(input: JSONValue, options: ExecuteOptions, cleanupFn: () => void): Promise<JSONValue> {
     let currState = this.definition.States[this.definition.StartAt];
     let currStateName = this.definition.StartAt;
     let currInput = cloneDeep(input);
@@ -123,6 +132,8 @@ export class StateMachine {
       } while (!isEndState && !options.abortSignal.aborted);
     } catch (error) {
       throw new ExecutionError(error as Error);
+    } finally {
+      cleanupFn();
     }
 
     return currResult;

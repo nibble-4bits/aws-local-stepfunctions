@@ -4,7 +4,8 @@
     "outDir": "build",
     "declaration": true,
     "noUncheckedIndexedAccess": false,
-    "noUnusedParameters": false
+    "noUnusedParameters": false,
+    "resolveJsonModule": true
   },
   "include": ["src/**/*.ts"],
   "exclude": ["node_modules"]

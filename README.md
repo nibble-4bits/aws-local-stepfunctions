@@ -16,6 +16,14 @@ This package lets you run AWS Step Functions completely locally, both in Node.js
 - [API](#api)
   - [Constructor](#constructor-new-statemachinedefinition-statemachineoptions)
   - [StateMachine.run](#statemachineruninput-options)
+- [CLI](#cli)
+  - [Basic usage](#basic-usage)
+  - [Passing input from stdin](#passing-input-from-stdin)
+  - [Overriding Task and Wait states](#overriding-task-and-wait-states)
+    - [Task state override](#task-state-override)
+    - [Wait state override](#wait-state-override)
+  - [Disabling ASL validations](#disabling-asl-validations)
+  - [Exit codes](#exit-codes)
 - [Examples](#examples)
 - [License](#license)
 
@@ -49,7 +57,7 @@ import { StateMachine } from 'aws-local-stepfunctions';
 
 You can import the bundled package directly into a browser script as an ES module, from one of the following CDNs:
 
-> NOTE: The following examples will import the latest package version. Refer to the CDNs websites to know about other ways in which you can specify the package URL (for example, to import a specific version).
+> NOTE: The following examples will import the latest package version. Refer to the CDNs websites to know about other ways in which you can specify the package URL (for example, to import a specific version or a minified version).
 
 #### [unpkg](https://unpkg.com/)
 
@@ -122,7 +130,7 @@ Each execution is independent of all others, meaning that you can concurrently c
 - `options?`:
   - `overrides?`: An object to override the behavior of certain states:
     - `taskResourceLocalHandlers?`: An [object that overrides](/docs/feature-support.md#task-state-resource-override) the resource of the specified `Task` states to run a local function.
-    - `waitTimeOverrides?`: An [object that overrides](/docs/feature-support.md#wait-state-duration-override) the wait duration of the specified `Wait` states. The specifed override duration should be in milliseconds.
+    - `waitTimeOverrides?`: An [object that overrides](/docs/feature-support.md#wait-state-duration-override) the wait duration of the specified `Wait` states. The specified override duration should be in milliseconds.
   - `noThrowOnAbort?`: If this option is set to `true`, aborting the execution will simply return `null` as result instead of throwing.
 
 #### Basic example:
@@ -148,6 +156,167 @@ const execution = stateMachine.run(myInput); // execute the state machine
 const result = await execution.result; // wait until the execution finishes to get the result
 console.log(result); // log the result of the execution
 ```
+
+## CLI
+
+In addition to the JavaScript API, `aws-local-stepfunctions` also provides a command-line interface. The CLI allows you to run one or several executions without having to create a Node.js script.
+
+To use the CLI as a global shell command, you need to install the package globally:
+
+```sh
+npm install -g aws-local-stepfunctions
+```
+
+After installing the package, the command `local-sfn` will be available in your shell.
+
+### Basic usage
+
+The simplest way to use the CLI is by passing either the `-d, --definition` or the `-f, --definition-file` option, along with the input(s) for the state machine. For example:
+
+```sh
+local-sfn \
+  -f state-machine.json \
+  '{ "num1": 1, "num2": 2 }' \
+  '{ "num1": 3, "num2": 4 }' \
+  '{ "num1": 5, "num2": 6 }'
+```
+
+This command would execute the state machine defined in file `state-machine.json` with `'{ "num1": 1, "num2": 2 }'`, `'{ "num1": 3, "num2": 4 }'`, and `'{ "num1": 5, "num2": 6 }'` as inputs. Each input corresponds to a state machine execution, and each execution is run independently, so the failure of one execution doesn't mean the failure of all of the other executions.
+
+Now, suppose the state machine in file `state-machine.json` is defined as a single `Task` state that calls a Lambda function that adds `num1` and `num2`:
+
+<a id="cli-state-machine"></a>
+
+```json
+{
+  "StartAt": "AddNumbers",
+  "States": {
+    "AddNumbers": {
+      "Type": "Task",
+      "Resource": "arn:aws:lambda:us-east-1:123456789012:function:AddNumbers",
+      "End": true
+    }
+  }
+}
+```
+
+Then, the output of the `local-sfn` command above may look something like this:
+
+```sh
+3
+7
+11
+```
+
+Note that each line of the output corresponds to the result of each input, in the same order that the inputs were given to the command.
+
+### Passing input from stdin
+
+`local-sfn` can also read the execution input from the standard input. For example, assume you have the following text file, called `inputs.txt`, and you want to pass the contents of the file as inputs to `local-sfn`:
+
+```txt
+{ "num1": 1, "num2": 2 }
+{ "num1": 3, "num2": 4 }
+{ "num1": 5, "num2": 6 }
+```
+
+You can then run the following command to pass the inputs of the text file to `local-sfn`:
+
+```sh
+cat inputs.txt | local-sfn -f state-machine.json
+```
+
+Alternatively, using input redirection:
+
+```sh
+local-sfn -f state-machine.json < inputs.txt
+```
+
+When reading from stdin, `local-sfn` will take each line and use it as an input. Hence, to avoid any parsing errors, make sure the output of the command you're piping into `local-sfn` prints each input in a new line.
+
+### Overriding Task and Wait states
+
+As explained in the Feature support document, it's possible to override the default actions of [`Task` states](/docs/feature-support.md#task-state-resource-override) and [`Wait` states](/docs/feature-support.md#wait-state-duration-override).
+
+#### Task state override
+
+To override a `Task` state, pass the `-t, --override-task` option. This option takes as value the name of the `Task` state you want to override, and a path to a script or program that will be executed instead of the resource specified in the state definition. The state name and the path must be separated by a colon `:`.
+
+Using the same [state machine definition](#cli-state-machine) as before, if you wanted to override the `AddNumbers` state to run a custom script, you can do it like this:
+
+```sh
+local-sfn -f state-machine.json -t AddNumbers:./override.sh '{ "num1": 1, "num2": 2 }'
+```
+
+This command would run the state machine, but instead of invoking the Lambda function specified in the `Resource` field of the `AddNumbers` state, the `override.sh` script would be executed.
+
+Now, suppose the `override.sh` script is defined like this:
+
+```sh
+#!/bin/sh
+
+TASK_INPUT=$1 # First argument is the input to the overridden Task state
+echo "$TASK_INPUT" | jq '.num1 + .num2' # Use jq to add "num1" and "num2", and print result to stdout
+```
+
+When overriding a `Task` state, the overriding executable will be passed the input to the `Task` state as first argument, which can then be used to compute the task result. Similarly, the executable must print the task result as a JSON value to the standard output, so `local-sfn` can then read stdout and use the value as the result of the `Task` state. If the executable terminates with an exit code different from `0`, its standard error will be printed and the execution will be marked as a failure.
+
+Additionally, you can pass the `-t, --override-task` option multiple times, to override more than one `Task` state. For example:
+
+```sh
+local-sfn
+  -f state-machine.json \
+  -t AddNumbers:./override.sh \
+  -t SendRequest:./request.py \
+  -t ProcessImage:./proc_image \
+  '{ "num1": 1, "num2": 2 }'
+```
+
+This command would execute the state machine, and override `Task` states `AddNumbers`, `SendRequest`, and `ProcessImage` to run the `override.sh` shell script, the `request.py` Python script, and the `proc_image` program, respectively.
+
+#### Wait state override
+
+To override the duration of a `Wait` state, pass the `-w, --override-wait` option. This option takes as value the name of the `Wait` state you want to override, and a number that represents the amount in milliseconds that you want to pause the execution for. The state name and the milliseconds amount must be separated by a colon `:`.
+
+For example:
+
+```sh
+local-sfn -f state-machine.json -w WaitResponse:1500 '{ "num1": 1, "num2": 2 }'
+```
+
+This command would execute the state machine, and when entering the `WaitResponse` `Wait` state, the execution would be paused for 1500 milliseconds (1.5 seconds), disregarding the `Seconds`, `Timestamp`, `SecondsPath`, or `TimestampPath` fields that could've been specified in the definition of `WaitResponse`.
+
+In the same way as the `-t, --override-task` option, you can pass the `-w, --override-wait` option multiple times, to override more than one `Wait` state. For example:
+
+```sh
+local-sfn \
+  -f state-machine.json \
+  -w WaitResponse:1500 \
+  -w PauseUntilSignal:250 \
+  -w Delay:0 \
+  '{ "num1": 1, "num2": 2 }'
+```
+
+This command would execute the state machine, and override `Wait` states `WaitResponse` and `PauseUntilSignal` to pause the execution for 1500 and 250 milliseconds, respectively. The `Delay` state wouldn't be paused at all, since the override value is set to 0.
+
+### Disabling ASL validations
+
+Before attempting to run the state machine with the given inputs, the state machine definition itself is validated to check that:
+
+- JSONPath strings are valid.
+- ARNs in the `Resource` field of `Task` states are valid.
+
+If any of these two checks fail, `local-sfn` will print the validation error and exit. To suppress this behavior, you can pass the `--no-jsonpath-validation` option, to suppress JSONPath validation; and the `--no-arn-validation` option, to suppress ARN validation.
+
+### Exit codes
+
+`local-sfn` can terminate with the following exit codes:
+
+| Exit code | Explanation                                                                          |
+| :-------: | ------------------------------------------------------------------------------------ |
+|     0     | The state machine was executed, and all executions ran successfully.                 |
+|     1     | An error occurred before the state machine could be executed (e.g. a parsing error). |
+|     2     | The state machine was executed, but at least one execution had an error.             |
 
 ## Examples
 

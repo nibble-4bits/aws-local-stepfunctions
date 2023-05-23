@@ -35,6 +35,9 @@
     "browser": "./build/main.browser.esm.js",
     "default": "./build/main.browser.esm.js"
   },
+  "bin": {
+    "local-sfn": "./build/CLI.cjs"
+  },
   "scripts": {
     "test": "jest",
     "build": "tsup",
@@ -64,6 +67,7 @@
     "@aws-sdk/client-lambda": "^3.314.0",
     "@aws-sdk/credential-providers": "^3.312.0",
     "asl-validator": "^3.5.1",
+    "commander": "^10.0.1",
     "crypto-js": "^4.1.1",
     "jsonpath-plus": "^7.2.0",
     "lodash": "^4.17.21",

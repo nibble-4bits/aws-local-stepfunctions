@@ -1,11 +1,18 @@
 import { defineConfig, Options } from 'tsup';
 
-function getCommonConfig(platform: 'node' | 'browser'): Options {
+function getCommonConfig(): Options {
   return {
-    name: platform,
-    entry: ['src/main.ts'],
     outDir: 'build',
     splitting: false,
+  };
+}
+
+function getPackageConfig(platform: 'node' | 'browser'): Options {
+  return {
+    ...getCommonConfig(),
+    name: platform,
+    platform,
+    entry: ['src/main.ts'],
     outExtension({ format }) {
       if (format === 'cjs') return { js: `.${platform}.${format}` };
       return { js: `.${platform}.${format}.js` };
@@ -13,17 +20,38 @@ function getCommonConfig(platform: 'node' | 'browser'): Options {
   };
 }
 
+function getCLIConfig(): Options {
+  return {
+    ...getCommonConfig(),
+    name: 'cli',
+    entry: ['src/cli/CLI.ts'],
+    format: ['cjs'],
+    esbuildPlugins: [
+      {
+        name: 'rewrite-main-import',
+        setup(build) {
+          build.onResolve({ filter: /^\.\.\/main$/ }, () => {
+            return { path: './main.node.cjs', external: true };
+          });
+        },
+      },
+    ],
+  };
+}
+
 export default defineConfig([
   {
-    ...getCommonConfig('node'),
+    ...getPackageConfig('node'),
     format: ['cjs', 'esm'],
     dts: true,
     clean: true,
   },
   {
-    ...getCommonConfig('browser'),
+    ...getPackageConfig('browser'),
     format: ['esm'],
-    platform: 'browser',
     noExternal: [/./],
+  },
+  {
+    ...getCLIConfig(),
   },
 ]);

@@ -2,11 +2,11 @@ import type { JSONValue } from './JSONValue';
 import type { FromCognitoIdentityPoolParameters } from '@aws-sdk/credential-provider-cognito-identity/dist-types/fromCognitoIdentityPool';
 import type { Credentials as AWSCredentials } from '@aws-sdk/types/dist-types/credentials';
 
-type TaskStateResourceLocalHandler = {
+export type TaskStateResourceLocalHandler = {
   [taskStateName: string]: (input: JSONValue) => Promise<JSONValue>;
 };
 
-type WaitStateTimeOverride = {
+export type WaitStateTimeOverride = {
   [waitStateName: string]: number;
 };
 
