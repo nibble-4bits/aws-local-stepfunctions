@@ -259,7 +259,7 @@ TASK_INPUT=$1 # First argument is the input to the overridden Task state
 echo "$TASK_INPUT" | jq '.num1 + .num2' # Use jq to add "num1" and "num2", and print result to stdout
 ```
 
-When overriding a `Task` state, the overriding script/program will be passed the input to the `Task` state as first argument, which can then be used to compute the task result. Similarly, the overriding script/program must print the task result as a JSON value to the standard output, so `local-sfn` can then read stdout and use the value as the result of the `Task` state.
+When overriding a `Task` state, the overriding executable will be passed the input to the `Task` state as first argument, which can then be used to compute the task result. Similarly, the executable must print the task result as a JSON value to the standard output, so `local-sfn` can then read stdout and use the value as the result of the `Task` state. If the executable terminates with an exit code different from `0`, its standard error will be printed and the execution will be marked as a failure.
 
 Additionally, you can pass the `-t, --override-task` option multiple times, to override more than one `Task` state. For example:
 
