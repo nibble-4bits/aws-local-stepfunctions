@@ -26,7 +26,16 @@ function getCLIConfig(): Options {
     name: 'cli',
     entry: ['src/cli/CLI.ts'],
     format: ['cjs'],
-    external: ['./main.node.cjs'],
+    esbuildPlugins: [
+      {
+        name: 'rewrite-main-import',
+        setup(build) {
+          build.onResolve({ filter: /^\.\.\/main$/ }, () => {
+            return { path: './main.node.cjs', external: true };
+          });
+        },
+      },
+    ],
   };
 }
 

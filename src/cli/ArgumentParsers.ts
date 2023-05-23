@@ -1,17 +1,17 @@
+import type { Command } from 'commander';
 import type { StateMachineDefinition } from '../typings/StateMachineDefinition';
 import type { TaskStateResourceLocalHandler, WaitStateTimeOverride } from '../typings/StateMachineImplementation';
 import type { JSONValue } from '../typings/JSONValue';
 import { readFileSync } from 'fs';
 import { spawnSync } from 'child_process';
-import { program } from 'commander';
 import { ExitCodes } from '../typings/CLI';
 import { tryJSONParse } from '../util';
 
-function parseDefinitionOption(definition: string): StateMachineDefinition {
+function parseDefinitionOption(command: Command, definition: string): StateMachineDefinition {
   const jsonOrError = tryJSONParse<StateMachineDefinition>(definition);
 
   if (jsonOrError instanceof Error) {
-    program.error(
+    command.error(
       `error: parsing of state machine definition passed in option '-d, --definition <definition>' failed: ${jsonOrError.message}`,
       {
         exitCode: ExitCodes.PreExecutionFailure,
@@ -22,19 +22,19 @@ function parseDefinitionOption(definition: string): StateMachineDefinition {
   return jsonOrError;
 }
 
-function parseDefinitionFileOption(definitionFile: string): StateMachineDefinition {
+function parseDefinitionFileOption(command: Command, definitionFile: string): StateMachineDefinition {
   let file: string;
 
   try {
     file = readFileSync(definitionFile).toString();
   } catch (error) {
-    program.error(`error: ${(error as Error).message}`, { exitCode: ExitCodes.PreExecutionFailure });
+    command.error(`error: ${(error as Error).message}`, { exitCode: ExitCodes.PreExecutionFailure });
   }
 
   const jsonOrError = tryJSONParse<StateMachineDefinition>(file);
 
   if (jsonOrError instanceof Error) {
-    program.error(
+    command.error(
       `error: parsing of state machine definition in file '${definitionFile}' failed: ${jsonOrError.message}`,
       { exitCode: ExitCodes.PreExecutionFailure }
     );
@@ -78,11 +78,11 @@ function parseOverrideWaitOption(value: string, previous: WaitStateTimeOverride 
   return previous;
 }
 
-function parseInputArguments(value: string, previous: JSONValue[] = []): JSONValue[] {
+function parseInputArguments(command: Command, value: string, previous: JSONValue[] = []): JSONValue[] {
   const jsonOrError = tryJSONParse<JSONValue>(value);
 
   if (jsonOrError instanceof Error) {
-    program.error(`error: parsing of input value '${value}' failed: ${jsonOrError.message}`, {
+    command.error(`error: parsing of input value '${value}' failed: ${jsonOrError.message}`, {
       exitCode: ExitCodes.PreExecutionFailure,
     });
   }
