@@ -52,6 +52,12 @@ function parseOverrideTaskOption(
   previous[taskStateName] = (input) => {
     const spawnResult = spawnSync(scriptPath, [JSON.stringify(input)]);
 
+    if (spawnResult.error) {
+      throw new Error(
+        `Attempt to run task override '${scriptPath}' for state '${taskStateName}' failed: ${spawnResult.error.message}`
+      );
+    }
+
     if (spawnResult.status !== 0) {
       throw new Error(`${scriptPath} ('${taskStateName}'): ${spawnResult.stderr.toString()}`);
     }
@@ -60,7 +66,7 @@ function parseOverrideTaskOption(
     const jsonOrError = tryJSONParse<JSONValue>(overrideResult);
     if (jsonOrError instanceof Error) {
       throw new Error(
-        `Parsing of output '${overrideResult}' in task override '${scriptPath}' for state '${taskStateName}' failed: ${jsonOrError.message}`
+        `Parsing of output '${overrideResult}' from task override '${scriptPath}' for state '${taskStateName}' failed: ${jsonOrError.message}`
       );
     }
 

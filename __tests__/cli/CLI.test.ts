@@ -417,6 +417,40 @@ describe('CLI', () => {
       expect(consoleLogMock).toHaveBeenCalledWith('Script result');
     });
 
+    test('should print error as result when attempt to spawn overriding script fails', async () => {
+      const consoleLogMock = jest.fn();
+      jest.spyOn(console, 'log').mockImplementation(consoleLogMock);
+
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      child_process.spawnSync = jest.fn(() => ({
+        status: 1,
+        error: new Error('spawnSync failure'),
+      }));
+
+      const definition = `{
+        "StartAt": "AddNumbers",
+        "States": {
+         "AddNumbers": {
+          "Type": "Task",
+          "Resource": "arn:aws:lambda:us-east-1:123456789012:function:AddNumbers",
+          "End": true
+         }
+        }
+       }`;
+
+      const program = makeProgram();
+      const overrideTaskMapping = 'AddNumbers:./override.sh';
+      const inputs = ['{ "num1": 1, "num2": 2 }'];
+
+      await program.parseAsync(['-d', definition, '-t', overrideTaskMapping, ...inputs], { from: 'user' });
+
+      expect(child_process.spawnSync).toHaveBeenCalled();
+      expect(consoleLogMock).toHaveBeenCalledWith(
+        "Execution has failed with the following error: Attempt to run task override './override.sh' for state 'AddNumbers' failed: spawnSync failure"
+      );
+    });
+
     test('should print error as result when overriding script terminates with non-zero exit code', async () => {
       const consoleLogMock = jest.fn();
       jest.spyOn(console, 'log').mockImplementation(consoleLogMock);
@@ -481,7 +515,7 @@ describe('CLI', () => {
 
       expect(child_process.spawnSync).toHaveBeenCalled();
       expect(consoleLogMock).toHaveBeenCalledWith(
-        "Execution has failed with the following error: Parsing of output '{ key: value }' in task override './override.sh' for state 'AddNumbers' failed: Unexpected token k in JSON at position 2"
+        "Execution has failed with the following error: Parsing of output '{ key: value }' from task override './override.sh' for state 'AddNumbers' failed: Unexpected token k in JSON at position 2"
       );
     });
   });
