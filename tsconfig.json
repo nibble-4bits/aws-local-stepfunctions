@@ -5,7 +5,8 @@
     "declaration": true,
     "noUncheckedIndexedAccess": false,
     "noUnusedParameters": false,
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
+    "stripInternal": true
   },
   "include": ["src/**/*.ts"],
   "exclude": ["node_modules"]
