@@ -23,14 +23,14 @@ export class LambdaClient {
     if (config) {
       if (!config.region) {
         throw new StatesRuntimeError(
-          '`awsConfig` option was specified for state machine, but `region` property is not set'
+          "'awsConfig' option was specified for state machine, but 'region' property is not set"
         );
       }
 
       // Check if multiple types of credentials were passed. Passing more than one type is an error.
       if (config.credentials) {
         const credentialsTypes = Object.keys(config.credentials);
-        const credentialsNames = credentialsTypes.map((name) => `\`${name}\``).join(', ');
+        const credentialsNames = credentialsTypes.map((name) => `'${name}'`).join(', ');
         if (credentialsTypes.length > 1) {
           throw new StatesRuntimeError(
             `More than one type of AWS credentials were specified: ${credentialsNames}. Only one type may be specified`
@@ -72,7 +72,7 @@ export class LambdaClient {
       const errorResult = resultValue as LambdaErrorResult;
       // Even though this is not a Fail State, we can take advantage of the `FailStateError`
       // to throw an error with a custom name and message.
-      throw new FailStateError(errorResult.errorType, `Execution of Lambda function "${funcNameOrArn}" failed`);
+      throw new FailStateError(errorResult.errorType, `Execution of Lambda function '${funcNameOrArn}' failed`);
     }
 
     return resultValue;

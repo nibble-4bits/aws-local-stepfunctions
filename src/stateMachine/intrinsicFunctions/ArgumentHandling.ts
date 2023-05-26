@@ -35,7 +35,7 @@ function validateArgumentType(allowedTypes: ArgumentType[], argPosition: number,
     if (matchesAllowedType) break;
   }
 
-  const expectedType = allowedTypes.map((type) => `"${type}"`).join(' | ');
+  const expectedType = allowedTypes.map((type) => `'${type}'`).join(' | ');
   if (!matchesAllowedType) {
     throw new StatesRuntimeError(
       `Intrinsic function ${funcName} expected argument ${argPosition} to be of type ${expectedType}, but received ${typeof funcArg}`
@@ -70,7 +70,7 @@ function validateArgumentConstraints(
       if (matchesAllConstraints) break;
     }
 
-    const expectedConstraints = argConstraints.map((constraint) => `"${constraint}"`).join(' | ');
+    const expectedConstraints = argConstraints.map((constraint) => `'${constraint}'`).join(' | ');
     if (!matchesAllConstraints) {
       throw new StatesRuntimeError(
         `Intrinsic function ${funcName} expected argument ${argPosition} to satisfy the following constraints: ${expectedConstraints}`
