@@ -41,7 +41,7 @@ function processPayloadTemplate(payloadTemplate: PayloadTemplate, json: JSONValu
 
     // Recursively process child object
     if (isPlainObj(value)) {
-      resolvedValue = processPayloadTemplate(value, json);
+      resolvedValue = processPayloadTemplate(value, json, context);
     }
 
     // Only resolve value if key ends with `.$` and value is a string

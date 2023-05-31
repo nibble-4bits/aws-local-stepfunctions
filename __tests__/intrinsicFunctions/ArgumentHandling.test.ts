@@ -105,7 +105,7 @@ describe('Intrinsic function argument handling', () => {
 
         expect(validateArgumentsWrapper).toThrow(StatesRuntimeError);
         expect(validateArgumentsWrapper).toThrow(
-          /^Intrinsic function Generic.Function expected argument 1 to be of type "string", but received number$/
+          /^Intrinsic function Generic.Function expected argument 1 to be of type 'string', but received number$/
         );
       });
 
@@ -121,7 +121,7 @@ describe('Intrinsic function argument handling', () => {
 
         expect(validateArgumentsWrapper).toThrow(StatesRuntimeError);
         expect(validateArgumentsWrapper).toThrow(
-          /^Intrinsic function Generic.Function expected argument 1 to be of type "number", but received string$/
+          /^Intrinsic function Generic.Function expected argument 1 to be of type 'number', but received string$/
         );
       });
 
@@ -137,7 +137,7 @@ describe('Intrinsic function argument handling', () => {
 
         expect(validateArgumentsWrapper).toThrow(StatesRuntimeError);
         expect(validateArgumentsWrapper).toThrow(
-          /^Intrinsic function Generic.Function expected argument 1 to be of type "boolean", but received string$/
+          /^Intrinsic function Generic.Function expected argument 1 to be of type 'boolean', but received string$/
         );
       });
 
@@ -153,7 +153,7 @@ describe('Intrinsic function argument handling', () => {
 
         expect(validateArgumentsWrapper).toThrow(StatesRuntimeError);
         expect(validateArgumentsWrapper).toThrow(
-          /^Intrinsic function Generic.Function expected argument 1 to be of type "null", but received string$/
+          /^Intrinsic function Generic.Function expected argument 1 to be of type 'null', but received string$/
         );
       });
 
@@ -169,7 +169,7 @@ describe('Intrinsic function argument handling', () => {
 
         expect(validateArgumentsWrapper).toThrow(StatesRuntimeError);
         expect(validateArgumentsWrapper).toThrow(
-          /^Intrinsic function Generic.Function expected argument 1 to be of type "array", but received string$/
+          /^Intrinsic function Generic.Function expected argument 1 to be of type 'array', but received string$/
         );
       });
 
@@ -185,7 +185,7 @@ describe('Intrinsic function argument handling', () => {
 
         expect(validateArgumentsWrapper).toThrow(StatesRuntimeError);
         expect(validateArgumentsWrapper).toThrow(
-          /^Intrinsic function Generic.Function expected argument 1 to be of type "object", but received string$/
+          /^Intrinsic function Generic.Function expected argument 1 to be of type 'object', but received string$/
         );
       });
 
@@ -221,7 +221,7 @@ describe('Intrinsic function argument handling', () => {
 
         expect(validateArgumentsWrapper).toThrow(StatesRuntimeError);
         expect(validateArgumentsWrapper).toThrow(
-          /^Intrinsic function Generic.Function expected argument 1 to satisfy the following constraints: "ZERO"$/
+          /^Intrinsic function Generic.Function expected argument 1 to satisfy the following constraints: 'ZERO'$/
         );
       });
 
@@ -242,7 +242,7 @@ describe('Intrinsic function argument handling', () => {
 
         expect(validateArgumentsWrapper).toThrow(StatesRuntimeError);
         expect(validateArgumentsWrapper).toThrow(
-          /^Intrinsic function Generic.Function expected argument 1 to satisfy the following constraints: "POSITIVE_INTEGER"$/
+          /^Intrinsic function Generic.Function expected argument 1 to satisfy the following constraints: 'POSITIVE_INTEGER'$/
         );
       });
 
@@ -263,7 +263,7 @@ describe('Intrinsic function argument handling', () => {
 
         expect(validateArgumentsWrapper).toThrow(StatesRuntimeError);
         expect(validateArgumentsWrapper).toThrow(
-          /^Intrinsic function Generic.Function expected argument 1 to satisfy the following constraints: "NEGATIVE_INTEGER"$/
+          /^Intrinsic function Generic.Function expected argument 1 to satisfy the following constraints: 'NEGATIVE_INTEGER'$/
         );
       });
 
@@ -284,7 +284,7 @@ describe('Intrinsic function argument handling', () => {
 
         expect(validateArgumentsWrapper).toThrow(StatesRuntimeError);
         expect(validateArgumentsWrapper).toThrow(
-          /^Intrinsic function Generic.Function expected argument 1 to satisfy the following constraints: "INTEGER"$/
+          /^Intrinsic function Generic.Function expected argument 1 to satisfy the following constraints: 'INTEGER'$/
         );
       });
     });

@@ -1,6 +1,6 @@
 import type { JSONValue } from './JSONValue';
 import type { FromCognitoIdentityPoolParameters } from '@aws-sdk/credential-provider-cognito-identity/dist-types/fromCognitoIdentityPool';
-import type { Credentials as AWSCredentials } from '@aws-sdk/types/dist-types/credentials';
+import type { AwsCredentialIdentity as AWSCredentials } from '@aws-sdk/types/dist-types/identity/AwsCredentialIdentity';
 
 export type TaskStateResourceLocalHandler = {
   [taskStateName: string]: (input: JSONValue) => Promise<JSONValue>;
@@ -18,6 +18,10 @@ interface Overrides {
 export interface ValidationOptions {
   readonly checkPaths?: boolean;
   readonly checkArn?: boolean;
+  /**
+   * @internal DO NOT USE. This property is meant for internal use only.
+   */
+  readonly _noValidate?: boolean;
 }
 
 export interface AWSConfig {

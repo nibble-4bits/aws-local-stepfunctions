@@ -35,14 +35,16 @@ export class StateMachine {
    * These options also apply to state machines defined in the `Iterator` field of `Map` states and in the `Branches` field of `Parallel` states.
    */
   constructor(definition: StateMachineDefinition, stateMachineOptions?: StateMachineOptions) {
-    const { isValid, errorsText } = aslValidator(definition, {
-      checkArn: true,
-      checkPaths: true,
-      ...stateMachineOptions?.validationOptions,
-    });
+    if (!stateMachineOptions?.validationOptions?._noValidate) {
+      const { isValid, errorsText } = aslValidator(definition, {
+        checkArn: true,
+        checkPaths: true,
+        ...stateMachineOptions?.validationOptions,
+      });
 
-    if (!isValid) {
-      throw new Error(`State machine definition is invalid, see error(s) below:\n ${errorsText('\n')}`);
+      if (!isValid) {
+        throw new Error(`State machine definition is invalid, see error(s) below:\n ${errorsText('\n')}`);
+      }
     }
 
     this.definition = definition;

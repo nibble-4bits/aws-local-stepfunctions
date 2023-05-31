@@ -44,7 +44,6 @@ export default defineConfig([
     ...getPackageConfig('node'),
     format: ['cjs', 'esm'],
     dts: true,
-    clean: true,
   },
   {
     ...getPackageConfig('browser'),

@@ -27,7 +27,10 @@ class ParallelStateAction extends BaseStateAction<ParallelState> {
     context: Context,
     options: ParallelStateActionOptions | undefined
   ): Promise<JSONValue> {
-    const stateMachine = new StateMachine(branch, options?.stateMachineOptions);
+    const stateMachine = new StateMachine(branch, {
+      ...options?.stateMachineOptions,
+      validationOptions: { _noValidate: true },
+    });
     const execution = stateMachine.run(input, options?.runOptions);
 
     this.executionAbortFuncs.push(execution.abort);
