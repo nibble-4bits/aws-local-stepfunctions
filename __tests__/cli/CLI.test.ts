@@ -32,7 +32,7 @@ describe('CLI', () => {
         },
       });
 
-      await expect(() => program.parseAsync([], { from: 'user' })).rejects.toThrow();
+      await expect(program.parseAsync([], { from: 'user' })).rejects.toThrow();
       expect(helpStr).toBe(
         'Usage: local-sfn [options] [inputs...]\n\nExecute an Amazon States Language state machine with the given inputs.\nThe result of each execution will be output in a new line and in the same order\nas its corresponding input.\n\nArguments:\n  inputs                         Input data for the state machine, can be any\n                                 valid JSON value. Each input represents a\n                                 state machine execution. If reading from the\n                                 standard input, each line will be considered\n                                 as an input.\n\nOptions:\n  -V, --version                  Print the version number and exit.\n  -d, --definition <definition>  A JSON definition of a state machine.\n  -f, --definition-file <path>   Path to a file containing a JSON state machine\n                                 definition.\n  -t, --override-task <mapping>  Override a Task state to run an executable\n                                 file or script, instead of calling the service\n                                 specified in the \'Resource\' field of the state\n                                 definition. The mapping value has to be\n                                 provided in the format\n                                 [TaskStateToOverride]:[path/to/override/script].\n                                 The override script will be passed the input\n                                 of the Task state as first argument, which can\n                                 then be used to compute the task result. The\n                                 script must print the task result as a JSON\n                                 value to the standard output.\n  -w, --override-wait <mapping>  Override a Wait state to pause for the\n                                 specified amount of milliseconds, instead of\n                                 pausing for the duration specified in the\n                                 state definition. The mapping value has to be\n                                 provided in the format\n                                 [WaitStateToOverride]:[number].\n  --no-jsonpath-validation       Disable validation of JSONPath strings in the\n                                 state machine definition.\n  --no-arn-validation            Disable validation of ARNs in the state\n                                 machine definition.\n  -h, --help                     Print help for command and exit.\n\nExit codes:\n  0\tAll executions ran successfully.\n  1\tAn error occurred before the state machine could be executed.\n  2\tAt least one execution had an error.\n\nExample calls:\n  $ local-sfn -f state-machine.json \'{ "num1": 2, "num2": 2 }\'\n  $ local-sfn -f state-machine.json -t SendRequest:./override.sh -w WaitResponse:2000 \'{ "num1": 2, "num2": 2 }\'\n  $ cat inputs.txt | local-sfn -f state-machine.json\n'
       );
@@ -52,7 +52,7 @@ describe('CLI', () => {
       });
 
       // program.parseAsync(['{}'], { from: 'user' });
-      await expect(() => program.parseAsync(['{}'], { from: 'user' })).rejects.toThrow();
+      await expect(program.parseAsync(['{}'], { from: 'user' })).rejects.toThrow();
       expect(errStr).toBe(
         "error: missing either option '-d, --definition <definition>' or option '-f, --definition-file <path>'\n"
       );
@@ -81,7 +81,7 @@ describe('CLI', () => {
         },
       });
 
-      await expect(() => program.parseAsync(['-d', definition, '{}'], { from: 'user' })).rejects.toThrow();
+      await expect(program.parseAsync(['-d', definition, '{}'], { from: 'user' })).rejects.toThrow();
       expect(errStr).toBe(
         "error: parsing of state machine definition passed in option '-d, --definition <definition>' failed: Unexpected token S in JSON at position 12\n"
       );
@@ -105,7 +105,7 @@ describe('CLI', () => {
         },
       });
 
-      await expect(() => program.parseAsync(['-f', filePath, '{}'], { from: 'user' })).rejects.toThrow();
+      await expect(program.parseAsync(['-f', filePath, '{}'], { from: 'user' })).rejects.toThrow();
       expect(errStr).toBe("error: ENOENT: no such file or directory, open '/path/to/nonexistent/file'\n");
     });
 
@@ -138,7 +138,7 @@ describe('CLI', () => {
         },
       });
 
-      await expect(() => program.parseAsync(['-f', filePath, '{}'], { from: 'user' })).rejects.toThrow();
+      await expect(program.parseAsync(['-f', filePath, '{}'], { from: 'user' })).rejects.toThrow();
       expect(errStr).toBe(
         "error: parsing of state machine definition in file './state-machine.asl.json' failed: Unexpected token S in JSON at position 12\n"
       );
@@ -167,7 +167,7 @@ describe('CLI', () => {
         },
       });
 
-      await expect(() => program.parseAsync(['-d', definition, input], { from: 'user' })).rejects.toThrow();
+      await expect(program.parseAsync(['-d', definition, input], { from: 'user' })).rejects.toThrow();
       expect(errStr).toBe(
         "error: parsing of input value '{ key: 123 }' failed: Unexpected token k in JSON at position 2\n"
       );
@@ -196,7 +196,7 @@ describe('CLI', () => {
         },
       });
 
-      await expect(() => program.parseAsync(['-d', definition, '{}'], { from: 'user' })).rejects.toThrow();
+      await expect(program.parseAsync(['-d', definition, '{}'], { from: 'user' })).rejects.toThrow();
       expect(errStr).toBe(
         'error: State machine definition is invalid, see error(s) below:\n SCHEMA_VALIDATION_FAILED: /States/AddNumbers/OutputPath is invalid. must match format "asl_path"\n'
       );
@@ -224,7 +224,7 @@ describe('CLI', () => {
         },
       });
 
-      await expect(() => program.parseAsync(['-d', definition, '{}'], { from: 'user' })).rejects.toThrow();
+      await expect(program.parseAsync(['-d', definition, '{}'], { from: 'user' })).rejects.toThrow();
       expect(errStr).toBe(
         'error: State machine definition is invalid, see error(s) below:\n SCHEMA_VALIDATION_FAILED: /States/AddNumbers/Resource is invalid. must match exactly one schema in oneOf\n'
       );

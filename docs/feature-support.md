@@ -17,6 +17,8 @@ The following features all come from the [Amazon States Language specification](
 
 ### Fully supported
 
+- Top-level fields
+  - [x] `TimeoutSeconds`
 - Input processing
   - [x] `InputPath`
   - [x] `Parameters`

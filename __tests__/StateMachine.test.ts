@@ -104,7 +104,7 @@ describe('State Machine', () => {
 
       execution.abort();
 
-      await expect(() => execution.result).rejects.toThrow(ExecutionAbortedError);
+      await expect(execution.result).rejects.toThrow(ExecutionAbortedError);
     });
 
     test('should return `null` if `noThrowOnAbort` option is passed', async () => {
@@ -135,7 +135,7 @@ describe('State Machine', () => {
       const stateMachine = new StateMachine(machineDefinition);
       const execution = stateMachine.run(input);
 
-      await expect(() => execution.result).rejects.toThrow(StatesTimeoutError);
+      await expect(execution.result).rejects.toThrow(StatesTimeoutError);
     });
 
     test('should throw an `ExecutionError` if execution fails', async () => {

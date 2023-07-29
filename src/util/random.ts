@@ -49,9 +49,9 @@ export function sfc32(a: number, b: number, c: number, d: number) {
  * Generates a random integer between two bounds.
  * @param min Lower bound of the range.
  * @param max High bound of the range.
- * @param rngGenerator A generator function that produces random values between 0 and 1. If not specified, uses `Math.random` as default.
+ * @param rng A generator function that produces random values between 0 and 1. If not specified, uses `Math.random` as default.
  * @returns A random integer between `min` and `max` (both inclusive)
  */
-export function getRandomNumber(min: number, max: number, rngGenerator = Math.random) {
-  return Math.floor(rngGenerator() * (max - min + 1)) + min;
+export function getRandomNumber(min: number, max: number, rng = Math.random) {
+  return Math.floor(rng() * (max - min + 1)) + min;
 }
