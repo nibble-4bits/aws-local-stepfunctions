@@ -16,11 +16,12 @@ export function isPlainObj(value: unknown): value is JSONObject {
  * @param abortSignal An abort signal that can cancel the sleep if the signal is aborted.
  */
 export function sleep(ms: number, abortSignal?: AbortSignal) {
-  return new Promise((resolve) => {
+  return new Promise<void>((resolve) => {
     const timeout = setTimeout(resolve, ms);
 
     abortSignal?.addEventListener('abort', () => {
       clearTimeout(timeout);
+      resolve();
     });
   });
 }
