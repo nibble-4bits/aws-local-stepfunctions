@@ -1,4 +1,5 @@
 import type { JSONValue } from './JSONValue';
+import type { Context } from './Context';
 import type { FromCognitoIdentityPoolParameters } from '@aws-sdk/credential-provider-cognito-identity/dist-types/fromCognitoIdentityPool';
 import type { AwsCredentialIdentity as AWSCredentials } from '@aws-sdk/types/dist-types/identity/AwsCredentialIdentity';
 
@@ -40,6 +41,7 @@ export interface StateMachineOptions {
 export interface RunOptions {
   overrides?: Overrides;
   noThrowOnAbort?: boolean;
+  context?: Context;
 }
 
 export interface ExecuteOptions {
