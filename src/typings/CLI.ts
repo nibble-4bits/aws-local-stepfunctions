@@ -1,3 +1,4 @@
+import type { Context } from './Context';
 import type { StateMachineDefinition } from './StateMachineDefinition';
 import type { TaskStateResourceLocalHandler, WaitStateTimeOverride } from './StateMachineImplementation';
 
@@ -6,6 +7,8 @@ export type ParsedCommandOptions = {
   definitionFile: StateMachineDefinition;
   overrideTask: TaskStateResourceLocalHandler;
   overrideWait: WaitStateTimeOverride;
+  context: Context;
+  contextFile: Context;
   jsonpathValidation: boolean;
   arnValidation: boolean;
 };
