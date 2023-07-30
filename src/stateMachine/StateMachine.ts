@@ -1,7 +1,6 @@
 import type { StateMachineDefinition } from '../typings/StateMachineDefinition';
 import type { JSONValue } from '../typings/JSONValue';
 import type { ExecuteOptions, RunOptions, StateMachineOptions } from '../typings/StateMachineImplementation';
-import type { Context } from '../typings/Context';
 import { ExecutionAbortedError } from '../error/ExecutionAbortedError';
 import { StatesTimeoutError } from '../error/predefined/StatesTimeoutError';
 import { ExecutionError } from '../error/ExecutionError';
@@ -113,14 +112,13 @@ export class StateMachine {
    * Helper method that handles the execution of the machine states and the transitions between them.
    */
   private async execute(input: JSONValue, options: ExecuteOptions, cleanupFn: () => void): Promise<JSONValue> {
+    const context = options.runOptions?.context ?? {};
     let currState = this.definition.States[this.definition.StartAt];
     let currStateName = this.definition.StartAt;
     let currInput = cloneDeep(input);
     let currResult: JSONValue = null;
     let nextState = '';
     let isEndState = false;
-    // eslint-disable-next-line prefer-const
-    let context: Context = {};
 
     try {
       do {

@@ -22,6 +22,7 @@ This package lets you run AWS Step Functions completely locally, both in Node.js
   - [Overriding Task and Wait states](#overriding-task-and-wait-states)
     - [Task state override](#task-state-override)
     - [Wait state override](#wait-state-override)
+  - [Passing a custom Context Object](#passing-a-custom-context-object)
   - [Disabling ASL validations](#disabling-asl-validations)
   - [Exit codes](#exit-codes)
 - [Examples](#examples)
@@ -132,6 +133,7 @@ Each execution is independent of all others, meaning that you can concurrently c
     - `taskResourceLocalHandlers?`: An [object that overrides](/docs/feature-support.md#task-state-resource-override) the resource of the specified `Task` states to run a local function.
     - `waitTimeOverrides?`: An [object that overrides](/docs/feature-support.md#wait-state-duration-override) the wait duration of the specified `Wait` states. The specified override duration should be in milliseconds.
   - `noThrowOnAbort?`: If this option is set to `true`, aborting the execution will simply return `null` as result instead of throwing.
+  - `context?`: An object that will be used as the [Context Object](https://docs.aws.amazon.com/step-functions/latest/dg/input-output-contextobject.html) for the execution. If not passed, the Context Object will default to an empty object. This option is useful to mock the Context Object in case your definition references it in a JSONPath.
 
 #### Basic example:
 
@@ -299,6 +301,46 @@ local-sfn \
 
 This command would execute the state machine, and override `Wait` states `WaitResponse` and `PauseUntilSignal` to pause the execution for 1500 and 250 milliseconds, respectively. The `Delay` state wouldn't be paused at all, since the override value is set to 0.
 
+### Passing a custom Context Object
+
+If the JSONPaths in your definition reference the Context Object, you can provide a mock Context Object by passing either the `--context` or the `--context-file` option. For example, given the following definition:
+
+```json
+{
+  "StartAt": "Get execution context data",
+  "States": {
+    "Get execution context data": {
+      "Type": "Pass",
+      "Parameters": {
+        "execId.$": "$$.Execution.Id",
+        "execName.$": "$$.Execution.Name"
+      },
+      "End": true
+    }
+  }
+}
+```
+
+And given the following `context.json` file:
+
+```json
+{
+  "Execution": {
+    "Id": "arn:aws:states:us-east-1:123456789012:execution:stateMachineName:executionName",
+    "Name": "executionName"
+  }
+}
+```
+
+You could provide the Context Object to the execution in the following manner:
+
+```sh
+local-sfn \
+  -f state-machine.json \
+  --context-file context.json \
+  '{}'
+```
+
 ### Disabling ASL validations
 
 Before attempting to run the state machine with the given inputs, the state machine definition itself is validated to check that:
@@ -340,3 +382,7 @@ node examples/abort-execution.js
 ## License
 
 [MIT](https://github.com/nibble-4bits/aws-local-stepfunctions/blob/develop/LICENSE)
+
+```
+
+```

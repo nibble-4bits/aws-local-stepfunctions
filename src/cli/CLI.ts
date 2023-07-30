@@ -10,6 +10,8 @@ import {
   parseInputArguments,
   parseOverrideTaskOption,
   parseOverrideWaitOption,
+  parseContextOption,
+  parseContextFileOption,
 } from './ArgumentParsers';
 import { commandAction, preActionHook } from './CommandHandler';
 
@@ -59,6 +61,18 @@ Example calls:
         '-w, --override-wait <mapping>',
         'Override a Wait state to pause for the specified amount of milliseconds, instead of pausing for the duration specified in the state definition. The mapping value has to be provided in the format [WaitStateToOverride]:[number].'
       ).argParser(parseOverrideWaitOption)
+    )
+    .addOption(
+      new Option(
+        '--context <json>',
+        'A JSON object that will be passed to each execution as the context object.'
+      ).argParser((value) => parseContextOption(command, value))
+    )
+    .addOption(
+      new Option(
+        '--context-file <path>',
+        'Path to a file containing a JSON object that will be passed to each execution as the context object.'
+      ).argParser((value) => parseContextFileOption(command, value))
     )
     .addOption(
       new Option('--no-jsonpath-validation', 'Disable validation of JSONPath strings in the state machine definition.')
