@@ -382,7 +382,3 @@ node examples/abort-execution.js
 ## License
 
 [MIT](https://github.com/nibble-4bits/aws-local-stepfunctions/blob/develop/LICENSE)
-
-```
-
-```
