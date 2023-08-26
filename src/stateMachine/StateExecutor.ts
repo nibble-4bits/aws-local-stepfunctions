@@ -1,5 +1,5 @@
 import type { AllStates } from '../typings/AllStates';
-import type { ExecutionResult } from '../typings/StateActions';
+import type { ActionResult } from '../typings/StateActions';
 import type { RetryResult, CatchResult, StateHandlers } from '../typings/StateExecutor';
 import type { ExecuteOptions } from '../typings/StateMachineImplementation';
 import type { ErrorOutput } from '../typings/ErrorHandling';
@@ -105,7 +105,7 @@ export class StateExecutor {
   /**
    * Execute the current state.
    */
-  async execute(input: JSONValue, context: Context, options: ExecuteOptions): Promise<ExecutionResult> {
+  async execute(input: JSONValue, context: Context, options: ExecuteOptions): Promise<ActionResult> {
     const rawInput = cloneDeep(input);
 
     try {
@@ -274,7 +274,7 @@ export class StateExecutor {
     context: Context,
     stateName: string,
     options: ExecuteOptions
-  ): Promise<ExecutionResult> {
+  ): Promise<ActionResult> {
     const overrideFn = options.runOptions?.overrides?.taskResourceLocalHandlers?.[stateName];
     const awsConfig = options.stateMachineOptions?.awsConfig;
 
@@ -297,7 +297,7 @@ export class StateExecutor {
     context: Context,
     stateName: string,
     options: ExecuteOptions
-  ): Promise<ExecutionResult> {
+  ): Promise<ActionResult> {
     const parallelStateAction = new ParallelStateAction(stateDefinition, stateName);
     const executionResult = await parallelStateAction.execute(input, context, {
       stateMachineOptions: options.stateMachineOptions,
@@ -323,7 +323,7 @@ export class StateExecutor {
     context: Context,
     stateName: string,
     options: ExecuteOptions
-  ): Promise<ExecutionResult> {
+  ): Promise<ActionResult> {
     const mapStateAction = new MapStateAction(stateDefinition, stateName);
     const executionResult = await mapStateAction.execute(input, context, {
       stateMachineOptions: options.stateMachineOptions,
@@ -350,7 +350,7 @@ export class StateExecutor {
     stateName: string,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     options: ExecuteOptions
-  ): Promise<ExecutionResult> {
+  ): Promise<ActionResult> {
     const passStateAction = new PassStateAction(stateDefinition, stateName);
     const executionResult = await passStateAction.execute(input, context);
 
@@ -370,7 +370,7 @@ export class StateExecutor {
     context: Context,
     stateName: string,
     options: ExecuteOptions
-  ): Promise<ExecutionResult> {
+  ): Promise<ActionResult> {
     const waitTimeOverrideOption = options.runOptions?.overrides?.waitTimeOverrides?.[stateName];
 
     const waitStateAction = new WaitStateAction(stateDefinition, stateName);
@@ -406,7 +406,7 @@ export class StateExecutor {
     stateName: string,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     options: ExecuteOptions
-  ): Promise<ExecutionResult> {
+  ): Promise<ActionResult> {
     const choiceStateAction = new ChoiceStateAction(stateDefinition, stateName);
     const executionResult = await choiceStateAction.execute(input, context);
 
@@ -427,7 +427,7 @@ export class StateExecutor {
     stateName: string,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     options: ExecuteOptions
-  ): Promise<ExecutionResult> {
+  ): Promise<ActionResult> {
     const succeedStateAction = new SucceedStateAction(stateDefinition, stateName);
     const executionResult = await succeedStateAction.execute(input, context);
 
@@ -448,7 +448,7 @@ export class StateExecutor {
     stateName: string,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     options: ExecuteOptions
-  ): Promise<ExecutionResult> {
+  ): Promise<ActionResult> {
     const failStateAction = new FailStateAction(stateDefinition, stateName);
     const executionResult = await failStateAction.execute(input, context);
 

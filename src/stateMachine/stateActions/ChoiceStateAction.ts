@@ -1,6 +1,6 @@
 import type { JSONValue } from '../../typings/JSONValue';
 import type { ChoiceState, ChoiceRuleWithoutNext } from '../../typings/ChoiceState';
-import type { ChoiceStateActionOptions, ExecutionResult } from '../../typings/StateActions';
+import type { ChoiceStateActionOptions, ActionResult } from '../../typings/StateActions';
 import type { Context } from '../../typings/Context';
 import { BaseStateAction } from './BaseStateAction';
 import { jsonPathQuery } from '../JsonPath';
@@ -257,7 +257,7 @@ class ChoiceStateAction extends BaseStateAction<ChoiceState> {
     context: Context,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     options?: ChoiceStateActionOptions
-  ): Promise<ExecutionResult> {
+  ): Promise<ActionResult> {
     const state = this.stateDefinition;
 
     for (const choice of state.Choices) {

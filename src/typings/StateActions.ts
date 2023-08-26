@@ -2,7 +2,7 @@ import type { JSONValue } from './JSONValue';
 import type { AWSConfig, RunOptions, StateMachineOptions } from './StateMachineImplementation';
 import type { EventLogger } from '../stateMachine/EventLogger';
 
-export interface ExecutionResult {
+export interface ActionResult {
   stateResult: JSONValue;
   nextState: string;
   isEndState: boolean;

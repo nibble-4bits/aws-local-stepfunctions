@@ -1,5 +1,5 @@
 import type { JSONValue } from '../../typings/JSONValue';
-import type { ExecutionResult, SucceedStateActionOptions } from '../../typings/StateActions';
+import type { ActionResult, SucceedStateActionOptions } from '../../typings/StateActions';
 import type { SucceedState } from '../../typings/SucceedState';
 import type { Context } from '../../typings/Context';
 import { BaseStateAction } from './BaseStateAction';
@@ -15,7 +15,7 @@ class SucceedStateAction extends BaseStateAction<SucceedState> {
     context: Context,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     options?: SucceedStateActionOptions
-  ): Promise<ExecutionResult> {
+  ): Promise<ActionResult> {
     return { stateResult: input, nextState: '', isEndState: true };
   }
 }
