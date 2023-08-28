@@ -4,6 +4,7 @@ import { StatesRuntimeError } from '../../src/error/predefined/StatesRuntimeErro
 
 afterEach(() => {
   jest.clearAllMocks();
+  jest.useRealTimers();
 });
 
 describe('Map State', () => {
@@ -190,5 +191,47 @@ describe('Map State', () => {
     const mapStateResult = mapStateAction.execute(input, context);
 
     await expect(mapStateResult).rejects.toThrow();
+  });
+
+  // If this test hangs, the `abort` is most likely not aborting the `sleep` call made by the `Wait` state
+  test('should abort action if `rootAbortSignal` is aborted', async () => {
+    jest.useFakeTimers();
+
+    const definition: MapState = {
+      Type: 'Map',
+      Iterator: {
+        StartAt: 'PassState',
+        States: {
+          PassState: {
+            Type: 'Pass',
+            Next: 'WaitState',
+          },
+          WaitState: {
+            Type: 'Wait',
+            Seconds: 60,
+            End: true,
+          },
+        },
+      },
+      End: true,
+    };
+    const input = [1, 2, 3];
+    const context = {};
+    const abortController = new AbortController();
+
+    const mapStateAction = new MapStateAction(definition);
+    const mapStateResult = mapStateAction.execute(input, context, {
+      stateMachineOptions: undefined,
+      runOptions: undefined,
+      rootAbortSignal: abortController.signal,
+    });
+
+    abortController.abort();
+
+    await expect(mapStateResult).resolves.toEqual({
+      isEndState: true,
+      nextState: '',
+      stateResult: [1, 2, 3],
+    });
   });
 });
