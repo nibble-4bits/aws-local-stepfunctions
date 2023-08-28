@@ -15,13 +15,11 @@ export type TaskStateActionOptions = {
 export type ParallelStateActionOptions = {
   stateMachineOptions: StateMachineOptions | undefined;
   runOptions: RunOptions | undefined;
-  rootAbortSignal: AbortSignal | undefined;
 };
 
 export type MapStateActionOptions = {
   stateMachineOptions: StateMachineOptions | undefined;
   runOptions: RunOptions | undefined;
-  rootAbortSignal: AbortSignal | undefined;
 };
 
 export type PassStateActionOptions = Record<string, unknown>;

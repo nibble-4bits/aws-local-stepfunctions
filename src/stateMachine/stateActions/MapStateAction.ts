@@ -48,10 +48,7 @@ class MapStateAction extends BaseStateAction<MapState> {
     }
 
     // Pass the current parameter value if defined, otherwise pass the current item being iterated
-    const execution = stateMachine.run(paramValue ?? item, {
-      ...options?.runOptions,
-      _rootAbortSignal: options?.rootAbortSignal,
-    });
+    const execution = stateMachine.run(paramValue ?? item, options?.runOptions);
 
     this.executionAbortFuncs.push(execution.abort);
 

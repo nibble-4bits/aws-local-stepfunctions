@@ -222,8 +222,7 @@ describe('Map State', () => {
     const mapStateAction = new MapStateAction(definition);
     const mapStateResult = mapStateAction.execute(input, context, {
       stateMachineOptions: undefined,
-      runOptions: undefined,
-      rootAbortSignal: abortController.signal,
+      runOptions: { _rootAbortSignal: abortController.signal },
     });
 
     abortController.abort();

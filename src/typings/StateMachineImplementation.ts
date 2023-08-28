@@ -58,5 +58,4 @@ export interface ExecuteOptions {
   stateMachineOptions: StateMachineOptions | undefined;
   runOptions: RunOptions | undefined;
   abortSignal: AbortSignal;
-  rootAbortSignal: AbortSignal | undefined;
 }

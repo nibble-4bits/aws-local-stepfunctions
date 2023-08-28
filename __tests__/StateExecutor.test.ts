@@ -39,7 +39,6 @@ describe('State Executor', () => {
       const stateExecutor = new StateExecutor('TaskState', stateDefinition);
       const { stateResult } = await stateExecutor.execute(input, context, {
         abortSignal: new AbortController().signal,
-        rootAbortSignal: new AbortController().signal,
         stateMachineOptions: undefined,
         runOptions: {
           overrides: {
@@ -78,7 +77,6 @@ describe('State Executor', () => {
       const stateExecutor = new StateExecutor('TaskState', stateDefinition);
       const { stateResult } = await stateExecutor.execute(input, context, {
         abortSignal: new AbortController().signal,
-        rootAbortSignal: new AbortController().signal,
         stateMachineOptions: undefined,
         runOptions: {
           overrides: {
@@ -118,7 +116,6 @@ describe('State Executor', () => {
       const stateExecutor = new StateExecutor('TaskState', stateDefinition);
       const executorResult = stateExecutor.execute(input, context, {
         abortSignal: new AbortController().signal,
-        rootAbortSignal: new AbortController().signal,
         stateMachineOptions: undefined,
         runOptions: {
           overrides: {
@@ -163,7 +160,6 @@ describe('State Executor', () => {
       const stateExecutor = new StateExecutor('TaskState', stateDefinition);
       const executorResult = stateExecutor.execute(input, context, {
         abortSignal: new AbortController().signal,
-        rootAbortSignal: new AbortController().signal,
         stateMachineOptions: undefined,
         runOptions: {
           overrides: {
@@ -203,7 +199,6 @@ describe('State Executor', () => {
         const stateExecutor = new StateExecutor('TaskState', stateDefinition);
         const { stateResult } = await stateExecutor.execute(input, context, {
           abortSignal: new AbortController().signal,
-          rootAbortSignal: new AbortController().signal,
           stateMachineOptions: undefined,
           runOptions: {
             overrides: {
@@ -245,7 +240,6 @@ describe('State Executor', () => {
       const stateExecutor = new StateExecutor('TaskState', stateDefinition);
       const { stateResult, nextState } = await stateExecutor.execute(input, context, {
         abortSignal: new AbortController().signal,
-        rootAbortSignal: new AbortController().signal,
         stateMachineOptions: undefined,
         runOptions: {
           overrides: {
@@ -283,7 +277,6 @@ describe('State Executor', () => {
       const stateExecutor = new StateExecutor('TaskState', stateDefinition);
       const { stateResult, nextState } = await stateExecutor.execute(input, context, {
         abortSignal: new AbortController().signal,
-        rootAbortSignal: new AbortController().signal,
         stateMachineOptions: undefined,
         runOptions: {
           overrides: {
@@ -322,7 +315,6 @@ describe('State Executor', () => {
       const stateExecutor = new StateExecutor('TaskState', stateDefinition);
       const { stateResult, nextState } = await stateExecutor.execute(input, context, {
         abortSignal: new AbortController().signal,
-        rootAbortSignal: new AbortController().signal,
         stateMachineOptions: undefined,
         runOptions: {
           overrides: {
@@ -372,7 +364,6 @@ describe('State Executor', () => {
       const stateExecutor = new StateExecutor('TaskState', stateDefinition);
       const executorResult = stateExecutor.execute(input, context, {
         abortSignal: new AbortController().signal,
-        rootAbortSignal: new AbortController().signal,
         stateMachineOptions: undefined,
         runOptions: {
           overrides: {
@@ -407,7 +398,6 @@ describe('State Executor', () => {
         const stateExecutor = new StateExecutor('TaskState', stateDefinition);
         const { stateResult, nextState } = await stateExecutor.execute(input, context, {
           abortSignal: new AbortController().signal,
-          rootAbortSignal: new AbortController().signal,
           stateMachineOptions: undefined,
           runOptions: {
             overrides: {

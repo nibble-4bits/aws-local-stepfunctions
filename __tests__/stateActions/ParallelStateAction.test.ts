@@ -174,8 +174,7 @@ describe('Parallel State', () => {
     const parallelStateAction = new ParallelStateAction(definition);
     const parallelStateResult = parallelStateAction.execute(input, context, {
       stateMachineOptions: undefined,
-      runOptions: undefined,
-      rootAbortSignal: abortController.signal,
+      runOptions: { _rootAbortSignal: abortController.signal },
     });
 
     abortController.abort();
