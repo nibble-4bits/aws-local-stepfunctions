@@ -92,6 +92,7 @@ export class StateMachine {
         stateMachineOptions: this.stateMachineOptions,
         runOptions: options,
         abortSignal: abortController.signal,
+        rootAbortSignal: options?._rootAbortSignal ?? abortController.signal,
       },
       () => {
         abortController.signal.removeEventListener('abort', onAbortHandler);
