@@ -131,7 +131,7 @@ export class StateExecutor {
       // Handle `Retry` logic
       const { shouldRetry, waitTimeBeforeRetry } = this.shouldRetry(error as RuntimeError);
       if (shouldRetry && waitTimeBeforeRetry) {
-        await sleep(waitTimeBeforeRetry, options.abortSignal);
+        await sleep(waitTimeBeforeRetry, options.abortSignal, options.rootAbortSignal);
         return this.execute(input, context, options);
       }
 
@@ -299,6 +299,7 @@ export class StateExecutor {
     const executionResult = await parallelStateAction.execute(input, context, {
       stateMachineOptions: options.stateMachineOptions,
       runOptions: options.runOptions,
+      rootAbortSignal: options.rootAbortSignal,
     });
 
     return executionResult;
@@ -322,6 +323,7 @@ export class StateExecutor {
     const executionResult = await mapStateAction.execute(input, context, {
       stateMachineOptions: options.stateMachineOptions,
       runOptions: options.runOptions,
+      rootAbortSignal: options.rootAbortSignal,
     });
 
     return executionResult;
@@ -362,12 +364,12 @@ export class StateExecutor {
     options: ExecuteOptions
   ): Promise<ExecutionResult> {
     const waitTimeOverrideOption = options.runOptions?.overrides?.waitTimeOverrides?.[stateName];
-    const abortSignal = options.abortSignal;
 
     const waitStateAction = new WaitStateAction(stateDefinition);
     const executionResult = await waitStateAction.execute(input, context, {
       waitTimeOverrideOption,
-      abortSignal,
+      abortSignal: options.abortSignal,
+      rootAbortSignal: options.rootAbortSignal,
     });
 
     return executionResult;

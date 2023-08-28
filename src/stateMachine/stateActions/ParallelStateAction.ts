@@ -31,7 +31,10 @@ class ParallelStateAction extends BaseStateAction<ParallelState> {
       ...options?.stateMachineOptions,
       validationOptions: { _noValidate: true },
     });
-    const execution = stateMachine.run(input, options?.runOptions);
+    const execution = stateMachine.run(input, {
+      ...options?.runOptions,
+      _rootAbortSignal: options?.rootAbortSignal,
+    });
 
     this.executionAbortFuncs.push(execution.abort);
 
