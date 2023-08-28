@@ -18,21 +18,28 @@ export function isPlainObj(value: unknown): value is JSONObject {
  */
 export function sleep(ms: number, abortSignal?: AbortSignal, rootAbortSignal?: AbortSignal) {
   return new Promise<void>((resolve) => {
+    // Resolve early if any of the abort signals have been aborted
     if (abortSignal?.aborted || rootAbortSignal?.aborted) {
       return resolve();
     }
 
-    const timeout = setTimeout(resolve, ms);
+    const onAbort = () => {
+      abortSignal?.removeEventListener('abort', onAbort);
+      rootAbortSignal?.removeEventListener('abort', onAbort);
 
-    abortSignal?.addEventListener('abort', () => {
       clearTimeout(timeout);
       resolve();
-    });
+    };
 
-    rootAbortSignal?.addEventListener('abort', () => {
-      clearTimeout(timeout);
+    const timeout = setTimeout(() => {
+      abortSignal?.removeEventListener('abort', onAbort);
+      rootAbortSignal?.removeEventListener('abort', onAbort);
+
       resolve();
-    });
+    }, ms);
+
+    abortSignal?.addEventListener('abort', onAbort);
+    rootAbortSignal?.addEventListener('abort', onAbort);
   });
 }
 
