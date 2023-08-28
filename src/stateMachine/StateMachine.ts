@@ -1,5 +1,6 @@
 import type { StateMachineDefinition } from '../typings/StateMachineDefinition';
 import type { JSONValue } from '../typings/JSONValue';
+import type { RuntimeError } from '../error/RuntimeError';
 import type { ExecuteOptions, RunOptions, StateMachineOptions } from '../typings/StateMachineImplementation';
 import { ExecutionAbortedError } from '../error/ExecutionAbortedError';
 import { StatesTimeoutError } from '../error/predefined/StatesTimeoutError';
@@ -131,7 +132,7 @@ export class StateMachine {
         currStateName = nextState;
       } while (!isEndState && !options.abortSignal.aborted);
     } catch (error) {
-      throw new ExecutionError(error as Error);
+      throw new ExecutionError(error as RuntimeError);
     } finally {
       cleanupFn();
     }
