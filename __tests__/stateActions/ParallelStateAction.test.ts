@@ -3,6 +3,7 @@ import { ParallelStateAction } from '../../src/stateMachine/stateActions/Paralle
 
 afterEach(() => {
   jest.clearAllMocks();
+  jest.useRealTimers();
 });
 
 describe('Parallel State', () => {
@@ -135,5 +136,53 @@ describe('Parallel State', () => {
     const parallelStateResult = parallelStateAction.execute(input, context);
 
     await expect(parallelStateResult).rejects.toThrow();
+  });
+
+  // If this test hangs, the `abort` is most likely not aborting the `sleep` call made by the `Wait` state
+  test('should abort action if `rootAbortSignal` is aborted', async () => {
+    jest.useFakeTimers();
+
+    const definition: ParallelState = {
+      Type: 'Parallel',
+      Branches: [
+        {
+          StartAt: 'PassState',
+          States: {
+            PassState: {
+              Type: 'Pass',
+              End: true,
+            },
+          },
+        },
+        {
+          StartAt: 'WaitState',
+          States: {
+            WaitState: {
+              Type: 'Wait',
+              Seconds: 60,
+              End: true,
+            },
+          },
+        },
+      ],
+      End: true,
+    };
+    const input = {};
+    const context = {};
+    const abortController = new AbortController();
+
+    const parallelStateAction = new ParallelStateAction(definition);
+    const parallelStateResult = parallelStateAction.execute(input, context, {
+      stateMachineOptions: undefined,
+      runOptions: { _rootAbortSignal: abortController.signal },
+    });
+
+    abortController.abort();
+
+    await expect(parallelStateResult).resolves.toEqual({
+      isEndState: true,
+      nextState: '',
+      stateResult: [{}, {}],
+    });
   });
 });
