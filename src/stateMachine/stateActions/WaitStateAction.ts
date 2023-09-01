@@ -16,7 +16,7 @@ class WaitStateAction extends BaseStateAction<WaitState> {
 
     if (options?.waitTimeOverrideOption !== undefined) {
       // If the wait time override is set, sleep for the specified number of milliseconds
-      await sleep(options.waitTimeOverrideOption, options.abortSignal, options?.rootAbortSignal);
+      await sleep(options.waitTimeOverrideOption, options.abortSignal, options.rootAbortSignal);
       return this.buildExecutionResult(input);
     }
 
