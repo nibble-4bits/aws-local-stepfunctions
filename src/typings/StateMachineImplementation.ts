@@ -2,6 +2,7 @@ import type { JSONValue } from './JSONValue';
 import type { Context } from './Context';
 import type { FromCognitoIdentityPoolParameters } from '@aws-sdk/credential-provider-cognito-identity/dist-types/fromCognitoIdentityPool';
 import type { AwsCredentialIdentity as AWSCredentials } from '@aws-sdk/types/dist-types/identity/AwsCredentialIdentity';
+import type { EventLogger } from '../stateMachine/EventLogger';
 
 export type TaskStateResourceLocalHandler = {
   [taskStateName: string]: (input: JSONValue) => Promise<JSONValue>;
@@ -58,4 +59,5 @@ export interface ExecuteOptions {
   stateMachineOptions: StateMachineOptions | undefined;
   runOptions: RunOptions | undefined;
   abortSignal: AbortSignal;
+  eventLogger: EventLogger;
 }
