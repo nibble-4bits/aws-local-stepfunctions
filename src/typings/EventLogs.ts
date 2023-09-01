@@ -10,7 +10,7 @@ type ExecutionEventType =
   | 'ParallelBranchStarted'
   | 'ParallelBranchSucceeded'
   | 'ExecutionAborted'
-  | 'ExecutionTimedOut';
+  | 'ExecutionTimeout';
 type ExecutionFailedEventType = 'ExecutionFailed' | 'ParallelBranchFailed' | 'MapIterationFailed';
 type StateEventType = 'StateEntered' | 'StateExited';
 

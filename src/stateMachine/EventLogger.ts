@@ -61,8 +61,8 @@ export class EventLogger {
     this.close();
   }
 
-  dispatchExecutionTimedOutEvent() {
-    this.dispatch({ type: 'ExecutionTimedOut', timestamp: Date.now() });
+  dispatchExecutionTimeoutEvent() {
+    this.dispatch({ type: 'ExecutionTimeout', timestamp: Date.now() });
     this.close();
   }
 

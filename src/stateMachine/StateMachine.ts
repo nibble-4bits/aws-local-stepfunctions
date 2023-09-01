@@ -95,7 +95,7 @@ export class StateMachine {
         abortController.signal.removeEventListener('abort', onAbortHandler);
         // Then we simply reuse the abort controller to abort the execution on timeout
         abortController.abort();
-        eventLogger.dispatchExecutionTimedOutEvent();
+        eventLogger.dispatchExecutionTimeoutEvent();
         reject(new StatesTimeoutError());
       }, timeoutSeconds * 1000);
     });

@@ -38,7 +38,7 @@ class ParallelStateAction extends BaseStateAction<ParallelState> {
         event.type = 'ParallelBranchSucceeded';
       } else if (event.type === 'ExecutionFailed') {
         event.type = 'ParallelBranchFailed';
-      } else if (event.type === 'ExecutionAborted' || event.type === 'ExecutionTimedOut') {
+      } else if (event.type === 'ExecutionAborted' || event.type === 'ExecutionTimeout') {
         continue;
       }
       eventLogger.forwardNestedEvent(event);

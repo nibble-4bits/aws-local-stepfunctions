@@ -41,7 +41,7 @@ class MapStateAction extends BaseStateAction<MapState> {
         event.type = 'MapIterationSucceeded';
       } else if (event.type === 'ExecutionFailed') {
         event.type = 'MapIterationFailed';
-      } else if (event.type === 'ExecutionAborted' || event.type === 'ExecutionTimedOut') {
+      } else if (event.type === 'ExecutionAborted' || event.type === 'ExecutionTimeout') {
         continue;
       }
       eventLogger.forwardNestedEvent(event);
