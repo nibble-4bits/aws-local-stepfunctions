@@ -4,7 +4,7 @@ import type { RuntimeError } from '../error/RuntimeError';
 import type { EventLog } from '../typings/EventLogs';
 import type { ExecuteOptions, RunOptions, StateMachineOptions } from '../typings/StateMachineImplementation';
 import { ExecutionAbortedError } from '../error/ExecutionAbortedError';
-import { StatesTimeoutError } from '../error/predefined/StatesTimeoutError';
+import { ExecutionTimeoutError } from '../error/ExecutionTimeoutError';
 import { ExecutionError } from '../error/ExecutionError';
 import { StateExecutor } from './StateExecutor';
 import { EventLogger } from './EventLogger';
@@ -92,7 +92,7 @@ export class StateMachine {
           // Then we simply reuse the abort controller to abort the execution on timeout
           abortController.abort();
           eventLogger.dispatchExecutionTimeoutEvent();
-          reject(new StatesTimeoutError());
+          reject(new ExecutionTimeoutError());
         }, this.definition.TimeoutSeconds! * 1000);
       });
     }
