@@ -10,13 +10,14 @@ describe('Succeed State', () => {
     const definition: SucceedState = {
       Type: 'Succeed',
     };
+    const stateName = 'SucceedState';
     const input = {
       prop1: 'test',
       prop2: 12345,
     };
     const context = {};
 
-    const succeedStateAction = new SucceedStateAction(definition);
+    const succeedStateAction = new SucceedStateAction(definition, stateName);
     const { stateResult } = await succeedStateAction.execute(input, context);
 
     expect(stateResult).toEqual({
@@ -29,13 +30,14 @@ describe('Succeed State', () => {
     const definition: SucceedState = {
       Type: 'Succeed',
     };
+    const stateName = 'SucceedState';
     const input = {
       prop1: 'test',
       prop2: 12345,
     };
     const context = {};
 
-    const succeedStateAction = new SucceedStateAction(definition);
+    const succeedStateAction = new SucceedStateAction(definition, stateName);
     const { isEndState } = await succeedStateAction.execute(input, context);
 
     expect(isEndState).toBe(true);

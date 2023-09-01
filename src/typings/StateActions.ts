@@ -17,12 +17,14 @@ export type ParallelStateActionOptions = {
   stateMachineOptions: StateMachineOptions | undefined;
   runOptions: RunOptions | undefined;
   eventLogger: EventLogger;
+  rawInput: JSONValue;
 };
 
 export type MapStateActionOptions = {
   stateMachineOptions: StateMachineOptions | undefined;
   runOptions: RunOptions | undefined;
   eventLogger: EventLogger;
+  rawInput: JSONValue;
 };
 
 export type PassStateActionOptions = Record<string, unknown>;

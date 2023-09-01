@@ -753,10 +753,11 @@ describe('Choice State', () => {
             ],
             Default: 'DefaultChoice',
           };
+          const stateName = 'ChoiceState';
           const input = { test: inputValue, comparisonValue };
           const context = {};
 
-          const choiceStateAction = new ChoiceStateAction(definition);
+          const choiceStateAction = new ChoiceStateAction(definition, stateName);
           const { nextState } = await choiceStateAction.execute(input, context);
 
           if (isMatch) {
@@ -791,10 +792,11 @@ describe('Choice State', () => {
       ],
       Default: 'FailState',
     };
+    const stateName = 'ChoiceState';
     const input = { testNumberValue: 50, testStringValue: 'test', testBooleanValue: true };
     const context = {};
 
-    const choiceStateAction = new ChoiceStateAction(definition);
+    const choiceStateAction = new ChoiceStateAction(definition, stateName);
     const { stateResult, nextState } = await choiceStateAction.execute(input, context);
 
     expect(stateResult).toEqual({ testNumberValue: 50, testStringValue: 'test', testBooleanValue: true });
@@ -818,10 +820,11 @@ describe('Choice State', () => {
       ],
       Default: 'DefaultChoice',
     };
+    const stateName = 'ChoiceState';
     const input = { testNumberValue: 50, testStringValue: 'test' };
     const context = {};
 
-    const choiceStateAction = new ChoiceStateAction(definition);
+    const choiceStateAction = new ChoiceStateAction(definition, stateName);
     const { stateResult, nextState } = await choiceStateAction.execute(input, context);
 
     expect(stateResult).toEqual({ testNumberValue: 50, testStringValue: 'test' });
@@ -844,10 +847,11 @@ describe('Choice State', () => {
         },
       ],
     };
+    const stateName = 'ChoiceState';
     const input = { testNumberValue: 50, testStringValue: 'test' };
     const context = {};
 
-    const choiceStateAction = new ChoiceStateAction(definition);
+    const choiceStateAction = new ChoiceStateAction(definition, stateName);
     const choiceStateResult = choiceStateAction.execute(input, context);
 
     await expect(choiceStateResult).rejects.toThrow(StatesNoChoiceMatchedError);

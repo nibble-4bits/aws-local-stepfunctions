@@ -5,8 +5,8 @@ import type { Context } from '../../typings/Context';
 import { BaseStateAction } from './BaseStateAction';
 
 class SucceedStateAction extends BaseStateAction<SucceedState> {
-  constructor(stateDefinition: SucceedState) {
-    super(stateDefinition);
+  constructor(stateDefinition: SucceedState, stateName: string) {
+    super(stateDefinition, stateName);
   }
 
   override async execute(

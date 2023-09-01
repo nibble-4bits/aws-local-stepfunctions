@@ -8,6 +8,7 @@ import type { ExecuteOptions } from './StateMachineImplementation';
 export type StateHandlers = {
   [T in AllStates as T['Type']]: (
     stateDefinition: T,
+    rawInput: JSONValue,
     input: JSONValue,
     context: Context,
     stateName: string,

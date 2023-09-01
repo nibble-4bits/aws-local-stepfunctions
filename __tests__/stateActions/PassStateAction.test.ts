@@ -11,13 +11,14 @@ describe('Pass State', () => {
       Type: 'Pass',
       End: true,
     };
+    const stateName = 'PassState';
     const input = {
       prop1: 'test',
       prop2: 12345,
     };
     const context = {};
 
-    const passStateAction = new PassStateAction(definition);
+    const passStateAction = new PassStateAction(definition, stateName);
     const { stateResult } = await passStateAction.execute(input, context);
 
     expect(stateResult).toEqual({
@@ -35,13 +36,14 @@ describe('Pass State', () => {
       },
       End: true,
     };
+    const stateName = 'PassState';
     const input = {
       prop1: 'test',
       prop2: 12345,
     };
     const context = {};
 
-    const passStateAction = new PassStateAction(definition);
+    const passStateAction = new PassStateAction(definition, stateName);
     const { stateResult } = await passStateAction.execute(input, context);
 
     expect(stateResult).toEqual({

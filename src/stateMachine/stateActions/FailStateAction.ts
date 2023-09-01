@@ -6,8 +6,8 @@ import { BaseStateAction } from './BaseStateAction';
 import { FailStateError } from '../../error/FailStateError';
 
 class FailStateAction extends BaseStateAction<FailState> {
-  constructor(stateDefinition: FailState) {
-    super(stateDefinition);
+  constructor(stateDefinition: FailState, stateName: string) {
+    super(stateDefinition, stateName);
   }
 
   override async execute(

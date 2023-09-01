@@ -8,8 +8,8 @@ import { StatesNoChoiceMatchedError } from '../../error/predefined/StatesNoChoic
 import wcmatch from 'wildcard-match';
 
 class ChoiceStateAction extends BaseStateAction<ChoiceState> {
-  constructor(stateDefinition: ChoiceState) {
-    super(stateDefinition);
+  constructor(stateDefinition: ChoiceState, stateName: string) {
+    super(stateDefinition, stateName);
   }
 
   testChoiceRule(choiceRule: ChoiceRuleWithoutNext, input: JSONValue): boolean {

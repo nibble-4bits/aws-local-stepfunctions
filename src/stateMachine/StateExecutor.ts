@@ -118,6 +118,7 @@ export class StateExecutor {
       } = await this.stateHandlers[this.stateDefinition.Type](
         // @ts-expect-error Indexing `this.stateActions` by non-literal value produces a `never` type for the `this.stateDefinition` parameter of the handler being called
         this.stateDefinition,
+        rawInput,
         processedInput,
         context,
         this.stateName,
@@ -268,6 +269,7 @@ export class StateExecutor {
    */
   private async executeTaskState(
     stateDefinition: TaskState,
+    rawInput: JSONValue,
     input: JSONValue,
     context: Context,
     stateName: string,
@@ -276,7 +278,7 @@ export class StateExecutor {
     const overrideFn = options.runOptions?.overrides?.taskResourceLocalHandlers?.[stateName];
     const awsConfig = options.stateMachineOptions?.awsConfig;
 
-    const taskStateAction = new TaskStateAction(stateDefinition);
+    const taskStateAction = new TaskStateAction(stateDefinition, stateName);
     const executionResult = await taskStateAction.execute(input, context, { overrideFn, awsConfig });
 
     return executionResult;
@@ -290,16 +292,18 @@ export class StateExecutor {
    */
   private async executeParallelState(
     stateDefinition: ParallelState,
+    rawInput: JSONValue,
     input: JSONValue,
     context: Context,
     stateName: string,
     options: ExecuteOptions
   ): Promise<ExecutionResult> {
-    const parallelStateAction = new ParallelStateAction(stateDefinition);
+    const parallelStateAction = new ParallelStateAction(stateDefinition, stateName);
     const executionResult = await parallelStateAction.execute(input, context, {
       stateMachineOptions: options.stateMachineOptions,
       runOptions: options.runOptions,
       eventLogger: options.eventLogger,
+      rawInput,
     });
 
     return executionResult;
@@ -314,16 +318,18 @@ export class StateExecutor {
    */
   private async executeMapState(
     stateDefinition: MapState,
+    rawInput: JSONValue,
     input: JSONValue,
     context: Context,
     stateName: string,
     options: ExecuteOptions
   ): Promise<ExecutionResult> {
-    const mapStateAction = new MapStateAction(stateDefinition);
+    const mapStateAction = new MapStateAction(stateDefinition, stateName);
     const executionResult = await mapStateAction.execute(input, context, {
       stateMachineOptions: options.stateMachineOptions,
       runOptions: options.runOptions,
       eventLogger: options.eventLogger,
+      rawInput,
     });
 
     return executionResult;
@@ -337,6 +343,7 @@ export class StateExecutor {
    */
   private async executePassState(
     stateDefinition: PassState,
+    rawInput: JSONValue,
     input: JSONValue,
     context: Context,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -344,7 +351,7 @@ export class StateExecutor {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     options: ExecuteOptions
   ): Promise<ExecutionResult> {
-    const passStateAction = new PassStateAction(stateDefinition);
+    const passStateAction = new PassStateAction(stateDefinition, stateName);
     const executionResult = await passStateAction.execute(input, context);
 
     return executionResult;
@@ -358,6 +365,7 @@ export class StateExecutor {
    */
   private async executeWaitState(
     stateDefinition: WaitState,
+    rawInput: JSONValue,
     input: JSONValue,
     context: Context,
     stateName: string,
@@ -365,7 +373,7 @@ export class StateExecutor {
   ): Promise<ExecutionResult> {
     const waitTimeOverrideOption = options.runOptions?.overrides?.waitTimeOverrides?.[stateName];
 
-    const waitStateAction = new WaitStateAction(stateDefinition);
+    const waitStateAction = new WaitStateAction(stateDefinition, stateName);
     const executionResult = await waitStateAction.execute(input, context, {
       waitTimeOverrideOption,
       abortSignal: options.abortSignal,
@@ -391,6 +399,7 @@ export class StateExecutor {
    */
   private async executeChoiceState(
     stateDefinition: ChoiceState,
+    rawInput: JSONValue,
     input: JSONValue,
     context: Context,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -398,7 +407,7 @@ export class StateExecutor {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     options: ExecuteOptions
   ): Promise<ExecutionResult> {
-    const choiceStateAction = new ChoiceStateAction(stateDefinition);
+    const choiceStateAction = new ChoiceStateAction(stateDefinition, stateName);
     const executionResult = await choiceStateAction.execute(input, context);
 
     return executionResult;
@@ -411,6 +420,7 @@ export class StateExecutor {
    */
   private async executeSucceedState(
     stateDefinition: SucceedState,
+    rawInput: JSONValue,
     input: JSONValue,
     context: Context,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -418,7 +428,7 @@ export class StateExecutor {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     options: ExecuteOptions
   ): Promise<ExecutionResult> {
-    const succeedStateAction = new SucceedStateAction(stateDefinition);
+    const succeedStateAction = new SucceedStateAction(stateDefinition, stateName);
     const executionResult = await succeedStateAction.execute(input, context);
 
     return executionResult;
@@ -431,6 +441,7 @@ export class StateExecutor {
    */
   private async executeFailState(
     stateDefinition: FailState,
+    rawInput: JSONValue,
     input: JSONValue,
     context: Context,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -438,7 +449,7 @@ export class StateExecutor {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     options: ExecuteOptions
   ): Promise<ExecutionResult> {
-    const failStateAction = new FailStateAction(stateDefinition);
+    const failStateAction = new FailStateAction(stateDefinition, stateName);
     const executionResult = await failStateAction.execute(input, context);
 
     return executionResult;

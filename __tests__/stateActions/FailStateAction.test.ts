@@ -11,13 +11,14 @@ describe('Fail State', () => {
     const definition: FailState = {
       Type: 'Fail',
     };
+    const stateName = 'FailState';
     const input = {
       prop1: 'test',
       prop2: 12345,
     };
     const context = {};
 
-    const failStateAction = new FailStateAction(definition);
+    const failStateAction = new FailStateAction(definition, stateName);
     const failStateResult = failStateAction.execute(input, context);
 
     await expect(failStateResult).rejects.toThrow(FailStateError);
@@ -30,13 +31,14 @@ describe('Fail State', () => {
       Error: 'Failure',
       Cause: 'This is the cause of the error',
     };
+    const stateName = 'FailState';
     const input = {
       prop1: 'test',
       prop2: 12345,
     };
     const context = {};
 
-    const failStateAction = new FailStateAction(definition);
+    const failStateAction = new FailStateAction(definition, stateName);
     const failStateResult = failStateAction.execute(input, context);
 
     await expect(failStateResult).rejects.toThrow(FailStateError);

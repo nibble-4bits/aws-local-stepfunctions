@@ -3,7 +3,7 @@ import type { JSONValue } from '../../typings/JSONValue';
 import type { ParallelState } from '../../typings/ParallelState';
 import type { ExecutionResult, ParallelStateActionOptions } from '../../typings/StateActions';
 import type { EventLogger } from '../EventLogger';
-import type { EventLog } from '../../typings/EventLogs';
+import type { EventLog, ParallelBranchEvent, ParallelBranchFailedEvent } from '../../typings/EventLogs';
 import { StateMachine } from '../StateMachine';
 import { BaseStateAction } from './BaseStateAction';
 import { ExecutionError } from '../../error/ExecutionError';
@@ -17,31 +17,38 @@ const DEFAULT_CONCURRENCY = 40;
 class ParallelStateAction extends BaseStateAction<ParallelState> {
   private executionAbortFuncs: (() => void)[];
 
-  constructor(stateDefinition: ParallelState) {
-    super(stateDefinition);
+  constructor(stateDefinition: ParallelState, stateName: string) {
+    super(stateDefinition, stateName);
 
     this.executionAbortFuncs = [];
   }
 
   private async forwardEventsToRootEventLogger(
     eventLogger: EventLogger | undefined,
-    executionEventLogs: AsyncGenerator<EventLog>
+    executionEventLogs: AsyncGenerator<EventLog>,
+    parentStateRawInput: JSONValue
   ) {
     if (!eventLogger) {
       return;
     }
 
     for await (const event of executionEventLogs) {
+      const parallelEvent = event as ParallelBranchEvent | ParallelBranchFailedEvent;
+
       if (event.type === 'ExecutionStarted') {
-        event.type = 'ParallelBranchStarted';
+        parallelEvent.type = 'ParallelBranchStarted';
+        parallelEvent.parentState = { name: this.stateName, type: 'Parallel', input: parentStateRawInput };
       } else if (event.type === 'ExecutionSucceeded') {
-        event.type = 'ParallelBranchSucceeded';
+        parallelEvent.type = 'ParallelBranchSucceeded';
+        parallelEvent.parentState = { name: this.stateName, type: 'Parallel', input: parentStateRawInput };
       } else if (event.type === 'ExecutionFailed') {
-        event.type = 'ParallelBranchFailed';
+        parallelEvent.type = 'ParallelBranchFailed';
+        parallelEvent.parentState = { name: this.stateName, type: 'Parallel', input: parentStateRawInput };
       } else if (event.type === 'ExecutionAborted' || event.type === 'ExecutionTimeout') {
         continue;
       }
-      eventLogger.forwardNestedEvent(event);
+
+      eventLogger.forwardNestedEvent(parallelEvent);
     }
   }
 
@@ -59,7 +66,10 @@ class ParallelStateAction extends BaseStateAction<ParallelState> {
 
     this.executionAbortFuncs.push(execution.abort);
 
-    this.forwardEventsToRootEventLogger(options?.eventLogger, execution.eventLogs);
+    // TODO: Find a way to remove this ignore directive and not rely on it
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    this.forwardEventsToRootEventLogger(options?.eventLogger, execution.eventLogs, options?.rawInput);
 
     return execution.result;
   }

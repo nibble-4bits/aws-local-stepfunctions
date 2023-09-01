@@ -3,7 +3,7 @@ import type { JSONValue } from '../../typings/JSONValue';
 import type { ExecutionResult, MapStateActionOptions } from '../../typings/StateActions';
 import type { Context } from '../../typings/Context';
 import type { EventLogger } from '../EventLogger';
-import type { EventLog } from '../../typings/EventLogs';
+import type { EventLog, MapIterationEvent, MapIterationFailedEvent, StateEvent } from '../../typings/EventLogs';
 import { BaseStateAction } from './BaseStateAction';
 import { StateMachine } from '../StateMachine';
 import { jsonPathQuery } from '../JsonPath';
@@ -20,31 +20,48 @@ const DEFAULT_MAX_CONCURRENCY = 40;
 class MapStateAction extends BaseStateAction<MapState> {
   private executionAbortFuncs: (() => void)[];
 
-  constructor(stateDefinition: MapState) {
-    super(stateDefinition);
+  constructor(stateDefinition: MapState, stateName: string) {
+    super(stateDefinition, stateName);
 
     this.executionAbortFuncs = [];
   }
 
   private async forwardEventsToRootEventLogger(
     eventLogger: EventLogger | undefined,
-    executionEventLogs: AsyncGenerator<EventLog>
+    executionEventLogs: AsyncGenerator<EventLog>,
+    index: number,
+    parentStateRawInput: JSONValue
   ) {
     if (!eventLogger) {
       return;
     }
 
     for await (const event of executionEventLogs) {
+      const mapEvent = event as MapIterationEvent | MapIterationFailedEvent | StateEvent;
+
       if (event.type === 'ExecutionStarted') {
-        event.type = 'MapIterationStarted';
+        mapEvent.type = 'MapIterationStarted';
+        (mapEvent as MapIterationEvent).parentState = { name: this.stateName, type: 'Map', input: parentStateRawInput };
+        mapEvent.index = index;
       } else if (event.type === 'ExecutionSucceeded') {
-        event.type = 'MapIterationSucceeded';
+        mapEvent.type = 'MapIterationSucceeded';
+        (mapEvent as MapIterationEvent).parentState = { name: this.stateName, type: 'Map', input: parentStateRawInput };
+        mapEvent.index = index;
       } else if (event.type === 'ExecutionFailed') {
-        event.type = 'MapIterationFailed';
+        mapEvent.type = 'MapIterationFailed';
+        (mapEvent as MapIterationFailedEvent).parentState = {
+          name: this.stateName,
+          type: 'Map',
+          input: parentStateRawInput,
+        };
+        mapEvent.index = index;
+      } else if (event.type === 'StateEntered' || event.type === 'StateExited') {
+        mapEvent.index = index;
       } else if (event.type === 'ExecutionAborted' || event.type === 'ExecutionTimeout') {
         continue;
       }
-      eventLogger.forwardNestedEvent(event);
+
+      eventLogger.forwardNestedEvent(mapEvent);
     }
   }
 
@@ -76,7 +93,10 @@ class MapStateAction extends BaseStateAction<MapState> {
 
     this.executionAbortFuncs.push(execution.abort);
 
-    this.forwardEventsToRootEventLogger(options?.eventLogger, execution.eventLogs);
+    // TODO: Find a way to remove this ignore directive and not rely on it
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    this.forwardEventsToRootEventLogger(options?.eventLogger, execution.eventLogs, index, options?.rawInput);
 
     return execution.result;
   }
