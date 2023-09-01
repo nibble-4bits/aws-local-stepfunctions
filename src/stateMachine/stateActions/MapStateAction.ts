@@ -2,6 +2,8 @@ import type { MapState } from '../../typings/MapState';
 import type { JSONValue } from '../../typings/JSONValue';
 import type { ExecutionResult, MapStateActionOptions } from '../../typings/StateActions';
 import type { Context } from '../../typings/Context';
+import type { EventLogger } from '../EventLogger';
+import type { EventLog } from '../../typings/EventLogs';
 import { BaseStateAction } from './BaseStateAction';
 import { StateMachine } from '../StateMachine';
 import { jsonPathQuery } from '../JsonPath';
@@ -22,6 +24,28 @@ class MapStateAction extends BaseStateAction<MapState> {
     super(stateDefinition);
 
     this.executionAbortFuncs = [];
+  }
+
+  private async forwardEventsToRootEventLogger(
+    eventLogger: EventLogger | undefined,
+    executionEventLogs: AsyncGenerator<EventLog>
+  ) {
+    if (!eventLogger) {
+      return;
+    }
+
+    for await (const event of executionEventLogs) {
+      if (event.type === 'ExecutionStarted') {
+        event.type = 'MapIterationStarted';
+      } else if (event.type === 'ExecutionSucceeded') {
+        event.type = 'MapIterationSucceeded';
+      } else if (event.type === 'ExecutionFailed') {
+        event.type = 'MapIterationFailed';
+      } else if (event.type === 'ExecutionAborted' || event.type === 'ExecutionTimedOut') {
+        continue;
+      }
+      eventLogger.forwardNestedEvent(event);
+    }
   }
 
   private processItem(
@@ -51,6 +75,8 @@ class MapStateAction extends BaseStateAction<MapState> {
     const execution = stateMachine.run(paramValue ?? item, options?.runOptions);
 
     this.executionAbortFuncs.push(execution.abort);
+
+    this.forwardEventsToRootEventLogger(options?.eventLogger, execution.eventLogs);
 
     return execution.result;
   }

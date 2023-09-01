@@ -2,6 +2,8 @@ import type { Context } from '../../typings/Context';
 import type { JSONValue } from '../../typings/JSONValue';
 import type { ParallelState } from '../../typings/ParallelState';
 import type { ExecutionResult, ParallelStateActionOptions } from '../../typings/StateActions';
+import type { EventLogger } from '../EventLogger';
+import type { EventLog } from '../../typings/EventLogs';
 import { StateMachine } from '../StateMachine';
 import { BaseStateAction } from './BaseStateAction';
 import { ExecutionError } from '../../error/ExecutionError';
@@ -21,6 +23,28 @@ class ParallelStateAction extends BaseStateAction<ParallelState> {
     this.executionAbortFuncs = [];
   }
 
+  private async forwardEventsToRootEventLogger(
+    eventLogger: EventLogger | undefined,
+    executionEventLogs: AsyncGenerator<EventLog>
+  ) {
+    if (!eventLogger) {
+      return;
+    }
+
+    for await (const event of executionEventLogs) {
+      if (event.type === 'ExecutionStarted') {
+        event.type = 'ParallelBranchStarted';
+      } else if (event.type === 'ExecutionSucceeded') {
+        event.type = 'ParallelBranchSucceeded';
+      } else if (event.type === 'ExecutionFailed') {
+        event.type = 'ParallelBranchFailed';
+      } else if (event.type === 'ExecutionAborted' || event.type === 'ExecutionTimedOut') {
+        continue;
+      }
+      eventLogger.forwardNestedEvent(event);
+    }
+  }
+
   private processBranch(
     branch: (typeof this.stateDefinition.Branches)[number],
     input: JSONValue,
@@ -34,6 +58,8 @@ class ParallelStateAction extends BaseStateAction<ParallelState> {
     const execution = stateMachine.run(input, options?.runOptions);
 
     this.executionAbortFuncs.push(execution.abort);
+
+    this.forwardEventsToRootEventLogger(options?.eventLogger, execution.eventLogs);
 
     return execution.result;
   }

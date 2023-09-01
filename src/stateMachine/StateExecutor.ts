@@ -299,6 +299,7 @@ export class StateExecutor {
     const executionResult = await parallelStateAction.execute(input, context, {
       stateMachineOptions: options.stateMachineOptions,
       runOptions: options.runOptions,
+      eventLogger: options.eventLogger,
     });
 
     return executionResult;
@@ -322,6 +323,7 @@ export class StateExecutor {
     const executionResult = await mapStateAction.execute(input, context, {
       stateMachineOptions: options.stateMachineOptions,
       runOptions: options.runOptions,
+      eventLogger: options.eventLogger,
     });
 
     return executionResult;

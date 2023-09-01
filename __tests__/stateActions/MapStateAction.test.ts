@@ -1,6 +1,7 @@
 import type { MapState } from '../../src/typings/MapState';
 import { MapStateAction } from '../../src/stateMachine/stateActions/MapStateAction';
 import { StatesRuntimeError } from '../../src/error/predefined/StatesRuntimeError';
+import { EventLogger } from '../../src/stateMachine/EventLogger';
 
 afterEach(() => {
   jest.clearAllMocks();
@@ -223,6 +224,7 @@ describe('Map State', () => {
     const mapStateResult = mapStateAction.execute(input, context, {
       stateMachineOptions: undefined,
       runOptions: { _rootAbortSignal: abortController.signal },
+      eventLogger: new EventLogger(),
     });
 
     abortController.abort();

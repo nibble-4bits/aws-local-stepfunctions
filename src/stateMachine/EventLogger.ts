@@ -3,6 +3,10 @@ import type { EventLog } from '../typings/EventLogs';
 import type { JSONValue } from '../typings/JSONValue';
 import type { StateType } from '../typings/StateType';
 
+/**
+ * This class handles the dispatching and queuing of state machine events as they are produced,
+ * which can then be consumed as an async stream via the `getEvents` async generator function.
+ */
 export class EventLogger {
   private eventTarget: EventTarget;
   private eventQueue: EventLog[];
@@ -29,7 +33,12 @@ export class EventLogger {
     }
   }
 
-  forwardEvent(event: EventLog) {
+  /**
+   * This utility function is used to forward nested events,
+   * such as the ones created by a `Map` state or a `Parallel` state, to the root state machine event logger.
+   * @param event An event dispatched by a nested state machine.
+   */
+  forwardNestedEvent(event: EventLog) {
     this.dispatch(event);
   }
 

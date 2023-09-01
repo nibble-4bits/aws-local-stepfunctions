@@ -1,5 +1,6 @@
 import type { TaskState } from '../src/typings/TaskState';
 import { StateExecutor } from '../src/stateMachine/StateExecutor';
+import { EventLogger } from '../src/stateMachine/EventLogger';
 import * as utilModule from '../src/util';
 
 afterEach(() => {
@@ -39,6 +40,7 @@ describe('State Executor', () => {
       const stateExecutor = new StateExecutor('TaskState', stateDefinition);
       const { stateResult } = await stateExecutor.execute(input, context, {
         abortSignal: new AbortController().signal,
+        eventLogger: new EventLogger(),
         stateMachineOptions: undefined,
         runOptions: {
           overrides: {
@@ -77,6 +79,7 @@ describe('State Executor', () => {
       const stateExecutor = new StateExecutor('TaskState', stateDefinition);
       const { stateResult } = await stateExecutor.execute(input, context, {
         abortSignal: new AbortController().signal,
+        eventLogger: new EventLogger(),
         stateMachineOptions: undefined,
         runOptions: {
           overrides: {
@@ -116,6 +119,7 @@ describe('State Executor', () => {
       const stateExecutor = new StateExecutor('TaskState', stateDefinition);
       const executorResult = stateExecutor.execute(input, context, {
         abortSignal: new AbortController().signal,
+        eventLogger: new EventLogger(),
         stateMachineOptions: undefined,
         runOptions: {
           overrides: {
@@ -160,6 +164,7 @@ describe('State Executor', () => {
       const stateExecutor = new StateExecutor('TaskState', stateDefinition);
       const executorResult = stateExecutor.execute(input, context, {
         abortSignal: new AbortController().signal,
+        eventLogger: new EventLogger(),
         stateMachineOptions: undefined,
         runOptions: {
           overrides: {
@@ -199,6 +204,7 @@ describe('State Executor', () => {
         const stateExecutor = new StateExecutor('TaskState', stateDefinition);
         const { stateResult } = await stateExecutor.execute(input, context, {
           abortSignal: new AbortController().signal,
+          eventLogger: new EventLogger(),
           stateMachineOptions: undefined,
           runOptions: {
             overrides: {
@@ -240,6 +246,7 @@ describe('State Executor', () => {
       const stateExecutor = new StateExecutor('TaskState', stateDefinition);
       const { stateResult, nextState } = await stateExecutor.execute(input, context, {
         abortSignal: new AbortController().signal,
+        eventLogger: new EventLogger(),
         stateMachineOptions: undefined,
         runOptions: {
           overrides: {
@@ -277,6 +284,7 @@ describe('State Executor', () => {
       const stateExecutor = new StateExecutor('TaskState', stateDefinition);
       const { stateResult, nextState } = await stateExecutor.execute(input, context, {
         abortSignal: new AbortController().signal,
+        eventLogger: new EventLogger(),
         stateMachineOptions: undefined,
         runOptions: {
           overrides: {
@@ -315,6 +323,7 @@ describe('State Executor', () => {
       const stateExecutor = new StateExecutor('TaskState', stateDefinition);
       const { stateResult, nextState } = await stateExecutor.execute(input, context, {
         abortSignal: new AbortController().signal,
+        eventLogger: new EventLogger(),
         stateMachineOptions: undefined,
         runOptions: {
           overrides: {
@@ -364,6 +373,7 @@ describe('State Executor', () => {
       const stateExecutor = new StateExecutor('TaskState', stateDefinition);
       const executorResult = stateExecutor.execute(input, context, {
         abortSignal: new AbortController().signal,
+        eventLogger: new EventLogger(),
         stateMachineOptions: undefined,
         runOptions: {
           overrides: {
@@ -398,6 +408,7 @@ describe('State Executor', () => {
         const stateExecutor = new StateExecutor('TaskState', stateDefinition);
         const { stateResult, nextState } = await stateExecutor.execute(input, context, {
           abortSignal: new AbortController().signal,
+          eventLogger: new EventLogger(),
           stateMachineOptions: undefined,
           runOptions: {
             overrides: {

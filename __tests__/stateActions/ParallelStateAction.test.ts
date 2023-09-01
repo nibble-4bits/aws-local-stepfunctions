@@ -1,5 +1,6 @@
 import type { ParallelState } from '../../src/typings/ParallelState';
 import { ParallelStateAction } from '../../src/stateMachine/stateActions/ParallelStateAction';
+import { EventLogger } from '../../src/stateMachine/EventLogger';
 
 afterEach(() => {
   jest.clearAllMocks();
@@ -175,6 +176,7 @@ describe('Parallel State', () => {
     const parallelStateResult = parallelStateAction.execute(input, context, {
       stateMachineOptions: undefined,
       runOptions: { _rootAbortSignal: abortController.signal },
+      eventLogger: new EventLogger(),
     });
 
     abortController.abort();
