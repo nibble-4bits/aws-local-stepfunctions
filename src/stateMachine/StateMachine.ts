@@ -58,6 +58,9 @@ export class StateMachine {
    * If the execution fails, the result will throw an `ExecutionError` explaining why the
    * execution failed.
    *
+   * If the execution times out because the number of seconds specified in
+   * the `TimeoutSeconds` top-level field has elapsed, the result will throw an `ExecutionTimeoutError`.
+   *
    * By default, if the execution is aborted, the result will throw an `ExecutionAbortedError`. This behavior can be changed by setting
    * the `noThrowOnAbort` option to `true`, in which case the result will be `null`.
    *
