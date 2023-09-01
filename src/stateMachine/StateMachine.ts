@@ -11,14 +11,6 @@ import { EventLogger } from './EventLogger';
 import aslValidator from 'asl-validator';
 import cloneDeep from 'lodash/cloneDeep.js';
 
-/**
- * Default max amount of seconds that an execution is allowed to run before timing out.
- * This value corresponds to `2^31 - 1` seconds (about 24 days, 20 hours, 31 minutes, and 24 seconds),
- * since browsers store the delay as a 32-bit signed integer.
- * @see https://developer.mozilla.org/en-US/docs/Web/API/setTimeout#maximum_delay_value
- */
-const DEFAULT_MAX_EXECUTION_TIMEOUT = 2147483.647;
-
 export class StateMachine {
   /**
    * The structure of the State Machine as represented by the Amazon States Language.
@@ -73,7 +65,6 @@ export class StateMachine {
   ): { abort: () => void; result: Promise<JSONValue>; eventLogs: AsyncGenerator<EventLog> } {
     const abortController = new AbortController();
     const eventLogger = new EventLogger();
-    const timeoutSeconds = this.definition.TimeoutSeconds ?? DEFAULT_MAX_EXECUTION_TIMEOUT;
 
     let onAbortHandler: () => void;
     const settleOnAbort = new Promise<null>((resolve, reject) => {
@@ -91,17 +82,20 @@ export class StateMachine {
       abortController.signal.addEventListener('abort', onAbortHandler);
     });
 
-    let timeoutId: NodeJS.Timeout;
-    const rejectOnTimeout = new Promise<null>((_, reject) => {
-      timeoutId = setTimeout(() => {
-        // Handle timeout by removing the abort handler from the abort signal listener
-        abortController.signal.removeEventListener('abort', onAbortHandler);
-        // Then we simply reuse the abort controller to abort the execution on timeout
-        abortController.abort();
-        eventLogger.dispatchExecutionTimeoutEvent();
-        reject(new StatesTimeoutError());
-      }, timeoutSeconds * 1000);
-    });
+    let rejectOnTimeout: Promise<null> | undefined;
+    let timeoutId: NodeJS.Timeout | undefined;
+    if (this.definition.TimeoutSeconds !== undefined) {
+      rejectOnTimeout = new Promise<null>((_, reject) => {
+        timeoutId = setTimeout(() => {
+          // Handle timeout by removing the abort handler from the abort signal listener
+          abortController.signal.removeEventListener('abort', onAbortHandler);
+          // Then we simply reuse the abort controller to abort the execution on timeout
+          abortController.abort();
+          eventLogger.dispatchExecutionTimeoutEvent();
+          reject(new StatesTimeoutError());
+        }, this.definition.TimeoutSeconds! * 1000);
+      });
+    }
 
     const executionResult = this.execute(
       input,
@@ -117,7 +111,11 @@ export class StateMachine {
       }
     );
 
-    const racingPromises = [executionResult, settleOnAbort, rejectOnTimeout];
+    const racingPromises = [executionResult, settleOnAbort];
+    if (rejectOnTimeout) {
+      racingPromises.push(rejectOnTimeout);
+    }
+
     const result = Promise.race(racingPromises);
 
     return {
