@@ -3,7 +3,7 @@ import type { JSONValue } from '../../typings/JSONValue';
 import type { ExecutionResult, MapStateActionOptions } from '../../typings/StateActions';
 import type { Context } from '../../typings/Context';
 import type { EventLogger } from '../EventLogger';
-import type { EventLog, MapIterationEvent, MapIterationFailedEvent, StateEvent } from '../../typings/EventLogs';
+import type { EventLog } from '../../typings/EventLogs';
 import { BaseStateAction } from './BaseStateAction';
 import { StateMachine } from '../StateMachine';
 import { jsonPathQuery } from '../JsonPath';
@@ -32,36 +32,10 @@ class MapStateAction extends BaseStateAction<MapState> {
     index: number,
     parentStateRawInput: JSONValue
   ) {
-    if (!eventLogger) {
-      return;
-    }
+    if (!eventLogger) return;
 
     for await (const event of executionEventLogs) {
-      const mapEvent = event as MapIterationEvent | MapIterationFailedEvent | StateEvent;
-
-      if (event.type === 'ExecutionStarted') {
-        mapEvent.type = 'MapIterationStarted';
-        (mapEvent as MapIterationEvent).parentState = { name: this.stateName, type: 'Map', input: parentStateRawInput };
-        mapEvent.index = index;
-      } else if (event.type === 'ExecutionSucceeded') {
-        mapEvent.type = 'MapIterationSucceeded';
-        (mapEvent as MapIterationEvent).parentState = { name: this.stateName, type: 'Map', input: parentStateRawInput };
-        mapEvent.index = index;
-      } else if (event.type === 'ExecutionFailed') {
-        mapEvent.type = 'MapIterationFailed';
-        (mapEvent as MapIterationFailedEvent).parentState = {
-          name: this.stateName,
-          type: 'Map',
-          input: parentStateRawInput,
-        };
-        mapEvent.index = index;
-      } else if (event.type === 'StateEntered' || event.type === 'StateExited') {
-        mapEvent.index = index;
-      } else if (event.type === 'ExecutionAborted' || event.type === 'ExecutionTimeout') {
-        continue;
-      }
-
-      eventLogger.forwardNestedEvent(mapEvent);
+      eventLogger.forwardNestedMapEvent(event, index, this.stateName, parentStateRawInput);
     }
   }
 

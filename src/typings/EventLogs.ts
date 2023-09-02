@@ -34,11 +34,11 @@ interface BaseEvent {
   timestamp: number;
 }
 
-interface ExecutionEvent extends BaseEvent {
+export interface ExecutionEvent extends BaseEvent {
   type: ExecutionEventType;
 }
 
-interface ExecutionFailedEvent extends BaseEvent, ErrorOutput {
+export interface ExecutionFailedEvent extends BaseEvent, ErrorOutput {
   type: ExecutionFailedEventType;
 }
 
@@ -48,11 +48,11 @@ interface BaseMapIterationEvent extends BaseEvent {
   index: number;
 }
 
-export interface MapIterationEvent extends BaseMapIterationEvent {
+interface MapIterationEvent extends BaseMapIterationEvent {
   type: MapIterationEventType;
 }
 
-export interface MapIterationFailedEvent extends BaseMapIterationEvent, ErrorOutput {
+interface MapIterationFailedEvent extends BaseMapIterationEvent, ErrorOutput {
   type: MapIterationFailedEventType;
 }
 
@@ -61,11 +61,11 @@ interface BaseParallelBranchEvent extends BaseEvent {
   parentState: StateData;
 }
 
-export interface ParallelBranchEvent extends BaseParallelBranchEvent {
+interface ParallelBranchEvent extends BaseParallelBranchEvent {
   type: ParallelBranchEventType;
 }
 
-export interface ParallelBranchFailedEvent extends BaseParallelBranchEvent, ErrorOutput {
+interface ParallelBranchFailedEvent extends BaseParallelBranchEvent, ErrorOutput {
   type: ParallelBranchFailedEventType;
 }
 
