@@ -35,6 +35,9 @@
     "browser": "./build/main.browser.esm.js",
     "default": "./build/main.browser.esm.js"
   },
+  "engines": {
+    "node": ">=16.0.0"
+  },
   "bin": {
     "local-sfn": "./build/CLI.cjs"
   },
