@@ -2,8 +2,10 @@ import type { ErrorOutput } from './ErrorHandling';
 import type { JSONValue } from './JSONValue';
 import type { StateType } from './StateType';
 
-type ExecutionEventType = 'ExecutionStarted' | 'ExecutionSucceeded' | 'ExecutionAborted' | 'ExecutionTimeout';
+type ExecutionStartedEventType = 'ExecutionStarted';
+type ExecutionSucceededEventType = 'ExecutionSucceeded';
 type ExecutionFailedEventType = 'ExecutionFailed';
+type ExecutionTerminatedEventType = 'ExecutionAborted' | 'ExecutionTimeout';
 
 type MapIterationEventType = 'MapIterationStarted' | 'MapIterationSucceeded';
 type MapIterationFailedEventType = 'MapIterationFailed';
@@ -14,8 +16,10 @@ type ParallelBranchFailedEventType = 'ParallelBranchFailed';
 type StateEventType = 'StateEntered' | 'StateExited';
 
 type AllEventTypes =
-  | ExecutionEventType
+  | ExecutionStartedEventType
+  | ExecutionSucceededEventType
   | ExecutionFailedEventType
+  | ExecutionTerminatedEventType
   | MapIterationEventType
   | MapIterationFailedEventType
   | ParallelBranchEventType
@@ -34,12 +38,22 @@ interface BaseEvent {
   timestamp: number;
 }
 
-export interface ExecutionEvent extends BaseEvent {
-  type: ExecutionEventType;
+export interface ExecutionStartedEvent extends BaseEvent {
+  type: ExecutionStartedEventType;
+  input: JSONValue;
+}
+
+export interface ExecutionSucceededEvent extends BaseEvent {
+  type: ExecutionSucceededEventType;
+  output: JSONValue;
 }
 
 export interface ExecutionFailedEvent extends BaseEvent, ErrorOutput {
   type: ExecutionFailedEventType;
+}
+
+export interface ExecutionTerminatedEvent extends BaseEvent {
+  type: ExecutionTerminatedEventType;
 }
 
 interface BaseMapIterationEvent extends BaseEvent {
@@ -76,8 +90,10 @@ export interface StateEvent extends BaseEvent {
 }
 
 export type EventLog =
-  | ExecutionEvent
+  | ExecutionStartedEvent
+  | ExecutionSucceededEvent
   | ExecutionFailedEvent
+  | ExecutionTerminatedEvent
   | MapIterationEvent
   | MapIterationFailedEvent
   | ParallelBranchEvent

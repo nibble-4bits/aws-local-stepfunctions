@@ -225,7 +225,7 @@ describe('State Machine', () => {
       }
 
       expect(events).toEqual([
-        { type: 'ExecutionStarted', timestamp: 1670198400000 },
+        { type: 'ExecutionStarted', timestamp: 1670198400000, input: {} },
         { type: 'StateEntered', timestamp: 1670198400000, state: { name: 'PassState1', type: 'Pass', input: {} } },
         {
           type: 'StateExited',
@@ -244,7 +244,7 @@ describe('State Machine', () => {
           timestamp: 1670198400000,
           state: { name: 'PassState3', type: 'Pass', input: 2, output: 3 },
         },
-        { type: 'ExecutionSucceeded', timestamp: 1670198400000 },
+        { type: 'ExecutionSucceeded', timestamp: 1670198400000, output: 3 },
       ]);
     });
 
@@ -276,7 +276,7 @@ describe('State Machine', () => {
 
       await expect(execution.result).rejects.toThrow(ExecutionError);
       expect(events).toEqual([
-        { type: 'ExecutionStarted', timestamp: 1670198400000 },
+        { type: 'ExecutionStarted', timestamp: 1670198400000, input: {} },
         { type: 'StateEntered', timestamp: 1670198400000, state: { name: 'PassState1', type: 'Pass', input: {} } },
         {
           type: 'StateExited',
@@ -328,7 +328,7 @@ describe('State Machine', () => {
 
       await expect(execution.result).rejects.toThrow(ExecutionAbortedError);
       expect(events).toEqual([
-        { type: 'ExecutionStarted', timestamp: 1670198400000 },
+        { type: 'ExecutionStarted', timestamp: 1670198400000, input: {} },
         { type: 'StateEntered', timestamp: 1670198400000, state: { name: 'PassState1', type: 'Pass', input: {} } },
         { type: 'ExecutionAborted', timestamp: 1670198400000 },
       ]);
@@ -368,7 +368,7 @@ describe('State Machine', () => {
 
       await expect(execution.result).rejects.toThrow(StatesTimeoutError);
       expect(events).toEqual([
-        { type: 'ExecutionStarted', timestamp: 1670198400000 },
+        { type: 'ExecutionStarted', timestamp: 1670198400000, input: {} },
         { type: 'StateEntered', timestamp: 1670198400000, state: { name: 'PassState1', type: 'Pass', input: {} } },
         {
           type: 'StateExited',

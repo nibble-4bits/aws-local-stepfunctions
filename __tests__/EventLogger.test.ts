@@ -1,5 +1,11 @@
 import type { RuntimeError } from '../src/error/RuntimeError';
-import type { ExecutionEvent, ExecutionFailedEvent, StateEvent } from '../src/typings/EventLogs';
+import type {
+  ExecutionFailedEvent,
+  ExecutionStartedEvent,
+  ExecutionSucceededEvent,
+  ExecutionTerminatedEvent,
+  StateEvent,
+} from '../src/typings/EventLogs';
 import { EventLogger } from '../src/stateMachine/EventLogger';
 import './_customMatchers';
 
@@ -19,10 +25,10 @@ describe('Event Logger', () => {
       const eventLogger = new EventLogger();
       const generator = eventLogger.getEvents();
 
-      eventLogger.dispatchExecutionStartedEvent();
+      eventLogger.dispatchExecutionStartedEvent(50);
       eventLogger.dispatchStateEnteredEvent('SomeState', 'Choice', { a: 1, b: 'string', c: true, d: [1, 2, 3] });
       eventLogger.dispatchStateExitedEvent('AnotherState', 'Task', ['a', 'b', 1, null], 123.456);
-      eventLogger.dispatchExecutionSucceededEvent();
+      eventLogger.dispatchExecutionSucceededEvent('result');
 
       const firstEvent = await generator.next();
       const secondEvent = await generator.next();
@@ -30,7 +36,7 @@ describe('Event Logger', () => {
       const fourthEvent = await generator.next();
       const endEvent = await generator.next();
 
-      expect(firstEvent.value).toEqual({ type: 'ExecutionStarted', timestamp: 1670198400000 });
+      expect(firstEvent.value).toEqual({ type: 'ExecutionStarted', timestamp: 1670198400000, input: 50 });
       expect(secondEvent.value).toEqual({
         type: 'StateEntered',
         timestamp: 1670198400000,
@@ -41,7 +47,7 @@ describe('Event Logger', () => {
         timestamp: 1670198400000,
         state: { name: 'AnotherState', type: 'Task', input: ['a', 'b', 1, null], output: 123.456 },
       });
-      expect(fourthEvent.value).toEqual({ type: 'ExecutionSucceeded', timestamp: 1670198400000 });
+      expect(fourthEvent.value).toEqual({ type: 'ExecutionSucceeded', timestamp: 1670198400000, output: 'result' });
       expect(endEvent.value).toBeUndefined();
 
       expect(firstEvent.done).toBe(false);
@@ -57,7 +63,7 @@ describe('Event Logger', () => {
       test('should forward `ExecutionStarted` event into `MapIterationStarted` event', async () => {
         const eventLogger = new EventLogger();
         const generator = eventLogger.getEvents();
-        const event: ExecutionEvent = { type: 'ExecutionStarted', timestamp: Date.now() };
+        const event: ExecutionStartedEvent = { type: 'ExecutionStarted', timestamp: Date.now(), input: 'input' };
 
         eventLogger.forwardNestedMapEvent(event, 0, 'MapState', {});
 
@@ -66,6 +72,7 @@ describe('Event Logger', () => {
         expect(value).toEqual({
           type: 'MapIterationStarted',
           timestamp: 1670198400000,
+          input: 'input',
           index: 0,
           parentState: { type: 'Map', name: 'MapState', input: {} },
         });
@@ -75,7 +82,7 @@ describe('Event Logger', () => {
       test('should forward `ExecutionSucceeded` event into `MapIterationSucceeded` event', async () => {
         const eventLogger = new EventLogger();
         const generator = eventLogger.getEvents();
-        const event: ExecutionEvent = { type: 'ExecutionSucceeded', timestamp: Date.now() };
+        const event: ExecutionSucceededEvent = { type: 'ExecutionSucceeded', timestamp: Date.now(), output: 'output' };
 
         eventLogger.forwardNestedMapEvent(event, 3, 'MapState', {});
 
@@ -84,6 +91,7 @@ describe('Event Logger', () => {
         expect(value).toEqual({
           type: 'MapIterationSucceeded',
           timestamp: 1670198400000,
+          output: 'output',
           index: 3,
           parentState: { type: 'Map', name: 'MapState', input: {} },
         });
@@ -162,7 +170,7 @@ describe('Event Logger', () => {
       test('should not forward `ExecutionAborted` event', async () => {
         const eventLogger = new EventLogger();
         const generator = eventLogger.getEvents();
-        const event: ExecutionEvent = { type: 'ExecutionAborted', timestamp: Date.now() };
+        const event: ExecutionTerminatedEvent = { type: 'ExecutionAborted', timestamp: Date.now() };
 
         eventLogger.forwardNestedMapEvent(event, 5, 'MapState', {});
 
@@ -174,7 +182,7 @@ describe('Event Logger', () => {
       test('should not forward `ExecutionTimeout` event', async () => {
         const eventLogger = new EventLogger();
         const generator = eventLogger.getEvents();
-        const event: ExecutionEvent = { type: 'ExecutionTimeout', timestamp: Date.now() };
+        const event: ExecutionTerminatedEvent = { type: 'ExecutionTimeout', timestamp: Date.now() };
 
         eventLogger.forwardNestedMapEvent(event, 5, 'MapState', {});
 
@@ -188,7 +196,7 @@ describe('Event Logger', () => {
       test('should forward `ExecutionStarted` event into `ParallelBranchStarted` event', async () => {
         const eventLogger = new EventLogger();
         const generator = eventLogger.getEvents();
-        const event: ExecutionEvent = { type: 'ExecutionStarted', timestamp: Date.now() };
+        const event: ExecutionStartedEvent = { type: 'ExecutionStarted', timestamp: Date.now(), input: 'input' };
 
         eventLogger.forwardNestedParallelEvent(event, 'ParallelState', {});
 
@@ -197,6 +205,7 @@ describe('Event Logger', () => {
         expect(value).toEqual({
           type: 'ParallelBranchStarted',
           timestamp: 1670198400000,
+          input: 'input',
           parentState: { type: 'Parallel', name: 'ParallelState', input: {} },
         });
         expect(done).toBe(false);
@@ -205,7 +214,7 @@ describe('Event Logger', () => {
       test('should forward `ExecutionSucceeded` event into `ParallelBranchSucceeded` event', async () => {
         const eventLogger = new EventLogger();
         const generator = eventLogger.getEvents();
-        const event: ExecutionEvent = { type: 'ExecutionSucceeded', timestamp: Date.now() };
+        const event: ExecutionSucceededEvent = { type: 'ExecutionSucceeded', timestamp: Date.now(), output: 'output' };
 
         eventLogger.forwardNestedParallelEvent(event, 'ParallelState', {});
 
@@ -214,6 +223,7 @@ describe('Event Logger', () => {
         expect(value).toEqual({
           type: 'ParallelBranchSucceeded',
           timestamp: 1670198400000,
+          output: 'output',
           parentState: { type: 'Parallel', name: 'ParallelState', input: {} },
         });
         expect(done).toBe(false);
@@ -246,7 +256,7 @@ describe('Event Logger', () => {
       test('should not forward `ExecutionAborted` event', async () => {
         const eventLogger = new EventLogger();
         const generator = eventLogger.getEvents();
-        const event: ExecutionEvent = { type: 'ExecutionAborted', timestamp: Date.now() };
+        const event: ExecutionTerminatedEvent = { type: 'ExecutionAborted', timestamp: Date.now() };
 
         eventLogger.forwardNestedParallelEvent(event, 'ParallelState', {});
 
@@ -258,7 +268,7 @@ describe('Event Logger', () => {
       test('should not forward `ExecutionTimeout` event', async () => {
         const eventLogger = new EventLogger();
         const generator = eventLogger.getEvents();
-        const event: ExecutionEvent = { type: 'ExecutionTimeout', timestamp: Date.now() };
+        const event: ExecutionTerminatedEvent = { type: 'ExecutionTimeout', timestamp: Date.now() };
 
         eventLogger.forwardNestedParallelEvent(event, 'ParallelState', {});
 
@@ -273,8 +283,9 @@ describe('Event Logger', () => {
     test('should close logger after dispatching `ExecutionSucceeded` event', async () => {
       const eventLogger = new EventLogger();
       const generator = eventLogger.getEvents();
+      const output = 'output';
 
-      eventLogger.dispatchExecutionSucceededEvent();
+      eventLogger.dispatchExecutionSucceededEvent(output);
 
       const { value: firstValue, done: firstDone } = await generator.next();
       const { value: secondValue, done: secondDone } = await generator.next();

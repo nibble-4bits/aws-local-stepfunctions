@@ -128,7 +128,7 @@ export class StateMachine {
    * Helper method that handles the execution of the machine states and the transitions between them.
    */
   private async execute(input: JSONValue, options: ExecuteOptions, cleanupFn: () => void): Promise<JSONValue> {
-    options.eventLogger.dispatchExecutionStartedEvent();
+    options.eventLogger.dispatchExecutionStartedEvent(input);
 
     const context = options.runOptions?.context ?? {};
     let currState = this.definition.States[this.definition.StartAt];
@@ -159,7 +159,7 @@ export class StateMachine {
       cleanupFn();
     }
 
-    options.eventLogger.dispatchExecutionSucceededEvent();
+    options.eventLogger.dispatchExecutionSucceededEvent(currResult);
 
     return currResult;
   }

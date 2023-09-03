@@ -1,5 +1,10 @@
 import type { RuntimeError } from '../error/RuntimeError';
-import type { EventLog, ExecutionEvent, ExecutionFailedEvent } from '../typings/EventLogs';
+import type {
+  EventLog,
+  ExecutionFailedEvent,
+  ExecutionStartedEvent,
+  ExecutionSucceededEvent,
+} from '../typings/EventLogs';
 import type { JSONValue } from '../typings/JSONValue';
 import type { StateType } from '../typings/StateType';
 
@@ -91,12 +96,12 @@ export class EventLogger {
     }
   }
 
-  dispatchExecutionStartedEvent() {
-    this.dispatch({ type: 'ExecutionStarted', timestamp: Date.now() });
+  dispatchExecutionStartedEvent(input: JSONValue) {
+    this.dispatch({ type: 'ExecutionStarted', timestamp: Date.now(), input });
   }
 
-  dispatchExecutionSucceededEvent() {
-    this.dispatch({ type: 'ExecutionSucceeded', timestamp: Date.now() });
+  dispatchExecutionSucceededEvent(output: JSONValue) {
+    this.dispatch({ type: 'ExecutionSucceeded', timestamp: Date.now(), output });
     this.close();
   }
 
@@ -132,7 +137,7 @@ export class EventLogger {
   }
 
   private dispatchMapIterationStartedEvent(
-    event: ExecutionEvent,
+    event: ExecutionStartedEvent,
     index: number,
     mapStateName: string,
     mapStateRawInput: JSONValue
@@ -146,7 +151,7 @@ export class EventLogger {
   }
 
   private dispatchMapIterationSucceededEvent(
-    event: ExecutionEvent,
+    event: ExecutionSucceededEvent,
     index: number,
     mapStateName: string,
     mapStateRawInput: JSONValue
@@ -174,7 +179,7 @@ export class EventLogger {
   }
 
   private dispatchParallelBranchStartedEvent(
-    event: ExecutionEvent,
+    event: ExecutionStartedEvent,
     parallelStateName: string,
     parallelStateRawInput: JSONValue
   ) {
@@ -186,7 +191,7 @@ export class EventLogger {
   }
 
   private dispatchParallelBranchSucceededEvent(
-    event: ExecutionEvent,
+    event: ExecutionSucceededEvent,
     parallelStateName: string,
     parallelStateRawInput: JSONValue
   ) {
