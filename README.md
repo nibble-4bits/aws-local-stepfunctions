@@ -120,8 +120,9 @@ const stateMachine = new StateMachine(machineDefinition, {
 
 Runs the state machine with the given `input` parameter and returns an object with the following properties:
 
+- `result`: A `Promise` that resolves with the result of the execution once it terminates.
 - `abort`: A function that takes no parameters and doesn't return any value. If called, [aborts the execution](/docs/feature-support.md#abort-a-running-execution) and throws an `ExecutionAbortedError`, unless the `noThrowOnAbort` option is set.
-- `result`: A `Promise` that resolves with the execution result once it finishes.
+- `eventLogs`: An `AsyncGenerator` that [produces a log of events](/docs/feature-support.md#execution-event-logs) as the execution runs. To learn more about the events, their type, and their format, see the [following document](/docs/execution-event-logs.md).
 
 Each execution is independent of all others, meaning that you can concurrently call this method as many times as needed, without worrying about race conditions.
 
