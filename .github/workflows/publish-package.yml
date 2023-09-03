@@ -1,9 +1,9 @@
 name: publish-package
 
 on:
-  push:
-    branches:
-      - 'master'
+  release:
+    types:
+      - published
 
 concurrency: ${{ github.workflow }}-${{ github.ref }}
 
