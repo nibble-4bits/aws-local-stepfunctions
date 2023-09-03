@@ -215,13 +215,19 @@ Note that each line of the output corresponds to the result of each input, in th
 
 ### Passing input from stdin
 
-`local-sfn` can also read the execution input from the standard input. For example, assume you have the following text file, called `inputs.txt`, and you want to pass the contents of the file as inputs to `local-sfn`:
+`local-sfn` can also read the execution input from the standard input.
+
+If the first line of stdin can be parsed as a single JSON value, then `local-sfn` will consider each line as an input. Otherwise, the entire stdin will be considered as a single JSON input.
+
+For example, assume you have the following text file, called `inputs.txt`, and you want to pass the contents of the file as inputs to `local-sfn`:
 
 ```txt
 { "num1": 1, "num2": 2 }
 { "num1": 3, "num2": 4 }
 { "num1": 5, "num2": 6 }
 ```
+
+Because the first line is parsable as JSON, `local-sfn` will process each line as a single input.
 
 You can then run the following command to pass the inputs of the text file to `local-sfn`:
 
@@ -235,7 +241,16 @@ Alternatively, using input redirection:
 local-sfn -f state-machine.json < inputs.txt
 ```
 
-When reading from stdin, `local-sfn` will take each line and use it as an input. Hence, to avoid any parsing errors, make sure the output of the command you're piping into `local-sfn` prints each input in a new line.
+On the other hand, assume you have this additional file, called `input.json`:
+
+```json
+{
+  "num1": 5,
+  "num2": 3
+}
+```
+
+If you pass this file as input, `local-sfn` will automatically detect that it is a single, multiline JSON value and process it as a single value.
 
 ### Overriding Task and Wait states
 
