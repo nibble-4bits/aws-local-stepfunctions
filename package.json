@@ -1,7 +1,7 @@
 {
   "name": "aws-local-stepfunctions",
   "version": "0.7.0",
-  "description": "Execute an AWS Step Function locally",
+  "description": "Execute an AWS Step Function state machine locally",
   "keywords": [
     "aws",
     "local",
