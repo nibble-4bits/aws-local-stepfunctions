@@ -2,7 +2,13 @@
 
 A TypeScript implementation of the [Amazon States Language specification](https://states-language.net/spec.html).
 
-This package lets you run AWS Step Functions completely locally, both in Node.js and in the browser!
+This package lets you run AWS Step Functions state machines completely locally, both in Node.js and in the browser!
+
+<img alt="Project license (MIT)" src="https://img.shields.io/github/license/nibble-4bits/aws-local-stepfunctions">
+<img alt="GitHub Workflow Status (with event)" src="https://img.shields.io/github/actions/workflow/status/nibble-4bits/aws-local-stepfunctions/pr-run-tests.yml">
+<img alt="Latest npm version" src="https://img.shields.io/npm/v/aws-local-stepfunctions">
+<img alt="node-lts" src="https://img.shields.io/node/v-lts/aws-local-stepfunctions">
+<img alt="npm type definitions" src="https://img.shields.io/npm/types/aws-local-stepfunctions">
 
 ## Table of contents
 
