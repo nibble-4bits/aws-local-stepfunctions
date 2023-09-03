@@ -1,0 +1,29 @@
+name: prepare-for-release
+
+on:
+  push:
+    branches:
+      - 'master'
+
+concurrency: ${{ github.workflow }}-${{ github.ref }}
+
+jobs:
+  test-build-prepare-for-release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '16'
+          registry-url: 'https://registry.npmjs.org'
+      - name: Install dependencies
+        run: npm ci
+      - name: Run tests
+        run: npm test
+      - name: Build project
+        run: npm run build
+      - name: Create tag from package.json
+        uses: jaywcjlove/create-tag-action@v1.3.18
+        with:
+          token: ${{ github.token }}
+          package-path: ./package.json
