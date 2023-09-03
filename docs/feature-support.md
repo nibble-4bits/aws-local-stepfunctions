@@ -10,6 +10,7 @@
   - [Wait duration override](#wait-state-duration-override)
   - [Abort a running execution](#abort-a-running-execution)
   - [AWS config for Lambda functions](#providing-aws-credentials-and-region-to-execute-lambda-functions-specified-in-task-states)
+  - [Execution event logs](#execution-event-logs)
 
 ## Spec features
 
@@ -147,7 +148,7 @@ An example usage of this feature can be found [here](/examples/wait-state-local-
 
 ### Abort a running execution
 
-If for some reason you need to abort an execution in progress, you can do so by calling the `abort` method that is part of the value returned by the `StateMachine.run` method.
+If for some reason you need to abort an execution in progress, you can do so by calling the `abort` method that is part of the object returned by the `StateMachine.run` method.
 
 By default, aborting an execution will throw an error of type `ExecutionAbortedError`, which you can catch and compare against using `instanceof`. A demonstration of this behavior can be found in this [example](/examples/abort-execution.js).
 
@@ -169,3 +170,15 @@ To provide credentials and region, specify the `stateMachineOptions.awsConfig` o
 2. [Cognito Identity Pool](https://docs.aws.amazon.com/cognito/latest/developerguide/cognito-identity.html): The ID of a Cognito Identity Pool ([example](/examples/aws-credentials-cognito.js)).
 
 Make sure that the IAM user/role associated with the access keys or Cognito Identity Pool have the necessary policies to be able to invoke the Lambda functions referenced in your state machine definition.
+
+### Execution event logs
+
+During the course of an execution, the state machine goes through several events, such as transitioning into different states, or performing the action that corresponds to each type of event. Naturally, these events happen until the execution terminates, either by reaching the end state, encountering an error and failing, being aborted or timing out.
+
+`aws-local-stepfunctions` provides the ability to retrieve these events through the `eventLogs` property that is part of the object returned by the `StateMachine.run` method. This feature is similar to the execution logs returned by the [GetExecutionHistory](https://docs.aws.amazon.com/step-functions/latest/apireference/API_GetExecutionHistory.html) action of the AWS Step Functions API.
+
+Note that the `eventLogs` property is an [`AsyncGenerator`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/AsyncGenerator), meaning that the events are yielded as they occur.
+
+You could, for example, use these events to debug your state machine by having a better insight into how and when the execution transitions between the states of the machine.
+
+An example usage of this feature can be found [here](/examples/execution-event-logs.js).

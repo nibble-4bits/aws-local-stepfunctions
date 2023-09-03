@@ -2,6 +2,8 @@ import type { MapState } from '../../typings/MapState';
 import type { JSONValue } from '../../typings/JSONValue';
 import type { ExecutionResult, MapStateActionOptions } from '../../typings/StateActions';
 import type { Context } from '../../typings/Context';
+import type { EventLogger } from '../EventLogger';
+import type { EventLog } from '../../typings/EventLogs';
 import { BaseStateAction } from './BaseStateAction';
 import { StateMachine } from '../StateMachine';
 import { jsonPathQuery } from '../JsonPath';
@@ -18,10 +20,23 @@ const DEFAULT_MAX_CONCURRENCY = 40;
 class MapStateAction extends BaseStateAction<MapState> {
   private executionAbortFuncs: (() => void)[];
 
-  constructor(stateDefinition: MapState) {
-    super(stateDefinition);
+  constructor(stateDefinition: MapState, stateName: string) {
+    super(stateDefinition, stateName);
 
     this.executionAbortFuncs = [];
+  }
+
+  private async forwardEventsToRootEventLogger(
+    eventLogger: EventLogger | undefined,
+    executionEventLogs: AsyncGenerator<EventLog>,
+    index: number,
+    parentStateRawInput: JSONValue
+  ) {
+    if (!eventLogger) return;
+
+    for await (const event of executionEventLogs) {
+      eventLogger.forwardNestedMapEvent(event, index, this.stateName, parentStateRawInput);
+    }
   }
 
   private processItem(
@@ -51,6 +66,11 @@ class MapStateAction extends BaseStateAction<MapState> {
     const execution = stateMachine.run(paramValue ?? item, options?.runOptions);
 
     this.executionAbortFuncs.push(execution.abort);
+
+    // TODO: Find a way to remove this ignore directive and not rely on it
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    this.forwardEventsToRootEventLogger(options?.eventLogger, execution.eventLogs, index, options?.rawInput);
 
     return execution.result;
   }

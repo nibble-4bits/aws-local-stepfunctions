@@ -1,4 +1,5 @@
 import type { StateMachineDefinition } from '../src/typings/StateMachineDefinition';
+import type { EventLog } from '../src/typings/EventLogs';
 import { StateMachine } from '../src/stateMachine/StateMachine';
 import { ExecutionAbortedError } from '../src/error/ExecutionAbortedError';
 import { StatesTimeoutError } from '../src/error/predefined/StatesTimeoutError';
@@ -86,6 +87,12 @@ describe('State Machine', () => {
   });
 
   describe('run()', () => {
+    const mockDateNowFunction = jest.fn(() => 1670198400000); // 2022-12-05T00:00:00Z
+
+    beforeEach(() => {
+      jest.spyOn(Date, 'now').mockImplementation(mockDateNowFunction);
+    });
+
     const machineDefinition: StateMachineDefinition = {
       StartAt: 'PassState',
       States: {
@@ -184,6 +191,193 @@ describe('State Machine', () => {
       const execution = stateMachine.run(input);
 
       await expect(execution.result).resolves.toBe(3);
+    });
+
+    test('should generate event logs in expected order', async () => {
+      const machineDefinition: StateMachineDefinition = {
+        StartAt: 'PassState1',
+        States: {
+          PassState1: {
+            Type: 'Pass',
+            Result: 1,
+            Next: 'PassState2',
+          },
+          PassState2: {
+            Type: 'Pass',
+            Result: 2,
+            Next: 'PassState3',
+          },
+          PassState3: {
+            Type: 'Pass',
+            Result: 3,
+            End: true,
+          },
+        },
+      };
+      const input = {};
+
+      const stateMachine = new StateMachine(machineDefinition);
+      const execution = stateMachine.run(input);
+
+      const events: EventLog[] = [];
+      for await (const event of execution.eventLogs) {
+        events.push(event);
+      }
+
+      expect(events).toEqual([
+        { type: 'ExecutionStarted', timestamp: 1670198400000, input: {} },
+        { type: 'StateEntered', timestamp: 1670198400000, state: { name: 'PassState1', type: 'Pass', input: {} } },
+        {
+          type: 'StateExited',
+          timestamp: 1670198400000,
+          state: { name: 'PassState1', type: 'Pass', input: {}, output: 1 },
+        },
+        { type: 'StateEntered', timestamp: 1670198400000, state: { name: 'PassState2', type: 'Pass', input: 1 } },
+        {
+          type: 'StateExited',
+          timestamp: 1670198400000,
+          state: { name: 'PassState2', type: 'Pass', input: 1, output: 2 },
+        },
+        { type: 'StateEntered', timestamp: 1670198400000, state: { name: 'PassState3', type: 'Pass', input: 2 } },
+        {
+          type: 'StateExited',
+          timestamp: 1670198400000,
+          state: { name: 'PassState3', type: 'Pass', input: 2, output: 3 },
+        },
+        { type: 'ExecutionSucceeded', timestamp: 1670198400000, output: 3 },
+      ]);
+    });
+
+    test('should generate an `ExecutionFailed` event as last event if execution fails', async () => {
+      const machineDefinition: StateMachineDefinition = {
+        StartAt: 'PassState1',
+        States: {
+          PassState1: {
+            Type: 'Pass',
+            Result: 1,
+            Next: 'FailState',
+          },
+          FailState: {
+            Type: 'Fail',
+            Error: 'MachineFailure',
+            Cause: 'The state machine failed',
+          },
+        },
+      };
+      const input = {};
+
+      const stateMachine = new StateMachine(machineDefinition);
+      const execution = stateMachine.run(input);
+
+      const events: EventLog[] = [];
+      for await (const event of execution.eventLogs) {
+        events.push(event);
+      }
+
+      await expect(execution.result).rejects.toThrow(ExecutionError);
+      expect(events).toEqual([
+        { type: 'ExecutionStarted', timestamp: 1670198400000, input: {} },
+        { type: 'StateEntered', timestamp: 1670198400000, state: { name: 'PassState1', type: 'Pass', input: {} } },
+        {
+          type: 'StateExited',
+          timestamp: 1670198400000,
+          state: { name: 'PassState1', type: 'Pass', input: {}, output: 1 },
+        },
+        { type: 'StateEntered', timestamp: 1670198400000, state: { name: 'FailState', type: 'Fail', input: 1 } },
+        {
+          type: 'ExecutionFailed',
+          timestamp: 1670198400000,
+          Error: 'MachineFailure',
+          Cause: 'The state machine failed',
+        },
+      ]);
+    });
+
+    test('should generate an `ExecutionAborted` event as last event if execution is aborted', async () => {
+      const machineDefinition: StateMachineDefinition = {
+        StartAt: 'PassState1',
+        States: {
+          PassState1: {
+            Type: 'Pass',
+            Result: 1,
+            Next: 'PassState2',
+          },
+          PassState2: {
+            Type: 'Pass',
+            Result: 2,
+            Next: 'PassState3',
+          },
+          PassState3: {
+            Type: 'Pass',
+            Result: 3,
+            End: true,
+          },
+        },
+      };
+      const input = {};
+
+      const stateMachine = new StateMachine(machineDefinition);
+      const execution = stateMachine.run(input);
+
+      execution.abort();
+
+      const events: EventLog[] = [];
+      for await (const event of execution.eventLogs) {
+        events.push(event);
+      }
+
+      await expect(execution.result).rejects.toThrow(ExecutionAbortedError);
+      expect(events).toEqual([
+        { type: 'ExecutionStarted', timestamp: 1670198400000, input: {} },
+        { type: 'StateEntered', timestamp: 1670198400000, state: { name: 'PassState1', type: 'Pass', input: {} } },
+        { type: 'ExecutionAborted', timestamp: 1670198400000 },
+      ]);
+    });
+
+    test('should generate an `ExecutionTimeout` event as last event if execution times out', async () => {
+      const machineDefinition: StateMachineDefinition = {
+        StartAt: 'PassState1',
+        TimeoutSeconds: 1,
+        States: {
+          PassState1: {
+            Type: 'Pass',
+            Result: 1,
+            Next: 'WaitState',
+          },
+          WaitState: {
+            Type: 'Wait',
+            Seconds: 2,
+            Next: 'PassState2',
+          },
+          PassState2: {
+            Type: 'Pass',
+            Result: 2,
+            End: true,
+          },
+        },
+      };
+      const input = {};
+
+      const stateMachine = new StateMachine(machineDefinition);
+      const execution = stateMachine.run(input);
+
+      const events: EventLog[] = [];
+      for await (const event of execution.eventLogs) {
+        events.push(event);
+      }
+
+      await expect(execution.result).rejects.toThrow(StatesTimeoutError);
+      expect(events).toEqual([
+        { type: 'ExecutionStarted', timestamp: 1670198400000, input: {} },
+        { type: 'StateEntered', timestamp: 1670198400000, state: { name: 'PassState1', type: 'Pass', input: {} } },
+        {
+          type: 'StateExited',
+          timestamp: 1670198400000,
+          state: { name: 'PassState1', type: 'Pass', input: {}, output: 1 },
+        },
+        { type: 'StateEntered', timestamp: 1670198400000, state: { name: 'WaitState', type: 'Wait', input: 1 } },
+        { type: 'ExecutionTimeout', timestamp: 1670198400000 },
+      ]);
     });
   });
 });

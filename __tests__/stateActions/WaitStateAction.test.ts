@@ -21,10 +21,11 @@ describe('Wait State', () => {
       Seconds: 10,
       End: true,
     };
+    const stateName = 'WaitState';
     const input = { prop1: 'test', prop2: 12345 };
     const context = {};
 
-    const waitStateAction = new WaitStateAction(definition);
+    const waitStateAction = new WaitStateAction(definition, stateName);
     const { stateResult } = await waitStateAction.execute(input, context);
 
     expect(mockSleepFunction).toHaveBeenCalledWith(10000, undefined, undefined);
@@ -37,10 +38,11 @@ describe('Wait State', () => {
       Timestamp: '2022-12-05T05:45:00Z',
       End: true,
     };
+    const stateName = 'WaitState';
     const input = { prop1: 'test', prop2: 12345 };
     const context = {};
 
-    const waitStateAction = new WaitStateAction(definition);
+    const waitStateAction = new WaitStateAction(definition, stateName);
     const { stateResult } = await waitStateAction.execute(input, context);
 
     expect(mockSleepFunction).toHaveBeenCalledWith(20700000, undefined, undefined);
@@ -53,10 +55,11 @@ describe('Wait State', () => {
       SecondsPath: '$.waitFor',
       End: true,
     };
+    const stateName = 'WaitState';
     const input = { waitFor: 10 };
     const context = {};
 
-    const waitStateAction = new WaitStateAction(definition);
+    const waitStateAction = new WaitStateAction(definition, stateName);
     const { stateResult } = await waitStateAction.execute(input, context);
 
     expect(mockSleepFunction).toHaveBeenCalledWith(10000, undefined, undefined);
@@ -69,10 +72,11 @@ describe('Wait State', () => {
       TimestampPath: '$.waitUntil',
       End: true,
     };
+    const stateName = 'WaitState';
     const input = { waitUntil: '2022-12-05T05:45:00Z' };
     const context = {};
 
-    const waitStateAction = new WaitStateAction(definition);
+    const waitStateAction = new WaitStateAction(definition, stateName);
     const { stateResult } = await waitStateAction.execute(input, context);
 
     expect(mockSleepFunction).toHaveBeenCalledWith(20700000, undefined, undefined);
@@ -85,13 +89,14 @@ describe('Wait State', () => {
       TimestampPath: '$.waitUntil',
       End: true,
     };
+    const stateName = 'WaitState';
     const input = { waitUntil: '2022-12-05T05:45:00Z' };
     const context = {};
     const abortSignal = new AbortController().signal;
     const rootAbortSignal = new AbortController().signal;
     const options = { waitTimeOverrideOption: 1500, abortSignal, rootAbortSignal };
 
-    const waitStateAction = new WaitStateAction(definition);
+    const waitStateAction = new WaitStateAction(definition, stateName);
     const { stateResult } = await waitStateAction.execute(input, context, options);
 
     expect(mockSleepFunction).toHaveBeenCalledTimes(1);

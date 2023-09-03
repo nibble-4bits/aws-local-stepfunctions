@@ -19,10 +19,11 @@ describe('Task State', () => {
       Resource: 'mock-arn',
       End: true,
     };
+    const stateName = 'TaskState';
     const input = { input1: 'input string', input2: 10 };
     const context = {};
 
-    const taskStateAction = new TaskStateAction(definition);
+    const taskStateAction = new TaskStateAction(definition, stateName);
     await taskStateAction.execute(input, context);
 
     expect(mockInvokeFunction).toHaveBeenCalledWith('mock-arn', { input1: 'input string', input2: 10 });
@@ -34,12 +35,13 @@ describe('Task State', () => {
       Resource: 'mock-arn',
       End: true,
     };
+    const stateName = 'TaskState';
     const input = { num1: 5, num2: 3 };
     const context = {};
 
     mockInvokeFunction.mockReturnValue(input.num1 + input.num2);
 
-    const taskStateAction = new TaskStateAction(definition);
+    const taskStateAction = new TaskStateAction(definition, stateName);
     const { stateResult } = await taskStateAction.execute(input, context);
 
     expect(mockInvokeFunction).toHaveBeenCalledWith('mock-arn', { num1: 5, num2: 3 });
@@ -52,13 +54,14 @@ describe('Task State', () => {
       Resource: 'mock-arn',
       End: true,
     };
+    const stateName = 'TaskState';
     const input = { num1: 5, num2: 3 };
     const context = {};
 
     const localHandlerFn = jest.fn((event) => event.num1 + event.num2);
     const options = { overrideFn: localHandlerFn, awsConfig: undefined };
 
-    const taskStateAction = new TaskStateAction(definition);
+    const taskStateAction = new TaskStateAction(definition, stateName);
     const { stateResult } = await taskStateAction.execute(input, context, options);
 
     expect(localHandlerFn).toHaveBeenCalledWith(input);

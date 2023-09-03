@@ -1,10 +1,13 @@
 import type { StateMachineDefinition } from '../typings/StateMachineDefinition';
 import type { JSONValue } from '../typings/JSONValue';
+import type { RuntimeError } from '../error/RuntimeError';
+import type { EventLog } from '../typings/EventLogs';
 import type { ExecuteOptions, RunOptions, StateMachineOptions } from '../typings/StateMachineImplementation';
 import { ExecutionAbortedError } from '../error/ExecutionAbortedError';
 import { StatesTimeoutError } from '../error/predefined/StatesTimeoutError';
 import { ExecutionError } from '../error/ExecutionError';
 import { StateExecutor } from './StateExecutor';
+import { EventLogger } from './EventLogger';
 import aslValidator from 'asl-validator';
 import cloneDeep from 'lodash/cloneDeep.js';
 
@@ -61,16 +64,26 @@ export class StateMachine {
    * @param input The input to pass to this state machine execution.
    * @param options Miscellaneous options to control certain behaviors of the execution.
    */
-  run(input: JSONValue, options?: RunOptions): { abort: () => void; result: Promise<JSONValue> } {
+  run(
+    input: JSONValue,
+    options?: RunOptions
+  ): { abort: () => void; result: Promise<JSONValue>; eventLogs: AsyncGenerator<EventLog> } {
     const abortController = new AbortController();
+    const eventLogger = new EventLogger();
     const timeoutSeconds = this.definition.TimeoutSeconds ?? DEFAULT_MAX_EXECUTION_TIMEOUT;
 
     let onAbortHandler: () => void;
     const settleOnAbort = new Promise<null>((resolve, reject) => {
       if (options?.noThrowOnAbort) {
-        onAbortHandler = () => resolve(null);
+        onAbortHandler = () => {
+          eventLogger.dispatchExecutionAbortedEvent();
+          resolve(null);
+        };
       } else {
-        onAbortHandler = () => reject(new ExecutionAbortedError());
+        onAbortHandler = () => {
+          eventLogger.dispatchExecutionAbortedEvent();
+          reject(new ExecutionAbortedError());
+        };
       }
       abortController.signal.addEventListener('abort', onAbortHandler);
     });
@@ -82,6 +95,7 @@ export class StateMachine {
         abortController.signal.removeEventListener('abort', onAbortHandler);
         // Then we simply reuse the abort controller to abort the execution on timeout
         abortController.abort();
+        eventLogger.dispatchExecutionTimeoutEvent();
         reject(new StatesTimeoutError());
       }, timeoutSeconds * 1000);
     });
@@ -92,6 +106,7 @@ export class StateMachine {
         stateMachineOptions: this.stateMachineOptions,
         runOptions: { ...options, _rootAbortSignal: options?._rootAbortSignal ?? abortController.signal },
         abortSignal: abortController.signal,
+        eventLogger,
       },
       () => {
         abortController.signal.removeEventListener('abort', onAbortHandler);
@@ -104,6 +119,7 @@ export class StateMachine {
 
     return {
       abort: () => abortController.abort(),
+      eventLogs: eventLogger.getEvents(),
       result,
     };
   }
@@ -112,6 +128,8 @@ export class StateMachine {
    * Helper method that handles the execution of the machine states and the transitions between them.
    */
   private async execute(input: JSONValue, options: ExecuteOptions, cleanupFn: () => void): Promise<JSONValue> {
+    options.eventLogger.dispatchExecutionStartedEvent(input);
+
     const context = options.runOptions?.context ?? {};
     let currState = this.definition.States[this.definition.StartAt];
     let currStateName = this.definition.StartAt;
@@ -122,8 +140,12 @@ export class StateMachine {
 
     try {
       do {
+        options.eventLogger.dispatchStateEnteredEvent(currStateName, currState.Type, currInput);
+
         const stateExecutor = new StateExecutor(currStateName, currState);
         ({ stateResult: currResult, nextState, isEndState } = await stateExecutor.execute(currInput, context, options));
+
+        options.eventLogger.dispatchStateExitedEvent(currStateName, currState.Type, currInput, currResult);
 
         currInput = currResult;
 
@@ -131,10 +153,13 @@ export class StateMachine {
         currStateName = nextState;
       } while (!isEndState && !options.abortSignal.aborted);
     } catch (error) {
-      throw new ExecutionError(error as Error);
+      options.eventLogger.dispatchExecutionFailedEvent(error as RuntimeError);
+      throw new ExecutionError(error as RuntimeError);
     } finally {
       cleanupFn();
     }
+
+    options.eventLogger.dispatchExecutionSucceededEvent(currResult);
 
     return currResult;
   }

@@ -6,8 +6,8 @@ import { BaseStateAction } from './BaseStateAction';
 import { LambdaClient } from '../../aws/LambdaClient';
 
 class TaskStateAction extends BaseStateAction<TaskState> {
-  constructor(stateDefinition: TaskState) {
-    super(stateDefinition);
+  constructor(stateDefinition: TaskState, stateName: string) {
+    super(stateDefinition, stateName);
   }
 
   override async execute(

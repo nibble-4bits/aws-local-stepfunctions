@@ -7,8 +7,8 @@ import { jsonPathQuery } from '../JsonPath';
 import { sleep } from '../../util';
 
 class WaitStateAction extends BaseStateAction<WaitState> {
-  constructor(stateDefinition: WaitState) {
-    super(stateDefinition);
+  constructor(stateDefinition: WaitState, stateName: string) {
+    super(stateDefinition, stateName);
   }
 
   override async execute(

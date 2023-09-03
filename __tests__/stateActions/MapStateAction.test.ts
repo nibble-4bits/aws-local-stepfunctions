@@ -1,6 +1,7 @@
 import type { MapState } from '../../src/typings/MapState';
 import { MapStateAction } from '../../src/stateMachine/stateActions/MapStateAction';
 import { StatesRuntimeError } from '../../src/error/predefined/StatesRuntimeError';
+import { EventLogger } from '../../src/stateMachine/EventLogger';
 
 afterEach(() => {
   jest.clearAllMocks();
@@ -22,6 +23,7 @@ describe('Map State', () => {
       ItemsPath: '$.items',
       End: true,
     };
+    const stateName = 'MapState';
     const input = {
       items: [
         { num1: 5, num2: 3 },
@@ -31,7 +33,7 @@ describe('Map State', () => {
     };
     const context = {};
 
-    const mapStateAction = new MapStateAction(definition);
+    const mapStateAction = new MapStateAction(definition, stateName);
     const { stateResult } = await mapStateAction.execute(input, context);
 
     expect(stateResult).toHaveLength(3);
@@ -55,6 +57,7 @@ describe('Map State', () => {
       },
       End: true,
     };
+    const stateName = 'MapState';
     const input = [
       { num1: 5, num2: 3 },
       { num1: 2, num2: 6 },
@@ -62,7 +65,7 @@ describe('Map State', () => {
     ];
     const context = {};
 
-    const mapStateAction = new MapStateAction(definition);
+    const mapStateAction = new MapStateAction(definition, stateName);
     const { stateResult } = await mapStateAction.execute(input, context);
 
     expect(stateResult).toHaveLength(3);
@@ -91,6 +94,7 @@ describe('Map State', () => {
       },
       End: true,
     };
+    const stateName = 'MapState';
     const input = {
       items: [
         { num1: 5, num2: 3 },
@@ -100,7 +104,7 @@ describe('Map State', () => {
     };
     const context = {};
 
-    const mapStateAction = new MapStateAction(definition);
+    const mapStateAction = new MapStateAction(definition, stateName);
     const { stateResult } = await mapStateAction.execute(input, context);
 
     expect(stateResult).toHaveLength(3);
@@ -133,10 +137,11 @@ describe('Map State', () => {
       },
       End: true,
     };
+    const stateName = 'MapState';
     const input = 'not an array';
     const context = {};
 
-    const mapStateAction = new MapStateAction(definition);
+    const mapStateAction = new MapStateAction(definition, stateName);
     const mapStateResult = mapStateAction.execute(input, context);
 
     await expect(mapStateResult).rejects.toThrow(StatesRuntimeError);
@@ -159,10 +164,11 @@ describe('Map State', () => {
       },
       End: true,
     };
+    const stateName = 'MapState';
     const input = { items: 'not an array' };
     const context = {};
 
-    const mapStateAction = new MapStateAction(definition);
+    const mapStateAction = new MapStateAction(definition, stateName);
     const mapStateResult = mapStateAction.execute(input, context);
 
     await expect(mapStateResult).rejects.toThrow(StatesRuntimeError);
@@ -184,10 +190,11 @@ describe('Map State', () => {
       },
       End: true,
     };
+    const stateName = 'MapState';
     const input = [1, 2, 3];
     const context = {};
 
-    const mapStateAction = new MapStateAction(definition);
+    const mapStateAction = new MapStateAction(definition, stateName);
     const mapStateResult = mapStateAction.execute(input, context);
 
     await expect(mapStateResult).rejects.toThrow();
@@ -215,14 +222,17 @@ describe('Map State', () => {
       },
       End: true,
     };
+    const stateName = 'MapState';
     const input = [1, 2, 3];
     const context = {};
     const abortController = new AbortController();
 
-    const mapStateAction = new MapStateAction(definition);
+    const mapStateAction = new MapStateAction(definition, stateName);
     const mapStateResult = mapStateAction.execute(input, context, {
       stateMachineOptions: undefined,
       runOptions: { _rootAbortSignal: abortController.signal },
+      eventLogger: new EventLogger(),
+      rawInput: input,
     });
 
     abortController.abort();

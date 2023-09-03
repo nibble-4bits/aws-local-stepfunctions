@@ -7,9 +7,11 @@ import type { Context } from '../../typings/Context';
 
 abstract class BaseStateAction<T extends BaseState | IntermediateState | TerminalState> {
   protected stateDefinition: T;
+  protected stateName: string;
 
-  constructor(stateDefinition: T) {
+  constructor(stateDefinition: T, stateName: string) {
     this.stateDefinition = stateDefinition;
+    this.stateName = stateName;
   }
 
   protected buildExecutionResult(stateResult: JSONValue): ExecutionResult {

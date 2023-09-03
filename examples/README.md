@@ -10,5 +10,6 @@ Here you can find some useful examples demonstrating specific usages of AWS Loca
 - [check-for-execution-timeout](./check-for-execution-timeout.js): Check if execution timed out because the execution ran longer than the seconds specified in the `TimeoutSeconds` field and catch error.
 - [custom-context-object](./custom-context-object.js): Pass a mock Context Object to the execution.
 - [disable-state-machine-validation](./disable-state-machine-validation.js): Disable ARN and/or JSONPath validations when instantiating a new `StateMachine` object.
+- [execution-event-logs](./execution-event-logs.js): Pulling the log of events produced by an execution as it runs and printing them.
 - [task-state-local-override](./task-state-local-override.js): Override the default action for a `Task` state, so that instead of invoking the Lambda specified in the `Resource` field, it runs a local function. This allows running state machines completely locally.
 - [wait-state-local-override](./wait-state-local-override.js): Override the wait duration of a `Wait` state so that instead of waiting the duration specified in the `Seconds`, `Timestamp`, `SecondsPath`, `TimestampPath` fields, it waits for a specified number of milliseconds.

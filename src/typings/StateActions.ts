@@ -1,5 +1,6 @@
 import type { JSONValue } from './JSONValue';
 import type { AWSConfig, RunOptions, StateMachineOptions } from './StateMachineImplementation';
+import type { EventLogger } from '../stateMachine/EventLogger';
 
 export interface ExecutionResult {
   stateResult: JSONValue;
@@ -15,11 +16,15 @@ export type TaskStateActionOptions = {
 export type ParallelStateActionOptions = {
   stateMachineOptions: StateMachineOptions | undefined;
   runOptions: RunOptions | undefined;
+  eventLogger: EventLogger;
+  rawInput: JSONValue;
 };
 
 export type MapStateActionOptions = {
   stateMachineOptions: StateMachineOptions | undefined;
   runOptions: RunOptions | undefined;
+  eventLogger: EventLogger;
+  rawInput: JSONValue;
 };
 
 export type PassStateActionOptions = Record<string, unknown>;

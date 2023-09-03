@@ -1,5 +1,6 @@
 import type { ParallelState } from '../../src/typings/ParallelState';
 import { ParallelStateAction } from '../../src/stateMachine/stateActions/ParallelStateAction';
+import { EventLogger } from '../../src/stateMachine/EventLogger';
 
 afterEach(() => {
   jest.clearAllMocks();
@@ -31,10 +32,11 @@ describe('Parallel State', () => {
       ],
       End: true,
     };
+    const stateName = 'ParallelState';
     const input = { value: 50 };
     const context = {};
 
-    const parallelStateAction = new ParallelStateAction(definition);
+    const parallelStateAction = new ParallelStateAction(definition, stateName);
     const { stateResult } = await parallelStateAction.execute(input, context);
 
     expect(Array.isArray(stateResult)).toBe(true);
@@ -88,10 +90,11 @@ describe('Parallel State', () => {
       ],
       End: true,
     };
+    const stateName = 'ParallelState';
     const input = { value: 50 };
     const context = {};
 
-    const parallelStateAction = new ParallelStateAction(definition);
+    const parallelStateAction = new ParallelStateAction(definition, stateName);
     const { stateResult } = await parallelStateAction.execute(input, context);
 
     expect(stateResult).toEqual([
@@ -129,10 +132,11 @@ describe('Parallel State', () => {
       ],
       End: true,
     };
+    const stateName = 'ParallelState';
     const input = { value: 50 };
     const context = {};
 
-    const parallelStateAction = new ParallelStateAction(definition);
+    const parallelStateAction = new ParallelStateAction(definition, stateName);
     const parallelStateResult = parallelStateAction.execute(input, context);
 
     await expect(parallelStateResult).rejects.toThrow();
@@ -167,14 +171,17 @@ describe('Parallel State', () => {
       ],
       End: true,
     };
+    const stateName = 'ParallelState';
     const input = {};
     const context = {};
     const abortController = new AbortController();
 
-    const parallelStateAction = new ParallelStateAction(definition);
+    const parallelStateAction = new ParallelStateAction(definition, stateName);
     const parallelStateResult = parallelStateAction.execute(input, context, {
       stateMachineOptions: undefined,
       runOptions: { _rootAbortSignal: abortController.signal },
+      eventLogger: new EventLogger(),
+      rawInput: input,
     });
 
     abortController.abort();
