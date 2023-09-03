@@ -14,6 +14,7 @@ import {
   parseContextFileOption,
 } from './ArgumentParsers';
 import { commandAction, preActionHook } from './CommandHandler';
+import { tryJSONParse } from '../util';
 
 function makeProgram() {
   const command = new Command();
@@ -80,7 +81,7 @@ Example calls:
     .addOption(new Option('--no-arn-validation', 'Disable validation of ARNs in the state machine definition.'))
     .argument(
       '[inputs...]',
-      'Input data for the state machine, can be any valid JSON value. Each input represents a state machine execution. If reading from the standard input, each line will be considered as an input.',
+      'Input data for the state machine, can be any valid JSON value. Each input represents a state machine execution.\n\nWhen reading from the standard input, if the first line can be parsed as a single JSON value, then each line will be considered as an input. Otherwise, the entire standard input will be considered as a single JSON input.',
       (value, previous: JSONValue[]) => parseInputArguments(command, value, previous)
     )
     .hook('preAction', preActionHook)
@@ -108,6 +109,14 @@ if (require.main === module) {
         stdin.push(line);
       }
 
+      const firstLineJSON = tryJSONParse<JSONValue>(stdin[0]);
+      if (firstLineJSON instanceof Error) {
+        // If first line of stdin is not parsable JSON, assume entire stdin is a single JSON value...
+        await program.parseAsync([...process.argv, stdin.join('').trim()]);
+        return;
+      }
+
+      // ...otherwise, assume each line of stdin is a distinct JSON value
       await program.parseAsync([...process.argv, ...stdin.filter((line) => line)]);
     }
   })();
