@@ -9,7 +9,7 @@ export interface ActionResult {
 }
 
 export type TaskStateActionOptions = {
-  overrideFn: ((input: JSONValue) => Promise<JSONValue>) | undefined;
+  overrideFn: ((input: JSONValue) => Promise<JSONValue> | JSONValue) | undefined;
   awsConfig: AWSConfig | undefined;
 };
 

@@ -5,7 +5,7 @@ import type { AwsCredentialIdentity as AWSCredentials } from '@aws-sdk/types/dis
 import type { EventLogger } from '../stateMachine/EventLogger';
 
 export type TaskStateResourceLocalHandler = {
-  [taskStateName: string]: (input: JSONValue) => Promise<JSONValue>;
+  [taskStateName: string]: (input: JSONValue) => Promise<JSONValue> | JSONValue;
 };
 
 export type WaitStateTimeOverride = {
