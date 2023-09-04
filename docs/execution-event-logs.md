@@ -280,7 +280,7 @@ The `ParallelBranchSucceeded` event is produced when a branch in a `Parallel` st
 
 ### `ParallelBranchFailed` event
 
-The `ParallelBranchFailed` event is produced when an branch in a `Parallel` encounters an error and fails.
+The `ParallelBranchFailed` event is produced when a branch in a `Parallel` state encounters an error and fails.
 
 #### Additional fields
 
@@ -312,8 +312,8 @@ The `StateEntered` event is produced when the execution transitions into a new s
 
 #### Additional fields
 
-- `state`: An object of type [`StateData`](#statedata) containing data associated with the event that was entered.
-- `index?`: The index of the `Map` iteration in which this state is being executed. This property is only set if this event is being executed within a `Map` state.
+- `state`: An object of type [`StateData`](#statedata) containing data associated with the state that was entered.
+- `index?`: The index of the `Map` iteration in which this state is being executed. This property is only set if this state is being executed within a `Map` state.
 
 #### Example
 
@@ -337,8 +337,8 @@ The `StateExited` event is produced when the execution transitions out of a stat
 
 #### Additional fields
 
-- `state`: An object of type [`StateData`](#statedata) containing data associated with the event that was exited.
-- `index?`: The index of the `Map` iteration in which this state was executed. This property is only set if this event was executed within a `Map` state.
+- `state`: An object of type [`StateData`](#statedata) containing data associated with the state that was exited.
+- `index?`: The index of the `Map` iteration in which this state was executed. This property is only set if this state was executed within a `Map` state.
 
 #### Example
 
