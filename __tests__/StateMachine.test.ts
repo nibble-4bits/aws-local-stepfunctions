@@ -2,7 +2,7 @@ import type { StateMachineDefinition } from '../src/typings/StateMachineDefiniti
 import type { EventLog } from '../src/typings/EventLogs';
 import { StateMachine } from '../src/stateMachine/StateMachine';
 import { ExecutionAbortedError } from '../src/error/ExecutionAbortedError';
-import { StatesTimeoutError } from '../src/error/predefined/StatesTimeoutError';
+import { ExecutionTimeoutError } from '../src/error/ExecutionTimeoutError';
 import { ExecutionError } from '../src/error/ExecutionError';
 
 afterEach(() => {
@@ -125,7 +125,7 @@ describe('State Machine', () => {
       await expect(execution.result).resolves.toBe(null);
     });
 
-    test('should throw an `States.Timeout` error if execution times out', async () => {
+    test('should throw an `ExecutionTimeoutError` error if execution times out', async () => {
       const machineDefinition: StateMachineDefinition = {
         StartAt: 'WaitState',
         TimeoutSeconds: 1,
@@ -142,7 +142,7 @@ describe('State Machine', () => {
       const stateMachine = new StateMachine(machineDefinition);
       const execution = stateMachine.run(input);
 
-      await expect(execution.result).rejects.toThrow(StatesTimeoutError);
+      await expect(execution.result).rejects.toThrow(ExecutionTimeoutError);
     });
 
     test('should throw an `ExecutionError` if execution fails', async () => {
@@ -366,7 +366,7 @@ describe('State Machine', () => {
         events.push(event);
       }
 
-      await expect(execution.result).rejects.toThrow(StatesTimeoutError);
+      await expect(execution.result).rejects.toThrow(ExecutionTimeoutError);
       expect(events).toEqual([
         { type: 'ExecutionStarted', timestamp: 1670198400000, input: {} },
         { type: 'StateEntered', timestamp: 1670198400000, state: { name: 'PassState1', type: 'Pass', input: {} } },

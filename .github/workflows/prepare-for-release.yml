@@ -1,14 +1,14 @@
-name: publish-package
+name: prepare-for-release
 
 on:
-  release:
-    types:
-      - published
+  push:
+    branches:
+      - 'master'
 
 concurrency: ${{ github.workflow }}-${{ github.ref }}
 
 jobs:
-  publish-to-npm:
+  test-build-prepare-for-release:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -22,7 +22,8 @@ jobs:
         run: npm test
       - name: Build project
         run: npm run build
-      - name: Publish to NPM
-        run: npm publish
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      - name: Create tag from package.json
+        uses: jaywcjlove/create-tag-action@v1.3.18
+        with:
+          token: ${{ github.token }}
+          package-path: ./package.json

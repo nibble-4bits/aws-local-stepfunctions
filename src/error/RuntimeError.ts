@@ -1,7 +1,7 @@
 /**
  * Base class for all internal errors that can be thrown during the state machine execution.
  */
-export class RuntimeError extends Error {
+export abstract class RuntimeError extends Error {
   /**
    * Whether this runtime error can be matched in a `Retry` field
    */

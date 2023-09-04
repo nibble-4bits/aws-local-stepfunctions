@@ -1,7 +1,7 @@
 import type { Context } from '../../typings/Context';
 import type { JSONValue } from '../../typings/JSONValue';
 import type { ParallelState } from '../../typings/ParallelState';
-import type { ExecutionResult, ParallelStateActionOptions } from '../../typings/StateActions';
+import type { ActionResult, ParallelStateActionOptions } from '../../typings/StateActions';
 import type { EventLogger } from '../EventLogger';
 import type { EventLog } from '../../typings/EventLogs';
 import { StateMachine } from '../StateMachine';
@@ -61,7 +61,7 @@ class ParallelStateAction extends BaseStateAction<ParallelState> {
     input: JSONValue,
     context: Context,
     options?: ParallelStateActionOptions
-  ): Promise<ExecutionResult> {
+  ): Promise<ActionResult> {
     const state = this.stateDefinition;
 
     const limit = pLimit(DEFAULT_CONCURRENCY);

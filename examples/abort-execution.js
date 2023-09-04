@@ -37,7 +37,7 @@ setTimeout(() => {
 
 try {
   const result = await execution.result;
-  console.log(result); // If not aborted, would log 12 once execution finished
+  console.log(result); // If not aborted, would log 12 once execution finishes
 } catch (e) {
   if (e instanceof ExecutionAbortedError) {
     // Since execution was aborted, type of error is `ExecutionAbortedError`

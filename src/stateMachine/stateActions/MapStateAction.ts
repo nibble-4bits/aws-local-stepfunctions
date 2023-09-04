@@ -1,6 +1,6 @@
 import type { MapState } from '../../typings/MapState';
 import type { JSONValue } from '../../typings/JSONValue';
-import type { ExecutionResult, MapStateActionOptions } from '../../typings/StateActions';
+import type { ActionResult, MapStateActionOptions } from '../../typings/StateActions';
 import type { Context } from '../../typings/Context';
 import type { EventLogger } from '../EventLogger';
 import type { EventLog } from '../../typings/EventLogs';
@@ -75,11 +75,7 @@ class MapStateAction extends BaseStateAction<MapState> {
     return execution.result;
   }
 
-  override async execute(
-    input: JSONValue,
-    context: Context,
-    options?: MapStateActionOptions
-  ): Promise<ExecutionResult> {
+  override async execute(input: JSONValue, context: Context, options?: MapStateActionOptions): Promise<ActionResult> {
     const state = this.stateDefinition;
 
     let items = input;

@@ -2,7 +2,7 @@ import type { IntermediateState } from '../../typings/IntermediateState';
 import type { TerminalState } from '../../typings/TerminalState';
 import type { JSONValue } from '../../typings/JSONValue';
 import type { BaseState } from '../../typings/BaseState';
-import type { ExecutionResult } from '../../typings/StateActions';
+import type { ActionResult } from '../../typings/StateActions';
 import type { Context } from '../../typings/Context';
 
 abstract class BaseStateAction<T extends BaseState | IntermediateState | TerminalState> {
@@ -14,8 +14,8 @@ abstract class BaseStateAction<T extends BaseState | IntermediateState | Termina
     this.stateName = stateName;
   }
 
-  protected buildExecutionResult(stateResult: JSONValue): ExecutionResult {
-    const executionResult: ExecutionResult = { stateResult, nextState: '', isEndState: false };
+  protected buildExecutionResult(stateResult: JSONValue): ActionResult {
+    const executionResult: ActionResult = { stateResult, nextState: '', isEndState: false };
 
     if ('Next' in this.stateDefinition) {
       executionResult.nextState = this.stateDefinition.Next;
@@ -28,7 +28,7 @@ abstract class BaseStateAction<T extends BaseState | IntermediateState | Termina
     return executionResult;
   }
 
-  abstract execute(input: JSONValue, context: Context, options?: Record<string, unknown>): Promise<ExecutionResult>;
+  abstract execute(input: JSONValue, context: Context, options?: Record<string, unknown>): Promise<ActionResult>;
 }
 
 export { BaseStateAction };
