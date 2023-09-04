@@ -30,6 +30,7 @@
   "module": "build/main.node.esm.js",
   "browser": "build/main.browser.esm.js",
   "exports": {
+    "types": "./build/main.d.ts",
     "import": "./build/main.node.esm.js",
     "require": "./build/main.node.cjs",
     "browser": "./build/main.browser.esm.js",
