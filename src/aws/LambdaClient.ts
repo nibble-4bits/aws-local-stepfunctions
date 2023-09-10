@@ -5,6 +5,7 @@ import { LambdaClient as AWSLambdaClient, InvokeCommand } from '@aws-sdk/client-
 import { fromCognitoIdentityPool } from '@aws-sdk/credential-providers';
 import { LambdaInvocationError } from '../error/LambdaInvocationError';
 import { StatesRuntimeError } from '../error/predefined/StatesRuntimeError';
+import { isBrowserEnvironment } from '../util';
 
 /**
  * Wrapper class around the Lambda AWS SDK client
@@ -18,7 +19,13 @@ export class LambdaClient {
     if (config) {
       if (!config.region) {
         throw new StatesRuntimeError(
-          "'awsConfig' option was specified for state machine, but 'region' property is not set"
+          "'awsConfig' option was specified in state machine constructor, but 'region' property is not set."
+        );
+      }
+
+      if (!config.credentials) {
+        throw new StatesRuntimeError(
+          "'awsConfig' option was specified in state machine constructor, but 'credentials' property is not set."
         );
       }
 
@@ -44,6 +51,13 @@ export class LambdaClient {
       } else if (config.credentials?.accessKeys) {
         this.client = new AWSLambdaClient({ region: config.region, credentials: config.credentials.accessKeys });
       }
+    } else {
+      // Browser environments must provide an AWS config in order for the Lambda client to make API calls.
+      if (isBrowserEnvironment) {
+        throw new StatesRuntimeError(
+          "aws-local-stepfunctions is running in a browser environment and your state machine definition contains a state of type 'Task'. In order to invoke the Lambda function, you must provide an AWS region and credentials in the state machine constructor by passing the 'awsConfig' option."
+        );
+      }
     }
   }
 
@@ -55,31 +69,23 @@ export class LambdaClient {
       Payload: payloadBuffer,
     });
 
-    try {
-      const invocationResult = await this.client.send(invokeCommand);
+    const invocationResult = await this.client.send(invokeCommand);
 
-      let resultValue = null;
-      if (invocationResult.Payload) {
-        resultValue = new TextDecoder().decode(invocationResult.Payload);
-        resultValue = JSON.parse(resultValue);
-      }
-
-      if (invocationResult.FunctionError) {
-        const errorResult = resultValue as LambdaErrorResult;
-        throw new LambdaInvocationError(
-          errorResult.errorType,
-          `${errorResult.errorType}: ${errorResult.errorMessage}`,
-          errorResult
-        );
-      }
-
-      return resultValue;
-    } catch (error) {
-      if (typeof error === 'string') {
-        throw new StatesRuntimeError(error);
-      }
-
-      throw error;
+    let resultValue = null;
+    if (invocationResult.Payload) {
+      resultValue = new TextDecoder().decode(invocationResult.Payload);
+      resultValue = JSON.parse(resultValue);
     }
+
+    if (invocationResult.FunctionError) {
+      const errorResult = resultValue as LambdaErrorResult;
+      throw new LambdaInvocationError(
+        errorResult.errorType,
+        `${errorResult.errorType}: ${errorResult.errorMessage}`,
+        errorResult
+      );
+    }
+
+    return resultValue;
   }
 }
