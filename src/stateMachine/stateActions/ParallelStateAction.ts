@@ -24,7 +24,7 @@ class ParallelStateAction extends BaseStateAction<ParallelState> {
   }
 
   private async forwardEventsToRootEventLogger(
-    eventLogger: EventLogger | undefined,
+    eventLogger: EventLogger,
     executionEventLogs: AsyncGenerator<EventLog>,
     parentStateRawInput: JSONValue
   ) {
@@ -39,20 +39,17 @@ class ParallelStateAction extends BaseStateAction<ParallelState> {
     branch: (typeof this.stateDefinition.Branches)[number],
     input: JSONValue,
     context: Context,
-    options: ParallelStateActionOptions | undefined
+    options: ParallelStateActionOptions
   ): Promise<JSONValue> {
     const stateMachine = new StateMachine(branch, {
-      ...options?.stateMachineOptions,
+      ...options.stateMachineOptions,
       validationOptions: { _noValidate: true },
     });
-    const execution = stateMachine.run(input, options?.runOptions);
+    const execution = stateMachine.run(input, options.runOptions);
 
     this.executionAbortFuncs.push(execution.abort);
 
-    // TODO: Find a way to remove this ignore directive and not rely on it
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    this.forwardEventsToRootEventLogger(options?.eventLogger, execution.eventLogs, options?.rawInput);
+    this.forwardEventsToRootEventLogger(options.eventLogger, execution.eventLogs, options.rawInput);
 
     return execution.result;
   }
@@ -60,7 +57,7 @@ class ParallelStateAction extends BaseStateAction<ParallelState> {
   override async execute(
     input: JSONValue,
     context: Context,
-    options?: ParallelStateActionOptions
+    options: ParallelStateActionOptions
   ): Promise<ActionResult> {
     const state = this.stateDefinition;
 

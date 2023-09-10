@@ -32,9 +32,15 @@ describe('Map State', () => {
       ],
     };
     const context = {};
+    const options = {
+      stateMachineOptions: undefined,
+      runOptions: undefined,
+      eventLogger: new EventLogger(),
+      rawInput: {},
+    };
 
     const mapStateAction = new MapStateAction(definition, stateName);
-    const { stateResult } = await mapStateAction.execute(input, context);
+    const { stateResult } = await mapStateAction.execute(input, context, options);
 
     expect(stateResult).toHaveLength(3);
     expect(stateResult).toEqual([
@@ -64,9 +70,15 @@ describe('Map State', () => {
       { num1: 7, num2: 4 },
     ];
     const context = {};
+    const options = {
+      stateMachineOptions: undefined,
+      runOptions: undefined,
+      eventLogger: new EventLogger(),
+      rawInput: {},
+    };
 
     const mapStateAction = new MapStateAction(definition, stateName);
-    const { stateResult } = await mapStateAction.execute(input, context);
+    const { stateResult } = await mapStateAction.execute(input, context, options);
 
     expect(stateResult).toHaveLength(3);
     expect(stateResult).toEqual([
@@ -103,9 +115,15 @@ describe('Map State', () => {
       ],
     };
     const context = {};
+    const options = {
+      stateMachineOptions: undefined,
+      runOptions: undefined,
+      eventLogger: new EventLogger(),
+      rawInput: {},
+    };
 
     const mapStateAction = new MapStateAction(definition, stateName);
-    const { stateResult } = await mapStateAction.execute(input, context);
+    const { stateResult } = await mapStateAction.execute(input, context, options);
 
     expect(stateResult).toHaveLength(3);
     expect(stateResult).toEqual([
@@ -140,9 +158,15 @@ describe('Map State', () => {
     const stateName = 'MapState';
     const input = 'not an array';
     const context = {};
+    const options = {
+      stateMachineOptions: undefined,
+      runOptions: undefined,
+      eventLogger: new EventLogger(),
+      rawInput: {},
+    };
 
     const mapStateAction = new MapStateAction(definition, stateName);
-    const mapStateResult = mapStateAction.execute(input, context);
+    const mapStateResult = mapStateAction.execute(input, context, options);
 
     await expect(mapStateResult).rejects.toThrow(StatesRuntimeError);
     await expect(mapStateResult).rejects.toThrow(
@@ -167,9 +191,15 @@ describe('Map State', () => {
     const stateName = 'MapState';
     const input = { items: 'not an array' };
     const context = {};
+    const options = {
+      stateMachineOptions: undefined,
+      runOptions: undefined,
+      eventLogger: new EventLogger(),
+      rawInput: {},
+    };
 
     const mapStateAction = new MapStateAction(definition, stateName);
-    const mapStateResult = mapStateAction.execute(input, context);
+    const mapStateResult = mapStateAction.execute(input, context, options);
 
     await expect(mapStateResult).rejects.toThrow(StatesRuntimeError);
     await expect(mapStateResult).rejects.toThrow(
@@ -193,9 +223,15 @@ describe('Map State', () => {
     const stateName = 'MapState';
     const input = [1, 2, 3];
     const context = {};
+    const options = {
+      stateMachineOptions: undefined,
+      runOptions: undefined,
+      eventLogger: new EventLogger(),
+      rawInput: {},
+    };
 
     const mapStateAction = new MapStateAction(definition, stateName);
-    const mapStateResult = mapStateAction.execute(input, context);
+    const mapStateResult = mapStateAction.execute(input, context, options);
 
     await expect(mapStateResult).rejects.toThrow();
   });
