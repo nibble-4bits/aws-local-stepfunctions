@@ -1,15 +1,10 @@
 import type { JSONValue } from '../typings/JSONValue';
 import type { AWSConfig } from '../typings/StateMachineImplementation';
+import type { LambdaErrorResult } from '../typings/LambdaExecution';
 import { LambdaClient as AWSLambdaClient, InvokeCommand } from '@aws-sdk/client-lambda';
 import { fromCognitoIdentityPool } from '@aws-sdk/credential-providers';
-import { FailStateError } from '../error/FailStateError';
+import { LambdaInvocationError } from '../error/LambdaInvocationError';
 import { StatesRuntimeError } from '../error/predefined/StatesRuntimeError';
-
-interface LambdaErrorResult {
-  errorType: string;
-  errorMessage: string;
-  trace: string[];
-}
 
 /**
  * Wrapper class around the Lambda AWS SDK client
@@ -60,21 +55,31 @@ export class LambdaClient {
       Payload: payloadBuffer,
     });
 
-    const invocationResult = await this.client.send(invokeCommand);
+    try {
+      const invocationResult = await this.client.send(invokeCommand);
 
-    let resultValue = null;
-    if (invocationResult.Payload) {
-      resultValue = new TextDecoder().decode(invocationResult.Payload);
-      resultValue = JSON.parse(resultValue);
+      let resultValue = null;
+      if (invocationResult.Payload) {
+        resultValue = new TextDecoder().decode(invocationResult.Payload);
+        resultValue = JSON.parse(resultValue);
+      }
+
+      if (invocationResult.FunctionError) {
+        const errorResult = resultValue as LambdaErrorResult;
+        throw new LambdaInvocationError(
+          errorResult.errorType,
+          `${errorResult.errorType}: ${errorResult.errorMessage}`,
+          errorResult
+        );
+      }
+
+      return resultValue;
+    } catch (error) {
+      if (typeof error === 'string') {
+        throw new StatesRuntimeError(error);
+      }
+
+      throw error;
     }
-
-    if (invocationResult.FunctionError) {
-      const errorResult = resultValue as LambdaErrorResult;
-      // Even though this is not a Fail State, we can take advantage of the `FailStateError`
-      // to throw an error with a custom name and message.
-      throw new FailStateError(errorResult.errorType, `Execution of Lambda function '${funcNameOrArn}' failed`);
-    }
-
-    return resultValue;
   }
 }
