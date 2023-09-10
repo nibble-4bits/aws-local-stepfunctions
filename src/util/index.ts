@@ -1,5 +1,9 @@
 import type { JSONObject } from '../typings/JSONValue';
 
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
+export const isBrowserEnvironment = typeof window !== 'undefined' && typeof window.document !== 'undefined';
+
 /**
  * Determines if a value is a plain object, i.e. one declared using the `{}` notation or constructed with `new Object()`.
  * @param value The value to test if it's a plain object or not.
