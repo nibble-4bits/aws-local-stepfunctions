@@ -1,7 +1,9 @@
+import { ErrorWithCause } from './ErrorWithCause';
+
 /**
  * Base class for all internal errors that can be thrown during the state machine execution.
  */
-export abstract class RuntimeError extends Error {
+export abstract class RuntimeError extends ErrorWithCause {
   /**
    * Whether this runtime error can be matched in a `Retry` field
    */
@@ -12,8 +14,8 @@ export abstract class RuntimeError extends Error {
    */
   protected catchable: boolean;
 
-  constructor(message: string) {
-    super(message);
+  constructor(message: string, cause?: unknown) {
+    super(message, { cause });
 
     this.name = 'RuntimeError';
     this.retryable = true;
