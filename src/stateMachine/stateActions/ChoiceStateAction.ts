@@ -87,9 +87,7 @@ class ChoiceStateAction extends BaseStateAction<ChoiceState> {
     }
 
     if ('NumericEquals' in choiceRule) {
-      console.log('choiceRule.Variable', choiceRule.Variable);
       const varValue = jsonPathQuery<number>(choiceRule.Variable, input, context);
-      console.log('varValue', varValue);
       return varValue === choiceRule.NumericEquals;
     }
 
