@@ -104,7 +104,7 @@ class MapStateAction extends BaseStateAction<MapState> {
       this.executionAbortFuncs.forEach((abort) => abort());
 
       if (error instanceof ExecutionError) {
-        throw error.getWrappedError;
+        throw error.cause;
       }
 
       throw error;

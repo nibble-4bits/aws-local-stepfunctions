@@ -78,7 +78,9 @@ The `ExecutionFailed` event is produced when the execution encounters an error a
 #### Additional fields
 
 - `Error`: Name of the error that caused the failure.
-- `Cause`: A human-readable description explaining why the execution failed.
+- `Cause`: This field can either be a string or an object:
+  - `string`: Contains a description explaining why the execution failed.
+  - `object`: Contains details that provide information as to why the execution failed.
 
 #### Example
 
@@ -202,7 +204,9 @@ The `MapIterationFailed` event is produced when an iteration in a `Map` encounte
 - `parentState`: An object of type [`StateData`](#statedata) containing data associated with the `Map` state to which this iteration belongs to.
 - `index`: The index of this iteration.
 - `Error`: Name of the error that caused the failure.
-- `Cause`: A human-readable description explaining why the iteration failed.
+- `Cause`: This field can either be a string or an object:
+  - `string`: Contains a description explaining why the iteration failed.
+  - `object`: Contains details that provide information as to why the iteration failed.
 
 #### Example
 
@@ -286,7 +290,9 @@ The `ParallelBranchFailed` event is produced when a branch in a `Parallel` state
 
 - `parentState`: An object of type [`StateData`](#statedata) containing data associated with the `Parallel` state to which this branch belongs to.
 - `Error`: Name of the error that caused the failure.
-- `Cause`: A human-readable description explaining why the branch failed.
+- `Cause`: This field can either be a string or an object:
+  - `string`: Contains a description explaining why the branch failed.
+  - `object`: Contains details that provide information as to why the branch failed.
 
 #### Example
 

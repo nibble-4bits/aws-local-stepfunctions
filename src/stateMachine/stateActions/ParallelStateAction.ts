@@ -77,7 +77,7 @@ class ParallelStateAction extends BaseStateAction<ParallelState> {
       this.executionAbortFuncs.forEach((abort) => abort());
 
       if (error instanceof ExecutionError) {
-        throw error.getWrappedError;
+        throw error.cause;
       }
 
       throw error;

@@ -106,7 +106,12 @@ export class EventLogger {
   }
 
   dispatchExecutionFailedEvent(error: RuntimeError) {
-    this.dispatch({ type: 'ExecutionFailed', timestamp: Date.now(), Error: error.name, Cause: error.message });
+    this.dispatch({
+      type: 'ExecutionFailed',
+      timestamp: Date.now(),
+      Error: error.name,
+      Cause: error.cause ?? error.message,
+    });
     this.close();
   }
 

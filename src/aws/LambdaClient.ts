@@ -1,15 +1,11 @@
 import type { JSONValue } from '../typings/JSONValue';
 import type { AWSConfig } from '../typings/StateMachineImplementation';
+import type { LambdaErrorResult } from '../typings/LambdaExecution';
 import { LambdaClient as AWSLambdaClient, InvokeCommand } from '@aws-sdk/client-lambda';
 import { fromCognitoIdentityPool } from '@aws-sdk/credential-providers';
-import { FailStateError } from '../error/FailStateError';
+import { LambdaInvocationError } from '../error/LambdaInvocationError';
 import { StatesRuntimeError } from '../error/predefined/StatesRuntimeError';
-
-interface LambdaErrorResult {
-  errorType: string;
-  errorMessage: string;
-  trace: string[];
-}
+import { isBrowserEnvironment } from '../util';
 
 /**
  * Wrapper class around the Lambda AWS SDK client
@@ -23,7 +19,13 @@ export class LambdaClient {
     if (config) {
       if (!config.region) {
         throw new StatesRuntimeError(
-          "'awsConfig' option was specified for state machine, but 'region' property is not set"
+          "'awsConfig' option was specified in state machine constructor, but 'region' property is not set."
+        );
+      }
+
+      if (!config.credentials) {
+        throw new StatesRuntimeError(
+          "'awsConfig' option was specified in state machine constructor, but 'credentials' property is not set."
         );
       }
 
@@ -49,6 +51,13 @@ export class LambdaClient {
       } else if (config.credentials?.accessKeys) {
         this.client = new AWSLambdaClient({ region: config.region, credentials: config.credentials.accessKeys });
       }
+    } else {
+      // Browser environments must provide an AWS config in order for the Lambda client to make API calls.
+      if (isBrowserEnvironment) {
+        throw new StatesRuntimeError(
+          "aws-local-stepfunctions is running in a browser environment and your state machine definition contains a state of type 'Task'. In order to invoke the Lambda function, you must provide an AWS region and credentials in the state machine constructor by passing the 'awsConfig' option."
+        );
+      }
     }
   }
 
@@ -70,9 +79,11 @@ export class LambdaClient {
 
     if (invocationResult.FunctionError) {
       const errorResult = resultValue as LambdaErrorResult;
-      // Even though this is not a Fail State, we can take advantage of the `FailStateError`
-      // to throw an error with a custom name and message.
-      throw new FailStateError(errorResult.errorType, `Execution of Lambda function '${funcNameOrArn}' failed`);
+      throw new LambdaInvocationError(
+        errorResult.errorType,
+        `${errorResult.errorType}: ${errorResult.errorMessage}`,
+        errorResult
+      );
     }
 
     return resultValue;

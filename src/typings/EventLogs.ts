@@ -1,4 +1,3 @@
-import type { ErrorOutput } from './ErrorHandling';
 import type { JSONValue } from './JSONValue';
 import type { StateType } from './StateType';
 
@@ -33,6 +32,11 @@ interface StateData {
   output?: JSONValue;
 }
 
+interface ErrorInfo {
+  Error: string;
+  Cause: unknown;
+}
+
 interface BaseEvent {
   type: AllEventTypes;
   timestamp: number;
@@ -48,7 +52,7 @@ export interface ExecutionSucceededEvent extends BaseEvent {
   output: JSONValue;
 }
 
-export interface ExecutionFailedEvent extends BaseEvent, ErrorOutput {
+export interface ExecutionFailedEvent extends BaseEvent, ErrorInfo {
   type: ExecutionFailedEventType;
 }
 
@@ -66,7 +70,7 @@ interface MapIterationEvent extends BaseMapIterationEvent {
   type: MapIterationEventType;
 }
 
-interface MapIterationFailedEvent extends BaseMapIterationEvent, ErrorOutput {
+interface MapIterationFailedEvent extends BaseMapIterationEvent, ErrorInfo {
   type: MapIterationFailedEventType;
 }
 
@@ -79,7 +83,7 @@ interface ParallelBranchEvent extends BaseParallelBranchEvent {
   type: ParallelBranchEventType;
 }
 
-interface ParallelBranchFailedEvent extends BaseParallelBranchEvent, ErrorOutput {
+interface ParallelBranchFailedEvent extends BaseParallelBranchEvent, ErrorInfo {
   type: ParallelBranchFailedEventType;
 }
 
