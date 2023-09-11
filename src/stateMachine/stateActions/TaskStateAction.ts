@@ -10,16 +10,16 @@ class TaskStateAction extends BaseStateAction<TaskState> {
     super(stateDefinition, stateName);
   }
 
-  override async execute(input: JSONValue, context: Context, options?: TaskStateActionOptions): Promise<ActionResult> {
+  override async execute(input: JSONValue, context: Context, options: TaskStateActionOptions): Promise<ActionResult> {
     const state = this.stateDefinition;
 
     // If local override for task resource is defined, use that
-    if (options?.overrideFn) {
+    if (options.overrideFn) {
       const result = await options.overrideFn(input);
       return this.buildExecutionResult(result);
     }
 
-    const lambdaClient = new LambdaClient(options?.awsConfig);
+    const lambdaClient = new LambdaClient(options.awsConfig);
     const result = await lambdaClient.invokeFunction(state.Resource, input);
     return this.buildExecutionResult(result);
   }

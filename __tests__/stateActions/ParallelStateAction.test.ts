@@ -35,9 +35,15 @@ describe('Parallel State', () => {
     const stateName = 'ParallelState';
     const input = { value: 50 };
     const context = {};
+    const options = {
+      stateMachineOptions: undefined,
+      runOptions: undefined,
+      eventLogger: new EventLogger(),
+      rawInput: {},
+    };
 
     const parallelStateAction = new ParallelStateAction(definition, stateName);
-    const { stateResult } = await parallelStateAction.execute(input, context);
+    const { stateResult } = await parallelStateAction.execute(input, context, options);
 
     expect(Array.isArray(stateResult)).toBe(true);
   });
@@ -93,9 +99,15 @@ describe('Parallel State', () => {
     const stateName = 'ParallelState';
     const input = { value: 50 };
     const context = {};
+    const options = {
+      stateMachineOptions: undefined,
+      runOptions: undefined,
+      eventLogger: new EventLogger(),
+      rawInput: {},
+    };
 
     const parallelStateAction = new ParallelStateAction(definition, stateName);
-    const { stateResult } = await parallelStateAction.execute(input, context);
+    const { stateResult } = await parallelStateAction.execute(input, context, options);
 
     expect(stateResult).toEqual([
       {
@@ -135,9 +147,15 @@ describe('Parallel State', () => {
     const stateName = 'ParallelState';
     const input = { value: 50 };
     const context = {};
+    const options = {
+      stateMachineOptions: undefined,
+      runOptions: undefined,
+      eventLogger: new EventLogger(),
+      rawInput: {},
+    };
 
     const parallelStateAction = new ParallelStateAction(definition, stateName);
-    const parallelStateResult = parallelStateAction.execute(input, context);
+    const parallelStateResult = parallelStateAction.execute(input, context, options);
 
     await expect(parallelStateResult).rejects.toThrow();
   });

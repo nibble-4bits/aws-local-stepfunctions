@@ -27,7 +27,7 @@ class MapStateAction extends BaseStateAction<MapState> {
   }
 
   private async forwardEventsToRootEventLogger(
-    eventLogger: EventLogger | undefined,
+    eventLogger: EventLogger,
     executionEventLogs: AsyncGenerator<EventLog>,
     index: number,
     parentStateRawInput: JSONValue
@@ -45,7 +45,7 @@ class MapStateAction extends BaseStateAction<MapState> {
     input: JSONValue,
     context: Context,
     index: number,
-    options: MapStateActionOptions | undefined
+    options: MapStateActionOptions
   ): Promise<JSONValue> {
     const state = this.stateDefinition;
 
@@ -63,19 +63,16 @@ class MapStateAction extends BaseStateAction<MapState> {
     }
 
     // Pass the current parameter value if defined, otherwise pass the current item being iterated
-    const execution = stateMachine.run(paramValue ?? item, options?.runOptions);
+    const execution = stateMachine.run(paramValue ?? item, options.runOptions);
 
     this.executionAbortFuncs.push(execution.abort);
 
-    // TODO: Find a way to remove this ignore directive and not rely on it
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    this.forwardEventsToRootEventLogger(options?.eventLogger, execution.eventLogs, index, options?.rawInput);
+    this.forwardEventsToRootEventLogger(options.eventLogger, execution.eventLogs, index, options.rawInput);
 
     return execution.result;
   }
 
-  override async execute(input: JSONValue, context: Context, options?: MapStateActionOptions): Promise<ActionResult> {
+  override async execute(input: JSONValue, context: Context, options: MapStateActionOptions): Promise<ActionResult> {
     const state = this.stateDefinition;
 
     let items = input;
@@ -88,7 +85,7 @@ class MapStateAction extends BaseStateAction<MapState> {
     }
 
     const iteratorStateMachine = new StateMachine(state.Iterator, {
-      ...options?.stateMachineOptions,
+      ...options.stateMachineOptions,
       validationOptions: { _noValidate: true },
     });
     const limit = pLimit(state.MaxConcurrency || DEFAULT_MAX_CONCURRENCY);

@@ -22,9 +22,10 @@ describe('Task State', () => {
     const stateName = 'TaskState';
     const input = { input1: 'input string', input2: 10 };
     const context = {};
+    const options = { overrideFn: undefined, awsConfig: undefined };
 
     const taskStateAction = new TaskStateAction(definition, stateName);
-    await taskStateAction.execute(input, context);
+    await taskStateAction.execute(input, context, options);
 
     expect(mockInvokeFunction).toHaveBeenCalledWith('mock-arn', { input1: 'input string', input2: 10 });
   });
@@ -38,11 +39,12 @@ describe('Task State', () => {
     const stateName = 'TaskState';
     const input = { num1: 5, num2: 3 };
     const context = {};
+    const options = { overrideFn: undefined, awsConfig: undefined };
 
     mockInvokeFunction.mockReturnValue(input.num1 + input.num2);
 
     const taskStateAction = new TaskStateAction(definition, stateName);
-    const { stateResult } = await taskStateAction.execute(input, context);
+    const { stateResult } = await taskStateAction.execute(input, context, options);
 
     expect(mockInvokeFunction).toHaveBeenCalledWith('mock-arn', { num1: 5, num2: 3 });
     expect(stateResult).toBe(8);
