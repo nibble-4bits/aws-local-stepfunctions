@@ -8,7 +8,7 @@ abstract class BaseIntrinsicFunction {
 
   protected abstract execute(...args: JSONValue[]): JSONValue;
 
-  call(input: JSONValue, context?: Context, ...args: string[]): JSONValue {
+  call(input: JSONValue, context: Context, ...args: string[]): JSONValue {
     const parsedArgs = parseArguments(input, context, ...args);
     validateArguments(this.funcDefinition, ...parsedArgs);
 

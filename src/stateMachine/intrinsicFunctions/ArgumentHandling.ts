@@ -127,7 +127,7 @@ function validateArguments(funcDefinition: IntrinsicFunctionDefinition, ...args:
   }
 }
 
-function parseArguments(input: JSONValue, context?: Context, ...args: string[]): JSONValue[] {
+function parseArguments(input: JSONValue, context: Context, ...args: string[]): JSONValue[] {
   return args.map<JSONValue>((arg) => {
     if (arg[0] === "'") {
       const lastSingleQuote = arg.lastIndexOf("'");

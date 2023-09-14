@@ -46,7 +46,7 @@ const functions: Record<IntrinsicFunctionName, BaseIntrinsicFunction> = {
  * Evaluate an intrinsic function. Any nested (however deeply) intrinsic functions also get evaluated.
  * @returns The result of the intrinsic function evaluation.
  */
-export function evaluateIntrinsicFunction(intrinsicFunction: string, input: JSONValue, context?: Context): JSONValue {
+export function evaluateIntrinsicFunction(intrinsicFunction: string, input: JSONValue, context: Context): JSONValue {
   const openingParensIdx = intrinsicFunction.indexOf('(');
   const funcName = intrinsicFunction.slice(0, openingParensIdx) as IntrinsicFunctionName;
   const funcArgs = intrinsicFunction.slice(openingParensIdx + 1, intrinsicFunction.length - 1);
