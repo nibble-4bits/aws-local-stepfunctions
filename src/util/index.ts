@@ -69,4 +69,11 @@ export function tryJSONParse<T>(jsonStr: string): T | Error {
   }
 }
 
+export function isRFC3339Date(date: string): boolean {
+  const regex =
+    /^\d{4}-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01])T([01][0-9]|2[0-3]):([0-5][0-9]):([0-5][0-9])(\.\d+)?(Z|(\+|-)([01][0-9]|2[0-3]):([0-5][0-9]))$/;
+
+  return regex.test(date);
+}
+
 export { getRandomNumber, sfc32, cyrb128 } from './random';

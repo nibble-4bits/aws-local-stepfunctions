@@ -5,6 +5,7 @@ import type { Context } from '../../typings/Context';
 import { BaseStateAction } from './BaseStateAction';
 import { jsonPathQuery } from '../jsonPath/JsonPath';
 import { StatesNoChoiceMatchedError } from '../../error/predefined/StatesNoChoiceMatchedError';
+import { isRFC3339Date } from '../../util';
 import wcmatch from 'wildcard-match';
 
 class ChoiceStateAction extends BaseStateAction<ChoiceState> {
@@ -245,7 +246,7 @@ class ChoiceStateAction extends BaseStateAction<ChoiceState> {
     if ('IsTimestamp' in choiceRule) {
       const varValue = jsonPathQuery<string>(choiceRule.Variable, input, context);
       const IsTimestampTrue = choiceRule.IsTimestamp;
-      return IsTimestampTrue && /\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(Z|(\+|-)\d{2}:\d{2})/.test(varValue);
+      return IsTimestampTrue && isRFC3339Date(varValue);
     }
 
     return false;
