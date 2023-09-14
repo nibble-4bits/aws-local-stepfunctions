@@ -3,7 +3,7 @@ import type { ChoiceState, ChoiceRuleWithoutNext } from '../../typings/ChoiceSta
 import type { ChoiceStateActionOptions, ActionResult } from '../../typings/StateActions';
 import type { Context } from '../../typings/Context';
 import { BaseStateAction } from './BaseStateAction';
-import { jsonPathQuery } from '../JsonPath';
+import { jsonPathQuery } from '../jsonPath/JsonPath';
 import { StatesNoChoiceMatchedError } from '../../error/predefined/StatesNoChoiceMatchedError';
 import wcmatch from 'wildcard-match';
 

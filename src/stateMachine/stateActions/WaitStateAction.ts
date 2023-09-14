@@ -3,7 +3,7 @@ import type { WaitState } from '../../typings/WaitState';
 import type { ActionResult, WaitStateActionOptions } from '../../typings/StateActions';
 import type { Context } from '../../typings/Context';
 import { BaseStateAction } from './BaseStateAction';
-import { jsonPathQuery } from '../JsonPath';
+import { jsonPathQuery } from '../jsonPath/JsonPath';
 import { sleep } from '../../util';
 
 class WaitStateAction extends BaseStateAction<WaitState> {

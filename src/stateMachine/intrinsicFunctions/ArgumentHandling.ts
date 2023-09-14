@@ -6,7 +6,7 @@ import type {
 import type { Context } from '../../typings/Context';
 import type { JSONValue } from '../../typings/JSONValue';
 import { StatesRuntimeError } from '../../error/predefined/StatesRuntimeError';
-import { jsonPathQuery } from '../JsonPath';
+import { jsonPathQuery } from '../jsonPath/JsonPath';
 import { isPlainObj } from '../../util';
 
 function validateArgumentType(allowedTypes: ArgumentType[], argPosition: number, funcArg: JSONValue, funcName: string) {

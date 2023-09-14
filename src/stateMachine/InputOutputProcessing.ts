@@ -2,7 +2,7 @@ import type { PayloadTemplate } from '../typings/InputOutputProcessing';
 import type { JSONValue } from '../typings/JSONValue';
 import type { Context } from '../typings/Context';
 import { isPlainObj } from '../util';
-import { jsonPathQuery } from './JsonPath';
+import { jsonPathQuery } from './jsonPath/JsonPath';
 import { StatesResultPathMatchFailureError } from '../error/predefined/StatesResultPathMatchFailureError';
 import { evaluateIntrinsicFunction } from './IntrinsicFunctionEvaluation';
 import cloneDeep from 'lodash/cloneDeep.js';

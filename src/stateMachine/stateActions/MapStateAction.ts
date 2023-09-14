@@ -6,7 +6,7 @@ import type { EventLogger } from '../EventLogger';
 import type { EventLog } from '../../typings/EventLogs';
 import { BaseStateAction } from './BaseStateAction';
 import { StateMachine } from '../StateMachine';
-import { jsonPathQuery } from '../JsonPath';
+import { jsonPathQuery } from '../jsonPath/JsonPath';
 import { processPayloadTemplate } from '../InputOutputProcessing';
 import { StatesRuntimeError } from '../../error/predefined/StatesRuntimeError';
 import { ExecutionError } from '../../error/ExecutionError';

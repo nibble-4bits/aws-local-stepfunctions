@@ -1,5 +1,5 @@
-import type { JSONValue } from '../typings/JSONValue';
-import type { Context } from '../typings/Context';
+import type { JSONValue } from '../../typings/JSONValue';
+import type { Context } from '../../typings/Context';
 import { JSONPath as jp } from 'jsonpath-plus';
 
 /**
