@@ -6,7 +6,7 @@ export class RFC3339TimestampConstraint extends BaseJSONPathConstraint {
   test(value: unknown): void {
     if (typeof value !== 'string' || !isRFC3339Date(value)) {
       throw new StatesRuntimeError(
-        `JSONPath expression '${this.pathExpression}' evaluated to ${quoteJSONValue(
+        `Path expression '${this.pathExpression}' evaluated to ${quoteJSONValue(
           value
         )}, but expected a timestamp conforming to the RFC3339 profile`
       );

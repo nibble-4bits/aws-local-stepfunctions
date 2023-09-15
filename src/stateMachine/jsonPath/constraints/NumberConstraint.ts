@@ -6,7 +6,7 @@ export class NumberConstraint extends BaseJSONPathConstraint {
   test(value: unknown): void {
     if (typeof value !== 'number') {
       throw new StatesRuntimeError(
-        `JSONPath expression '${this.pathExpression}' evaluated to ${quoteJSONValue(value)}, but expected a number`
+        `Path expression '${this.pathExpression}' evaluated to ${quoteJSONValue(value)}, but expected a number`
       );
     }
   }

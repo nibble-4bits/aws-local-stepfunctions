@@ -6,7 +6,7 @@ export class IntegerConstraint extends BaseJSONPathConstraint {
   test(value: unknown): void {
     if (!Number.isInteger(value)) {
       throw new StatesRuntimeError(
-        `JSONPath expression '${this.pathExpression}' evaluated to ${quoteJSONValue(value)}, but expected an integer`
+        `Path expression '${this.pathExpression}' evaluated to ${quoteJSONValue(value)}, but expected an integer`
       );
     }
   }
@@ -18,7 +18,7 @@ export class IntegerConstraint extends BaseJSONPathConstraint {
 
         if (value < n) {
           throw new StatesRuntimeError(
-            `JSONPath expression '${this.pathExpression}' evaluated to ${quoteJSONValue(
+            `Path expression '${this.pathExpression}' evaluated to ${quoteJSONValue(
               value
             )}, but expected an integer >= ${n}`
           );

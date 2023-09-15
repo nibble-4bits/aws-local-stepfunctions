@@ -6,7 +6,7 @@ export class ArrayConstraint extends BaseJSONPathConstraint {
   test(value: unknown): void {
     if (!Array.isArray(value)) {
       throw new StatesRuntimeError(
-        `JSONPath expression '${this.pathExpression}' evaluated to ${quoteJSONValue(value)}, but expected an array`
+        `Path expression '${this.pathExpression}' evaluated to ${quoteJSONValue(value)}, but expected an array`
       );
     }
   }

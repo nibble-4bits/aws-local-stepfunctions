@@ -9,7 +9,7 @@ import { DefinedValueConstraint } from './constraints/DefinedValueConstraint';
  * @param pathExpression The JSONPath expression to query for.
  * @param json The object to evaluate (whether of null, boolean, number, string, object, or array type).
  * @param context The context object to evaluate, if the path expression starts with `$$`.
- * @param constraints Optional array of constraints that check if the result of the evaluation complies with the constraints.
+ * @param constraints Optional array of constraints that check if the result of the evaluation fulfills the restrictions set by the constraints.
  * @returns The value of the property that was queried for, if found. Otherwise returns `undefined`.
  */
 function jsonPathQuery<T>(

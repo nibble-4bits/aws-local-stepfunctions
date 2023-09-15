@@ -6,7 +6,7 @@ export class BooleanConstraint extends BaseJSONPathConstraint {
   test(value: unknown): void {
     if (typeof value !== 'boolean') {
       throw new StatesRuntimeError(
-        `JSONPath expression '${this.pathExpression}' evaluated to ${quoteJSONValue(value)}, but expected a boolean`
+        `Path expression '${this.pathExpression}' evaluated to ${quoteJSONValue(value)}, but expected a boolean`
       );
     }
   }
