@@ -76,4 +76,8 @@ export function isRFC3339Date(date: string): boolean {
   return regex.test(date);
 }
 
+export function quoteJSONValue(value: unknown) {
+  return JSON.stringify(value);
+}
+
 export { getRandomNumber, sfc32, cyrb128 } from './random';
