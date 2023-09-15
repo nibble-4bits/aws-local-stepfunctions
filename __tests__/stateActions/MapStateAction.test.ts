@@ -203,7 +203,7 @@ describe('Map State', () => {
 
     await expect(mapStateResult).rejects.toThrow(StatesRuntimeError);
     await expect(mapStateResult).rejects.toThrow(
-      'Input of Map state must be an array or ItemsPath property must point to an array'
+      'Path expression \'$.items\' evaluated to "not an array", but expected an array'
     );
   });
 
