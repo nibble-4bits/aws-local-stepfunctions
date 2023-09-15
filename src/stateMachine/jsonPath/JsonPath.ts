@@ -1,4 +1,4 @@
-import type { BaseJSONPathConstraint } from './constraints/BaseJsonPathConstraint';
+import type { JSONPathQueryOptions } from '../../typings/JSONPathImplementation';
 import type { JSONValue } from '../../typings/JSONValue';
 import type { Context } from '../../typings/Context';
 import { JSONPath as jp } from 'jsonpath-plus';
@@ -16,10 +16,15 @@ function jsonPathQuery<T>(
   pathExpression: string,
   json: JSONValue,
   context: Context,
-  constraints: (new (...params: ConstructorParameters<typeof BaseJSONPathConstraint>) => BaseJSONPathConstraint)[] = []
+  options?: JSONPathQueryOptions
 ): T {
-  // All JSONPaths must point to a defined value
-  const defaultConstraints = [DefinedValueConstraint];
+  const defaultConstraints = [];
+  // All JSONPaths must point to a defined value, unless the `ignoreDefinedValueConstraint` option is set
+  if (!options?.ignoreDefinedValueConstraint) {
+    defaultConstraints.push(DefinedValueConstraint);
+  }
+
+  const constraints = [...defaultConstraints, ...(options?.constraints ?? [])];
   let evaluation: T;
 
   // If the expression starts with double `$$`, evaluate the path in the context object.
@@ -29,7 +34,7 @@ function jsonPathQuery<T>(
     evaluation = jp({ path: pathExpression, json, wrap: false });
   }
 
-  for (const Constraint of [...defaultConstraints, ...constraints]) {
+  for (const Constraint of constraints) {
     const constraintObject = new Constraint(pathExpression);
     constraintObject.test(evaluation);
   }

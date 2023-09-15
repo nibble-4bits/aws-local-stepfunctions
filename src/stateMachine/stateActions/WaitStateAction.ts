@@ -31,12 +31,14 @@ class WaitStateAction extends BaseStateAction<WaitState> {
 
       await sleep(timeDiff, options.abortSignal, options.rootAbortSignal);
     } else if (state.SecondsPath) {
-      const seconds = jsonPathQuery<number>(state.SecondsPath, input, context, [
-        IntegerConstraint.greaterThanOrEqual(0),
-      ]);
+      const seconds = jsonPathQuery<number>(state.SecondsPath, input, context, {
+        constraints: [IntegerConstraint.greaterThanOrEqual(0)],
+      });
       await sleep(seconds * 1000, options.abortSignal, options.rootAbortSignal);
     } else if (state.TimestampPath) {
-      const timestamp = jsonPathQuery<string>(state.TimestampPath, input, context, [RFC3339TimestampConstraint]);
+      const timestamp = jsonPathQuery<string>(state.TimestampPath, input, context, {
+        constraints: [RFC3339TimestampConstraint],
+      });
       const dateTimestamp = new Date(timestamp);
       const currentTime = Date.now();
       const timeDiff = dateTimestamp.getTime() - currentTime;

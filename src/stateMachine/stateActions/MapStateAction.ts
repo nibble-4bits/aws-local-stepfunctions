@@ -78,7 +78,9 @@ class MapStateAction extends BaseStateAction<MapState> {
 
     let items = input;
     if (state.ItemsPath) {
-      items = jsonPathQuery(state.ItemsPath, input, context, [ArrayConstraint]);
+      items = jsonPathQuery(state.ItemsPath, input, context, {
+        constraints: [ArrayConstraint],
+      });
     }
 
     if (!Array.isArray(items)) {
