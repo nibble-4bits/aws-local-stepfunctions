@@ -6,23 +6,17 @@ const machineDefinition = {
   States: {
     'Hello World': {
       Type: 'Task',
+      InputPath: 'invalid JSONPath syntax',
       Resource: 'arn:aws:lambda:us-east-1:123456789012:function:AddNumbers',
       End: true,
     },
-    UnreachableState: {
-      Type: 'Succeed',
-    },
-    InvalidStateType: {
-      Type: 'SomeNewType',
-    },
   },
-  InvalidTopLevelField: {},
 };
 
-// Construct a new state machine with the given definition and don't validate it at all
+// Construct a new state machine with the given definition and don't validate JSONPaths
 const stateMachine = new StateMachine(machineDefinition, {
   validationOptions: {
-    noValidate: true,
+    checkPaths: false,
   },
 });
 
