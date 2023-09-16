@@ -6,7 +6,7 @@ import type {
 import type { Context } from '../../typings/Context';
 import type { JSONValue } from '../../typings/JSONValue';
 import { StatesRuntimeError } from '../../error/predefined/StatesRuntimeError';
-import { jsonPathQuery } from '../JsonPath';
+import { jsonPathQuery } from '../jsonPath/JsonPath';
 import { isPlainObj } from '../../util';
 
 function validateArgumentType(allowedTypes: ArgumentType[], argPosition: number, funcArg: JSONValue, funcName: string) {
@@ -127,7 +127,7 @@ function validateArguments(funcDefinition: IntrinsicFunctionDefinition, ...args:
   }
 }
 
-function parseArguments(input: JSONValue, context?: Context, ...args: string[]): JSONValue[] {
+function parseArguments(input: JSONValue, context: Context, ...args: string[]): JSONValue[] {
   return args.map<JSONValue>((arg) => {
     if (arg[0] === "'") {
       const lastSingleQuote = arg.lastIndexOf("'");

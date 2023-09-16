@@ -6,10 +6,11 @@ import type { EventLogger } from '../EventLogger';
 import type { EventLog } from '../../typings/EventLogs';
 import { BaseStateAction } from './BaseStateAction';
 import { StateMachine } from '../StateMachine';
-import { jsonPathQuery } from '../JsonPath';
+import { jsonPathQuery } from '../jsonPath/JsonPath';
 import { processPayloadTemplate } from '../InputOutputProcessing';
 import { StatesRuntimeError } from '../../error/predefined/StatesRuntimeError';
 import { ExecutionError } from '../../error/ExecutionError';
+import { ArrayConstraint } from '../jsonPath/constraints/ArrayConstraint';
 import pLimit from 'p-limit';
 
 /**
@@ -77,7 +78,9 @@ class MapStateAction extends BaseStateAction<MapState> {
 
     let items = input;
     if (state.ItemsPath) {
-      items = jsonPathQuery(state.ItemsPath, input, context);
+      items = jsonPathQuery(state.ItemsPath, input, context, {
+        constraints: [ArrayConstraint],
+      });
     }
 
     if (!Array.isArray(items)) {

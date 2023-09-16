@@ -30,8 +30,9 @@ describe('Input processing', () => {
           lastUpdated: '2020-05-27T08:00:00Z',
         },
       };
+      const context = {};
 
-      const result = processInputPath(undefined, input);
+      const result = processInputPath(undefined, input, context);
 
       expect(result).toEqual(input);
     });
@@ -54,8 +55,9 @@ describe('Input processing', () => {
           lastUpdated: '2020-05-27T08:00:00Z',
         },
       };
+      const context = {};
 
-      const result = processInputPath('$.movies', input);
+      const result = processInputPath('$.movies', input, context);
 
       expect(result).toEqual([
         {
@@ -89,8 +91,9 @@ describe('Input processing', () => {
           lastUpdated: '2020-05-27T08:00:00Z',
         },
       };
+      const context = {};
 
-      const result = processInputPath(null, input);
+      const result = processInputPath(null, input, context);
 
       expect(result).toEqual({});
     });
@@ -108,8 +111,9 @@ describe('Input processing', () => {
         },
       };
       const input = {};
+      const context = {};
 
-      const result = processPayloadTemplate(parameters, input);
+      const result = processPayloadTemplate(parameters, input, context);
 
       expect(result).toEqual({
         field1: 50,
@@ -149,8 +153,9 @@ describe('Input processing', () => {
           lastUpdated: '2020-05-27T08:00:00Z',
         },
       };
+      const context = {};
 
-      const result = processPayloadTemplate(parameters, input);
+      const result = processPayloadTemplate(parameters, input, context);
 
       expect(result).toEqual({
         field1: 50,
@@ -192,8 +197,9 @@ describe('Input processing', () => {
           lastUpdated: '2020-05-27T08:00:00Z',
         },
       };
+      const context = {};
 
-      const result = processPayloadTemplate(parameters, input);
+      const result = processPayloadTemplate(parameters, input, context);
 
       expect(result).toEqual({
         field1: 50,
@@ -247,8 +253,9 @@ describe('Input processing', () => {
           lastUpdated: '2020-05-27T08:00:00Z',
         },
       };
+      const context = {};
 
-      const result = processPayloadTemplate(parameters, input);
+      const result = processPayloadTemplate(parameters, input, context);
 
       expect(result).toEqual({
         field1: 50,
@@ -279,8 +286,9 @@ describe('Output processing', () => {
         },
       };
       const input = {};
+      const context = {};
 
-      const result = processPayloadTemplate(resultSelector, input);
+      const result = processPayloadTemplate(resultSelector, input, context);
 
       expect(result).toEqual({
         field1: 50,
@@ -320,8 +328,9 @@ describe('Output processing', () => {
           lastUpdated: '2020-05-27T08:00:00Z',
         },
       };
+      const context = {};
 
-      const result = processPayloadTemplate(resultSelector, input);
+      const result = processPayloadTemplate(resultSelector, input, context);
 
       expect(result).toEqual({
         field1: 50,
@@ -363,8 +372,9 @@ describe('Output processing', () => {
           lastUpdated: '2020-05-27T08:00:00Z',
         },
       };
+      const context = {};
 
-      const result = processPayloadTemplate(resultSelector, input);
+      const result = processPayloadTemplate(resultSelector, input, context);
 
       expect(result).toEqual({
         field1: 50,
@@ -418,8 +428,9 @@ describe('Output processing', () => {
           lastUpdated: '2020-05-27T08:00:00Z',
         },
       };
+      const context = {};
 
-      const result = processPayloadTemplate(resultSelector, input);
+      const result = processPayloadTemplate(resultSelector, input, context);
 
       expect(result).toEqual({
         field1: 50,
@@ -621,8 +632,9 @@ describe('Output processing', () => {
           lastUpdated: '2020-05-27T08:00:00Z',
         },
       };
+      const context = {};
 
-      const result = processOutputPath(undefined, input);
+      const result = processOutputPath(undefined, input, context);
 
       expect(result).toEqual(input);
     });
@@ -645,8 +657,9 @@ describe('Output processing', () => {
           lastUpdated: '2020-05-27T08:00:00Z',
         },
       };
+      const context = {};
 
-      const result = processOutputPath('$.movies', input);
+      const result = processOutputPath('$.movies', input, context);
 
       expect(result).toEqual([
         {
@@ -680,8 +693,9 @@ describe('Output processing', () => {
           lastUpdated: '2020-05-27T08:00:00Z',
         },
       };
+      const context = {};
 
-      const result = processOutputPath(null, input);
+      const result = processOutputPath(null, input, context);
 
       expect(result).toEqual({});
     });

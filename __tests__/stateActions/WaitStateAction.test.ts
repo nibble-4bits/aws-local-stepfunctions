@@ -127,4 +127,50 @@ describe('Wait State', () => {
     expect(mockSleepFunction).toHaveBeenCalledWith(1500, abortSignal, rootAbortSignal);
     expect(stateResult).toEqual({ waitUntil: '2022-12-05T05:45:00Z' });
   });
+
+  test('should throw runtime error if `SecondsPath` evaluation does not reference an integer greater than or equal to 0', async () => {
+    const definition: WaitState = {
+      Type: 'Wait',
+      SecondsPath: '$.waitFor',
+      End: true,
+    };
+    const stateName = 'WaitState';
+    const input = { waitFor: -5 };
+    const context = {};
+    const abortSignal = new AbortController().signal;
+    const options = {
+      abortSignal,
+      rootAbortSignal: undefined,
+      waitTimeOverrideOption: undefined,
+    };
+
+    const waitStateAction = new WaitStateAction(definition, stateName);
+
+    await expect(() => waitStateAction.execute(input, context, options)).rejects.toThrow(
+      "Path expression '$.waitFor' evaluated to -5, but expected an integer >= 0"
+    );
+  });
+
+  test('should throw runtime error if `SecondsPath` evaluation does not reference an integer greater than or equal to 0', async () => {
+    const definition: WaitState = {
+      Type: 'Wait',
+      TimestampPath: '$.waitUntil',
+      End: true,
+    };
+    const stateName = 'WaitState';
+    const input = { waitUntil: 'not a valid timestamp' };
+    const context = {};
+    const abortSignal = new AbortController().signal;
+    const options = {
+      abortSignal,
+      rootAbortSignal: undefined,
+      waitTimeOverrideOption: undefined,
+    };
+
+    const waitStateAction = new WaitStateAction(definition, stateName);
+
+    await expect(() => waitStateAction.execute(input, context, options)).rejects.toThrow(
+      'Path expression \'$.waitUntil\' evaluated to "not a valid timestamp", but expected a timestamp conforming to the RFC3339 profile'
+    );
+  });
 });

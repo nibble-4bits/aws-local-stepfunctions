@@ -3,8 +3,13 @@ import type { ChoiceState, ChoiceRuleWithoutNext } from '../../typings/ChoiceSta
 import type { ChoiceStateActionOptions, ActionResult } from '../../typings/StateActions';
 import type { Context } from '../../typings/Context';
 import { BaseStateAction } from './BaseStateAction';
-import { jsonPathQuery } from '../JsonPath';
+import { jsonPathQuery } from '../jsonPath/JsonPath';
 import { StatesNoChoiceMatchedError } from '../../error/predefined/StatesNoChoiceMatchedError';
+import { isRFC3339Timestamp } from '../../util';
+import { StringConstraint } from '../jsonPath/constraints/StringConstraint';
+import { NumberConstraint } from '../jsonPath/constraints/NumberConstraint';
+import { BooleanConstraint } from '../jsonPath/constraints/BooleanConstraint';
+import { RFC3339TimestampConstraint } from '../jsonPath/constraints/RFC3339TimestampConstraint';
 import wcmatch from 'wildcard-match';
 
 class ChoiceStateAction extends BaseStateAction<ChoiceState> {
@@ -32,7 +37,9 @@ class ChoiceStateAction extends BaseStateAction<ChoiceState> {
 
     if ('StringEqualsPath' in choiceRule) {
       const varValue = jsonPathQuery<string>(choiceRule.Variable, input, context);
-      const stringValue = jsonPathQuery<string>(choiceRule.StringEqualsPath, input, context);
+      const stringValue = jsonPathQuery<string>(choiceRule.StringEqualsPath, input, context, {
+        constraints: [StringConstraint],
+      });
       return varValue === stringValue;
     }
 
@@ -43,7 +50,9 @@ class ChoiceStateAction extends BaseStateAction<ChoiceState> {
 
     if ('StringLessThanPath' in choiceRule) {
       const varValue = jsonPathQuery<string>(choiceRule.Variable, input, context);
-      const stringValue = jsonPathQuery<string>(choiceRule.StringLessThanPath, input, context);
+      const stringValue = jsonPathQuery<string>(choiceRule.StringLessThanPath, input, context, {
+        constraints: [StringConstraint],
+      });
       return varValue < stringValue;
     }
 
@@ -54,7 +63,9 @@ class ChoiceStateAction extends BaseStateAction<ChoiceState> {
 
     if ('StringGreaterThanPath' in choiceRule) {
       const varValue = jsonPathQuery<string>(choiceRule.Variable, input, context);
-      const stringValue = jsonPathQuery<string>(choiceRule.StringGreaterThanPath, input, context);
+      const stringValue = jsonPathQuery<string>(choiceRule.StringGreaterThanPath, input, context, {
+        constraints: [StringConstraint],
+      });
       return varValue > stringValue;
     }
 
@@ -65,7 +76,9 @@ class ChoiceStateAction extends BaseStateAction<ChoiceState> {
 
     if ('StringLessThanEqualsPath' in choiceRule) {
       const varValue = jsonPathQuery<string>(choiceRule.Variable, input, context);
-      const stringValue = jsonPathQuery<string>(choiceRule.StringLessThanEqualsPath, input, context);
+      const stringValue = jsonPathQuery<string>(choiceRule.StringLessThanEqualsPath, input, context, {
+        constraints: [StringConstraint],
+      });
       return varValue <= stringValue;
     }
 
@@ -76,7 +89,9 @@ class ChoiceStateAction extends BaseStateAction<ChoiceState> {
 
     if ('StringGreaterThanEqualsPath' in choiceRule) {
       const varValue = jsonPathQuery<string>(choiceRule.Variable, input, context);
-      const stringValue = jsonPathQuery<string>(choiceRule.StringGreaterThanEqualsPath, input, context);
+      const stringValue = jsonPathQuery<string>(choiceRule.StringGreaterThanEqualsPath, input, context, {
+        constraints: [StringConstraint],
+      });
       return varValue >= stringValue;
     }
 
@@ -93,7 +108,9 @@ class ChoiceStateAction extends BaseStateAction<ChoiceState> {
 
     if ('NumericEqualsPath' in choiceRule) {
       const varValue = jsonPathQuery<number>(choiceRule.Variable, input, context);
-      const numberValue = jsonPathQuery<number>(choiceRule.NumericEqualsPath, input, context);
+      const numberValue = jsonPathQuery<number>(choiceRule.NumericEqualsPath, input, context, {
+        constraints: [NumberConstraint],
+      });
       return varValue === numberValue;
     }
 
@@ -104,7 +121,9 @@ class ChoiceStateAction extends BaseStateAction<ChoiceState> {
 
     if ('NumericLessThanPath' in choiceRule) {
       const varValue = jsonPathQuery<number>(choiceRule.Variable, input, context);
-      const numberValue = jsonPathQuery<number>(choiceRule.NumericLessThanPath, input, context);
+      const numberValue = jsonPathQuery<number>(choiceRule.NumericLessThanPath, input, context, {
+        constraints: [NumberConstraint],
+      });
       return varValue < numberValue;
     }
 
@@ -115,7 +134,9 @@ class ChoiceStateAction extends BaseStateAction<ChoiceState> {
 
     if ('NumericGreaterThanPath' in choiceRule) {
       const varValue = jsonPathQuery<number>(choiceRule.Variable, input, context);
-      const numberValue = jsonPathQuery<number>(choiceRule.NumericGreaterThanPath, input, context);
+      const numberValue = jsonPathQuery<number>(choiceRule.NumericGreaterThanPath, input, context, {
+        constraints: [NumberConstraint],
+      });
       return varValue > numberValue;
     }
 
@@ -126,7 +147,9 @@ class ChoiceStateAction extends BaseStateAction<ChoiceState> {
 
     if ('NumericLessThanEqualsPath' in choiceRule) {
       const varValue = jsonPathQuery<number>(choiceRule.Variable, input, context);
-      const numberValue = jsonPathQuery<number>(choiceRule.NumericLessThanEqualsPath, input, context);
+      const numberValue = jsonPathQuery<number>(choiceRule.NumericLessThanEqualsPath, input, context, {
+        constraints: [NumberConstraint],
+      });
       return varValue <= numberValue;
     }
 
@@ -137,7 +160,9 @@ class ChoiceStateAction extends BaseStateAction<ChoiceState> {
 
     if ('NumericGreaterThanEqualsPath' in choiceRule) {
       const varValue = jsonPathQuery<number>(choiceRule.Variable, input, context);
-      const numberValue = jsonPathQuery<number>(choiceRule.NumericGreaterThanEqualsPath, input, context);
+      const numberValue = jsonPathQuery<number>(choiceRule.NumericGreaterThanEqualsPath, input, context, {
+        constraints: [NumberConstraint],
+      });
       return varValue >= numberValue;
     }
 
@@ -148,7 +173,9 @@ class ChoiceStateAction extends BaseStateAction<ChoiceState> {
 
     if ('BooleanEqualsPath' in choiceRule) {
       const varValue = jsonPathQuery<boolean>(choiceRule.Variable, input, context);
-      const booleanValue = jsonPathQuery<boolean>(choiceRule.BooleanEqualsPath, input, context);
+      const booleanValue = jsonPathQuery<boolean>(choiceRule.BooleanEqualsPath, input, context, {
+        constraints: [BooleanConstraint],
+      });
       return varValue === booleanValue;
     }
 
@@ -160,7 +187,11 @@ class ChoiceStateAction extends BaseStateAction<ChoiceState> {
 
     if ('TimestampEqualsPath' in choiceRule) {
       const varValue = new Date(jsonPathQuery<string>(choiceRule.Variable, input, context));
-      const timestampValue = new Date(jsonPathQuery<string>(choiceRule.TimestampEqualsPath, input, context));
+      const timestampValue = new Date(
+        jsonPathQuery<string>(choiceRule.TimestampEqualsPath, input, context, {
+          constraints: [RFC3339TimestampConstraint],
+        })
+      );
       return varValue.getTime() === timestampValue.getTime();
     }
 
@@ -172,7 +203,11 @@ class ChoiceStateAction extends BaseStateAction<ChoiceState> {
 
     if ('TimestampLessThanPath' in choiceRule) {
       const varValue = new Date(jsonPathQuery<string>(choiceRule.Variable, input, context));
-      const timestampValue = new Date(jsonPathQuery<string>(choiceRule.TimestampLessThanPath, input, context));
+      const timestampValue = new Date(
+        jsonPathQuery<string>(choiceRule.TimestampLessThanPath, input, context, {
+          constraints: [RFC3339TimestampConstraint],
+        })
+      );
       return varValue < timestampValue;
     }
 
@@ -184,7 +219,11 @@ class ChoiceStateAction extends BaseStateAction<ChoiceState> {
 
     if ('TimestampGreaterThanPath' in choiceRule) {
       const varValue = new Date(jsonPathQuery<string>(choiceRule.Variable, input, context));
-      const timestampValue = new Date(jsonPathQuery<string>(choiceRule.TimestampGreaterThanPath, input, context));
+      const timestampValue = new Date(
+        jsonPathQuery<string>(choiceRule.TimestampGreaterThanPath, input, context, {
+          constraints: [RFC3339TimestampConstraint],
+        })
+      );
       return varValue > timestampValue;
     }
 
@@ -196,7 +235,11 @@ class ChoiceStateAction extends BaseStateAction<ChoiceState> {
 
     if ('TimestampLessThanEqualsPath' in choiceRule) {
       const varValue = new Date(jsonPathQuery<string>(choiceRule.Variable, input, context));
-      const timestampValue = new Date(jsonPathQuery<string>(choiceRule.TimestampLessThanEqualsPath, input, context));
+      const timestampValue = new Date(
+        jsonPathQuery<string>(choiceRule.TimestampLessThanEqualsPath, input, context, {
+          constraints: [RFC3339TimestampConstraint],
+        })
+      );
       return varValue <= timestampValue;
     }
 
@@ -208,7 +251,11 @@ class ChoiceStateAction extends BaseStateAction<ChoiceState> {
 
     if ('TimestampGreaterThanEqualsPath' in choiceRule) {
       const varValue = new Date(jsonPathQuery<string>(choiceRule.Variable, input, context));
-      const timestampValue = new Date(jsonPathQuery<string>(choiceRule.TimestampGreaterThanEqualsPath, input, context));
+      const timestampValue = new Date(
+        jsonPathQuery<string>(choiceRule.TimestampGreaterThanEqualsPath, input, context, {
+          constraints: [RFC3339TimestampConstraint],
+        })
+      );
       return varValue >= timestampValue;
     }
 
@@ -219,7 +266,7 @@ class ChoiceStateAction extends BaseStateAction<ChoiceState> {
     }
 
     if ('IsPresent' in choiceRule) {
-      const varValue = jsonPathQuery(choiceRule.Variable, input, context);
+      const varValue = jsonPathQuery(choiceRule.Variable, input, context, { ignoreDefinedValueConstraint: true });
       const IsPresentTrue = choiceRule.IsPresent;
       return IsPresentTrue && varValue !== undefined;
     }
@@ -245,7 +292,7 @@ class ChoiceStateAction extends BaseStateAction<ChoiceState> {
     if ('IsTimestamp' in choiceRule) {
       const varValue = jsonPathQuery<string>(choiceRule.Variable, input, context);
       const IsTimestampTrue = choiceRule.IsTimestamp;
-      return IsTimestampTrue && /\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(Z|(\+|-)\d{2}:\d{2})/.test(varValue);
+      return IsTimestampTrue && isRFC3339Timestamp(varValue);
     }
 
     return false;
