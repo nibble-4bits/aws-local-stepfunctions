@@ -89,7 +89,7 @@ class MapStateAction extends BaseStateAction<MapState> {
 
     const iteratorStateMachine = new StateMachine(state.Iterator, {
       ...options.stateMachineOptions,
-      validationOptions: { _noValidate: true },
+      validationOptions: { noValidate: true },
     });
     const limit = pLimit(state.MaxConcurrency || DEFAULT_MAX_CONCURRENCY);
     const processedItemsPromise = items.map((item, i) =>
