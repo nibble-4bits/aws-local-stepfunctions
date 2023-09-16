@@ -1,4 +1,4 @@
-import { isPlainObj, sleep, isRFC3339Date } from '../../src/util';
+import { isPlainObj, sleep, isRFC3339Timestamp } from '../../src/util';
 
 afterEach(() => {
   jest.clearAllMocks();
@@ -59,7 +59,7 @@ describe('Utils', () => {
     });
   });
 
-  describe('isRFC3339Date', () => {
+  describe('isRFC3339Timestamp', () => {
     const positiveCases = [
       '2023-09-15T18:25:25Z',
       '2023-01-01T00:30:55+06:00',
@@ -79,7 +79,7 @@ describe('Utils', () => {
 
     describe.each(positiveCases)('Positive tests', (dateStr) => {
       test(`should return true if timestamp ${dateStr} conforms to RFC3339 profile`, () => {
-        const result = isRFC3339Date(dateStr);
+        const result = isRFC3339Timestamp(dateStr);
 
         expect(result).toBe(true);
       });
@@ -90,6 +90,7 @@ describe('Utils', () => {
       '2023-09',
       '2023-09-15',
       '2023-09-15T',
+      '18:25:25',
       '2023-09-15T18',
       '2023-09-15T18:25',
       '2023-09-1518:25:25',
@@ -111,7 +112,7 @@ describe('Utils', () => {
 
     describe.each(negativeCases)('Negative tests', (dateStr) => {
       test(`should return false if timestamp ${dateStr} does not conform to RFC3339 profile`, () => {
-        const result = isRFC3339Date(dateStr);
+        const result = isRFC3339Timestamp(dateStr);
 
         expect(result).toBe(false);
       });

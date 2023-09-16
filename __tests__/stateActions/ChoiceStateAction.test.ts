@@ -770,6 +770,148 @@ describe('Choice State', () => {
     });
   });
 
+  describe('Path expression operators', () => {
+    const rules = [
+      {
+        rule: 'StringEqualsPath',
+        ruleValue: '$.comparisonValue',
+        inputValue: 'hello',
+        comparisonValue: 12345,
+        expectedType: 'string',
+      },
+      {
+        rule: 'StringLessThanPath',
+        ruleValue: '$.comparisonValue',
+        inputValue: 'a',
+        comparisonValue: true,
+        expectedType: 'string',
+      },
+      {
+        rule: 'StringGreaterThanPath',
+        ruleValue: '$.comparisonValue',
+        inputValue: 'b',
+        comparisonValue: {},
+        expectedType: 'string',
+      },
+      {
+        rule: 'StringLessThanEqualsPath',
+        ruleValue: '$.comparisonValue',
+        inputValue: 'a',
+        comparisonValue: [],
+        expectedType: 'string',
+      },
+      {
+        rule: 'StringGreaterThanEqualsPath',
+        ruleValue: '$.comparisonValue',
+        inputValue: 'c',
+        comparisonValue: 1.2345,
+        expectedType: 'string',
+      },
+      {
+        rule: 'NumericEqualsPath',
+        ruleValue: '$.comparisonValue',
+        inputValue: 10,
+        comparisonValue: 'hello',
+        expectedType: 'number',
+      },
+      {
+        rule: 'NumericLessThanPath',
+        ruleValue: '$.comparisonValue',
+        inputValue: 100,
+        comparisonValue: false,
+        expectedType: 'number',
+      },
+      {
+        rule: 'NumericGreaterThanPath',
+        ruleValue: '$.comparisonValue',
+        inputValue: 200,
+        comparisonValue: {},
+        expectedType: 'number',
+      },
+      {
+        rule: 'NumericLessThanEqualsPath',
+        ruleValue: '$.comparisonValue',
+        inputValue: 100,
+        comparisonValue: [],
+        expectedType: 'number',
+      },
+      {
+        rule: 'NumericGreaterThanEqualsPath',
+        ruleValue: '$.comparisonValue',
+        inputValue: 200,
+        comparisonValue: 'hello',
+        expectedType: 'number',
+      },
+      {
+        rule: 'BooleanEqualsPath',
+        ruleValue: '$.comparisonValue',
+        inputValue: true,
+        comparisonValue: 12345,
+        expectedType: 'boolean',
+      },
+      {
+        rule: 'TimestampEqualsPath',
+        ruleValue: '$.comparisonValue',
+        inputValue: '2020-01-01T15:00:00Z',
+        comparisonValue: 'hello',
+        expectedType: 'timestamp',
+      },
+      {
+        rule: 'TimestampLessThanPath',
+        ruleValue: '$.comparisonValue',
+        inputValue: '2019-12-31T15:00:00Z',
+        comparisonValue: 12345,
+        expectedType: 'timestamp',
+      },
+      {
+        rule: 'TimestampGreaterThanPath',
+        ruleValue: '$.comparisonValue',
+        inputValue: '2020-12-12T15:00:00Z',
+        comparisonValue: false,
+        expectedType: 'timestamp',
+      },
+      {
+        rule: 'TimestampLessThanEqualsPath',
+        ruleValue: '$.comparisonValue',
+        inputValue: '2019-12-31T15:00:00Z',
+        comparisonValue: {},
+        expectedType: 'timestamp',
+      },
+      {
+        rule: 'TimestampGreaterThanEqualsPath',
+        ruleValue: '$.comparisonValue',
+        inputValue: '2020-12-12T15:00:00Z',
+        comparisonValue: [],
+        expectedType: 'timestamp',
+      },
+    ];
+
+    describe.each(rules)('$rule', ({ rule, ruleValue, inputValue, comparisonValue, expectedType }) => {
+      const testTitle = `should throw runtime error if path expression operator does not reference a \`${expectedType}\` value`;
+
+      test(testTitle, async () => {
+        const definition: ChoiceState = {
+          Type: 'Choice',
+          Choices: [
+            {
+              Variable: '$.test',
+              [rule]: ruleValue,
+              Next: 'MatchingChoice',
+            },
+          ],
+          Default: 'DefaultChoice',
+        };
+        const stateName = 'ChoiceState';
+        const input = { test: inputValue, comparisonValue };
+        const context = {};
+
+        const choiceStateAction = new ChoiceStateAction(definition, stateName);
+
+        await expect(() => choiceStateAction.execute(input, context)).rejects.toThrow();
+      });
+    });
+  });
+
   test('should return state that matches choice rule as next state', async () => {
     const definition: ChoiceState = {
       Type: 'Choice',
