@@ -103,6 +103,8 @@ The constructor takes the following parameters:
   - `validationOptions?`: An object that specifies how the definition should be validated.
     - `checkPaths`: If set to `false`, won't validate JSONPaths.
     - `checkArn`: If set to `false`, won't validate ARN syntax in `Task` states.
+    - `noValidate`: If set to `true`, will skip validation of the definition entirely.
+      > NOTE: Use this option at your own risk, there are no guarantees when passing an invalid/non-standard definition to the state machine. Running it might result in undefined behavior.
   - `awsConfig?`: An object that specifies the [AWS region and credentials](/docs/feature-support.md#providing-aws-credentials-and-region-to-execute-lambda-functions-specified-in-task-states) to use when invoking a Lambda function in a `Task` state. If not set, the AWS config will be resolved based on the [credentials provider chain](https://docs.aws.amazon.com/sdk-for-javascript/v3/developer-guide/setting-credentials-node.html) of the AWS SDK for JavaScript V3. You don't need to use this option if you have a [shared config/credentials file](https://docs.aws.amazon.com/sdkref/latest/guide/file-format.html) (for example, if you have the [AWS CLI](https://aws.amazon.com/cli/) installed) or if you use a local override for all of your `Task` states.
     - `region`: The AWS region where the Lambda functions are created.
     - `credentials`: An object that specifies which type of credentials to use.
