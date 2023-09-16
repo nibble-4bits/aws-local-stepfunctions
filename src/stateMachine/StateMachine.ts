@@ -29,7 +29,7 @@ export class StateMachine {
    * These options also apply to state machines defined in the `Iterator` field of `Map` states and in the `Branches` field of `Parallel` states.
    */
   constructor(definition: StateMachineDefinition, stateMachineOptions?: StateMachineOptions) {
-    if (!stateMachineOptions?.validationOptions?._noValidate) {
+    if (!stateMachineOptions?.validationOptions?.noValidate) {
       const { isValid, errorsText } = aslValidator(definition, {
         checkArn: true,
         checkPaths: true,

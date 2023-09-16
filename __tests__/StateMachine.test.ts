@@ -84,6 +84,31 @@ describe('State Machine', () => {
         new StateMachine(stateMachineDefinition, stateMachineOptions);
       }).not.toThrow();
     });
+
+    test('should not throw if definition validation is completely turned off when creating instance', async () => {
+      const stateMachineDefinition: StateMachineDefinition = {
+        StartAt: 'FirstState',
+        States: {
+          FirstState: {
+            Type: 'Pass',
+            InputPath: 'invalidPath',
+            ResultPath: 'invalidPath',
+            OutputPath: 'invalidPath',
+            End: true,
+          },
+          UnreachableState: {
+            // @ts-expect-error Invalid state type
+            Type: 'InvalidType',
+          },
+        },
+        InvalidTopLevelField: {},
+      };
+      const stateMachineOptions = { validationOptions: { noValidate: true } };
+
+      expect(() => {
+        new StateMachine(stateMachineDefinition, stateMachineOptions);
+      }).not.toThrow();
+    });
   });
 
   describe('run()', () => {

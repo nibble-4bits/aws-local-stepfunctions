@@ -18,15 +18,9 @@ interface Overrides {
 }
 
 export interface ValidationOptions {
+  readonly noValidate?: boolean;
   readonly checkPaths?: boolean;
   readonly checkArn?: boolean;
-  /**
-   * @internal DO NOT USE.
-   *
-   * This property is meant for internal use only.
-   * There are no guarantees regarding future changes made to this property.
-   */
-  readonly _noValidate?: boolean;
 }
 
 export interface AWSConfig {

@@ -6,23 +6,17 @@ const machineDefinition = {
   States: {
     'Hello World': {
       Type: 'Task',
-      Resource: 'arn:aws:lambda:us-east-1:123456789012:function:AddNumbers',
+      InputPath: '$.data',
+      Resource: 'invalid arn syntax',
       End: true,
     },
-    UnreachableState: {
-      Type: 'Succeed',
-    },
-    InvalidStateType: {
-      Type: 'SomeNewType',
-    },
   },
-  InvalidTopLevelField: {},
 };
 
-// Construct a new state machine with the given definition and don't validate it at all
+// Construct a new state machine with the given definition and don't validate ARNs
 const stateMachine = new StateMachine(machineDefinition, {
   validationOptions: {
-    noValidate: true,
+    checkArn: false,
   },
 });
 
