@@ -1,4 +1,5 @@
 import type { RuntimeError } from '../error/RuntimeError';
+import type { Catcher, Retrier } from '../typings/ErrorHandling';
 import type {
   EventLog,
   ExecutionFailedEvent,
@@ -58,6 +59,9 @@ export class EventLogger {
         break;
       case 'StateEntered':
       case 'StateExited':
+      case 'StateFailed':
+      case 'StateRetried':
+      case 'StateCaught':
         event.index = index;
         this.dispatch(event);
         break;
@@ -138,6 +142,40 @@ export class EventLogger {
       type: 'StateExited',
       timestamp: Date.now(),
       state: { name: stateName, type: stateType, input, output },
+    });
+  }
+
+  dispatchStateFailedEvent(stateName: string, stateType: StateType, input: JSONValue, error: RuntimeError) {
+    this.dispatch({
+      type: 'StateFailed',
+      timestamp: Date.now(),
+      state: { name: stateName, type: stateType, input },
+      Error: error.name,
+      Cause: error.cause ?? error.message,
+    });
+  }
+
+  dispatchStateRetriedEvent(
+    stateName: string,
+    stateType: StateType,
+    input: JSONValue,
+    retrier: Retrier,
+    retryAttempt: number
+  ) {
+    this.dispatch({
+      type: 'StateRetried',
+      timestamp: Date.now(),
+      state: { name: stateName, type: stateType, input },
+      retry: { retrier, attempt: retryAttempt },
+    });
+  }
+
+  dispatchStateCaughtEvent(stateName: string, stateType: StateType, input: JSONValue, catcher: Catcher) {
+    this.dispatch({
+      type: 'StateCaught',
+      timestamp: Date.now(),
+      state: { name: stateName, type: stateType, input },
+      catch: { catcher },
     });
   }
 

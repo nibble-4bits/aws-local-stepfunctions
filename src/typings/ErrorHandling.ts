@@ -1,4 +1,4 @@
-type Retrier = {
+export type Retrier = {
   ErrorEquals: string[];
   IntervalSeconds?: number; // default 1
   MaxAttempts?: number; // default 3
@@ -9,7 +9,7 @@ export interface RetryableState {
   Retry?: Retrier[];
 }
 
-type Catcher = {
+export type Catcher = {
   ErrorEquals: string[];
   Next: string;
   ResultPath?: string;

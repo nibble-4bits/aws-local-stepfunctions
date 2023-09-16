@@ -19,10 +19,12 @@ export type StateHandlers = {
 export type RetryResult = {
   shouldRetry: boolean;
   waitTimeBeforeRetry?: number;
+  retrierIndex?: number;
 };
 
 export type CatchResult = {
   nextState: string;
   errorOutput?: ErrorOutput;
   resultPath?: string | undefined;
+  catcherIndex?: number;
 };

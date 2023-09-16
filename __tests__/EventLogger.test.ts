@@ -4,8 +4,10 @@ import type {
   ExecutionStartedEvent,
   ExecutionSucceededEvent,
   ExecutionTerminatedEvent,
-  StateEvent,
+  StateEnteredEvent,
+  StateExitedEvent,
 } from '../src/typings/EventLogs';
+import { StatesRuntimeError } from '../src/error/predefined/StatesRuntimeError';
 import { EventLogger } from '../src/stateMachine/EventLogger';
 import './_customMatchers';
 
@@ -27,34 +29,70 @@ describe('Event Logger', () => {
 
       eventLogger.dispatchExecutionStartedEvent(50);
       eventLogger.dispatchStateEnteredEvent('SomeState', 'Choice', { a: 1, b: 'string', c: true, d: [1, 2, 3] });
+      eventLogger.dispatchStateFailedEvent(
+        'A state name',
+        'Parallel',
+        12345,
+        new StatesRuntimeError('An error happened during runtime')
+      );
+      eventLogger.dispatchStateRetriedEvent('A state name', 'Parallel', 12345, { ErrorEquals: ['States.ALL'] }, 2);
+      eventLogger.dispatchStateCaughtEvent('A state name', 'Parallel', 12345, {
+        ErrorEquals: ['States.ALL'],
+        Next: 'CatchState',
+      });
       eventLogger.dispatchStateExitedEvent('AnotherState', 'Task', ['a', 'b', 1, null], 123.456);
       eventLogger.dispatchExecutionSucceededEvent('result');
 
-      const firstEvent = await generator.next();
-      const secondEvent = await generator.next();
-      const thirdEvent = await generator.next();
-      const fourthEvent = await generator.next();
-      const endEvent = await generator.next();
+      const event1 = await generator.next();
+      const event2 = await generator.next();
+      const event3 = await generator.next();
+      const event4 = await generator.next();
+      const event5 = await generator.next();
+      const event6 = await generator.next();
+      const event7 = await generator.next();
+      const event8 = await generator.next();
 
-      expect(firstEvent.value).toEqual({ type: 'ExecutionStarted', timestamp: 1670198400000, input: 50 });
-      expect(secondEvent.value).toEqual({
+      expect(event1.value).toEqual({ type: 'ExecutionStarted', timestamp: 1670198400000, input: 50 });
+      expect(event2.value).toEqual({
         type: 'StateEntered',
         timestamp: 1670198400000,
         state: { name: 'SomeState', type: 'Choice', input: { a: 1, b: 'string', c: true, d: [1, 2, 3] } },
       });
-      expect(thirdEvent.value).toEqual({
+      expect(event3.value).toEqual({
+        type: 'StateFailed',
+        timestamp: 1670198400000,
+        state: { name: 'A state name', type: 'Parallel', input: 12345 },
+        Error: 'States.Runtime',
+        Cause: 'An error happened during runtime',
+      });
+      expect(event4.value).toEqual({
+        type: 'StateRetried',
+        timestamp: 1670198400000,
+        state: { name: 'A state name', type: 'Parallel', input: 12345 },
+        retry: { retrier: { ErrorEquals: ['States.ALL'] }, attempt: 2 },
+      });
+      expect(event5.value).toEqual({
+        type: 'StateCaught',
+        timestamp: 1670198400000,
+        state: { name: 'A state name', type: 'Parallel', input: 12345 },
+        catch: { catcher: { ErrorEquals: ['States.ALL'], Next: 'CatchState' } },
+      });
+      expect(event6.value).toEqual({
         type: 'StateExited',
         timestamp: 1670198400000,
         state: { name: 'AnotherState', type: 'Task', input: ['a', 'b', 1, null], output: 123.456 },
       });
-      expect(fourthEvent.value).toEqual({ type: 'ExecutionSucceeded', timestamp: 1670198400000, output: 'result' });
-      expect(endEvent.value).toBeUndefined();
+      expect(event7.value).toEqual({ type: 'ExecutionSucceeded', timestamp: 1670198400000, output: 'result' });
+      expect(event8.value).toBeUndefined();
 
-      expect(firstEvent.done).toBe(false);
-      expect(secondEvent.done).toBe(false);
-      expect(thirdEvent.done).toBe(false);
-      expect(fourthEvent.done).toBe(false);
-      expect(endEvent.done).toBe(true);
+      expect(event1.done).toBe(false);
+      expect(event2.done).toBe(false);
+      expect(event3.done).toBe(false);
+      expect(event4.done).toBe(false);
+      expect(event5.done).toBe(false);
+      expect(event6.done).toBe(false);
+      expect(event7.done).toBe(false);
+      expect(event8.done).toBe(true);
     });
   });
 
@@ -126,7 +164,7 @@ describe('Event Logger', () => {
       test('should forward `StateEntered` event and add index', async () => {
         const eventLogger = new EventLogger();
         const generator = eventLogger.getEvents();
-        const event: StateEvent = {
+        const event: StateEnteredEvent = {
           type: 'StateEntered',
           timestamp: Date.now(),
           state: { name: 'SomeEvent', type: 'Succeed', input: {} },
@@ -148,7 +186,7 @@ describe('Event Logger', () => {
       test('should forward `StateExited` event and add index', async () => {
         const eventLogger = new EventLogger();
         const generator = eventLogger.getEvents();
-        const event: StateEvent = {
+        const event: StateExitedEvent = {
           type: 'StateExited',
           timestamp: Date.now(),
           state: { name: 'SomeEvent', type: 'Succeed', input: {}, output: {} },

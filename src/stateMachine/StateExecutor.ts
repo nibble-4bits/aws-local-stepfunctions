@@ -129,16 +129,43 @@ export class StateExecutor {
 
       return { stateResult: processedResult, nextState, isEndState };
     } catch (error) {
+      options.eventLogger.dispatchStateFailedEvent(
+        this.stateName,
+        this.stateDefinition.Type,
+        input,
+        error as RuntimeError
+      );
+
       // Handle `Retry` logic
-      const { shouldRetry, waitTimeBeforeRetry } = this.shouldRetry(error as RuntimeError);
-      if (shouldRetry && waitTimeBeforeRetry) {
-        await sleep(waitTimeBeforeRetry, options.abortSignal, options.runOptions?._rootAbortSignal);
+      const { shouldRetry, waitTimeBeforeRetry, retrierIndex } = this.shouldRetry(error as RuntimeError);
+      if (shouldRetry) {
+        const stateDefinition = this.stateDefinition as TaskState | MapState | ParallelState;
+
+        await sleep(waitTimeBeforeRetry!, options.abortSignal, options.runOptions?._rootAbortSignal);
+
+        options.eventLogger.dispatchStateRetriedEvent(
+          this.stateName,
+          stateDefinition.Type,
+          input,
+          stateDefinition.Retry![retrierIndex!],
+          this.retrierAttempts[retrierIndex!]
+        );
+
         return this.execute(input, context, options);
       }
 
       // Handle `Catch` logic
-      const { nextState, errorOutput, resultPath } = this.catchError(error as RuntimeError);
+      const { nextState, errorOutput, resultPath, catcherIndex } = this.catchError(error as RuntimeError);
       if (nextState && errorOutput) {
+        const stateDefinition = this.stateDefinition as TaskState | MapState | ParallelState;
+
+        options.eventLogger.dispatchStateCaughtEvent(
+          this.stateName,
+          stateDefinition.Type,
+          input,
+          stateDefinition.Catch![catcherIndex!]
+        );
+
         return { stateResult: processResultPath(resultPath, rawInput, errorOutput), nextState, isEndState: false };
       }
 
@@ -216,7 +243,7 @@ export class StateExecutor {
 
           this.retrierAttempts[i]++;
 
-          return { shouldRetry: true, waitTimeBeforeRetry };
+          return { shouldRetry: true, waitTimeBeforeRetry, retrierIndex: i };
         }
       }
     }
@@ -253,7 +280,7 @@ export class StateExecutor {
           };
           const resultPath = catcher.ResultPath;
 
-          return { nextState, errorOutput, resultPath };
+          return { nextState, errorOutput, resultPath, catcherIndex: i };
         }
       }
     }
