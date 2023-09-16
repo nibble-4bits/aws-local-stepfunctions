@@ -76,7 +76,7 @@ export function isRFC3339Date(date: string): boolean {
   return regex.test(date);
 }
 
-export function quoteJSONValue(value: unknown) {
+export function stringifyJSONValue(value: unknown) {
   return JSON.stringify(value);
 }
 
