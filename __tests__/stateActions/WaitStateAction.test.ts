@@ -27,14 +27,13 @@ describe('Wait State', () => {
     const abortSignal = new AbortController().signal;
     const options = {
       abortSignal,
-      rootAbortSignal: undefined,
       waitTimeOverrideOption: undefined,
     };
 
     const waitStateAction = new WaitStateAction(definition, stateName);
     const { stateResult } = await waitStateAction.execute(input, context, options);
 
-    expect(mockSleepFunction).toHaveBeenCalledWith(10000, abortSignal, undefined);
+    expect(mockSleepFunction).toHaveBeenCalledWith(10000, abortSignal);
     expect(stateResult).toEqual({ prop1: 'test', prop2: 12345 });
   });
 
@@ -50,14 +49,13 @@ describe('Wait State', () => {
     const abortSignal = new AbortController().signal;
     const options = {
       abortSignal,
-      rootAbortSignal: undefined,
       waitTimeOverrideOption: undefined,
     };
 
     const waitStateAction = new WaitStateAction(definition, stateName);
     const { stateResult } = await waitStateAction.execute(input, context, options);
 
-    expect(mockSleepFunction).toHaveBeenCalledWith(20700000, abortSignal, undefined);
+    expect(mockSleepFunction).toHaveBeenCalledWith(20700000, abortSignal);
     expect(stateResult).toEqual({ prop1: 'test', prop2: 12345 });
   });
 
@@ -73,14 +71,13 @@ describe('Wait State', () => {
     const abortSignal = new AbortController().signal;
     const options = {
       abortSignal,
-      rootAbortSignal: undefined,
       waitTimeOverrideOption: undefined,
     };
 
     const waitStateAction = new WaitStateAction(definition, stateName);
     const { stateResult } = await waitStateAction.execute(input, context, options);
 
-    expect(mockSleepFunction).toHaveBeenCalledWith(10000, abortSignal, undefined);
+    expect(mockSleepFunction).toHaveBeenCalledWith(10000, abortSignal);
     expect(stateResult).toEqual({ waitFor: 10 });
   });
 
@@ -96,14 +93,13 @@ describe('Wait State', () => {
     const abortSignal = new AbortController().signal;
     const options = {
       abortSignal,
-      rootAbortSignal: undefined,
       waitTimeOverrideOption: undefined,
     };
 
     const waitStateAction = new WaitStateAction(definition, stateName);
     const { stateResult } = await waitStateAction.execute(input, context, options);
 
-    expect(mockSleepFunction).toHaveBeenCalledWith(20700000, abortSignal, undefined);
+    expect(mockSleepFunction).toHaveBeenCalledWith(20700000, abortSignal);
     expect(stateResult).toEqual({ waitUntil: '2022-12-05T05:45:00Z' });
   });
 
@@ -117,14 +113,13 @@ describe('Wait State', () => {
     const input = { waitUntil: '2022-12-05T05:45:00Z' };
     const context = {};
     const abortSignal = new AbortController().signal;
-    const rootAbortSignal = new AbortController().signal;
-    const options = { waitTimeOverrideOption: 1500, abortSignal, rootAbortSignal };
+    const options = { waitTimeOverrideOption: 1500, abortSignal };
 
     const waitStateAction = new WaitStateAction(definition, stateName);
     const { stateResult } = await waitStateAction.execute(input, context, options);
 
     expect(mockSleepFunction).toHaveBeenCalledTimes(1);
-    expect(mockSleepFunction).toHaveBeenCalledWith(1500, abortSignal, rootAbortSignal);
+    expect(mockSleepFunction).toHaveBeenCalledWith(1500, abortSignal);
     expect(stateResult).toEqual({ waitUntil: '2022-12-05T05:45:00Z' });
   });
 
@@ -140,7 +135,6 @@ describe('Wait State', () => {
     const abortSignal = new AbortController().signal;
     const options = {
       abortSignal,
-      rootAbortSignal: undefined,
       waitTimeOverrideOption: undefined,
     };
 
@@ -163,7 +157,6 @@ describe('Wait State', () => {
     const abortSignal = new AbortController().signal;
     const options = {
       abortSignal,
-      rootAbortSignal: undefined,
       waitTimeOverrideOption: undefined,
     };
 

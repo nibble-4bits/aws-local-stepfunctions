@@ -32,7 +32,6 @@ export type PassStateActionOptions = Record<string, unknown>;
 export type WaitStateActionOptions = {
   waitTimeOverrideOption: number | undefined;
   abortSignal: AbortSignal;
-  rootAbortSignal: AbortSignal | undefined;
 };
 
 export type ChoiceStateActionOptions = Record<string, unknown>;

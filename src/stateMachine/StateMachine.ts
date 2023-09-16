@@ -66,6 +66,18 @@ export class StateMachine {
     const abortController = new AbortController();
     const eventLogger = new EventLogger();
 
+    let rootSignalAbortHandler: () => void;
+    if (options?._rootAbortSignal) {
+      rootSignalAbortHandler = () => abortController.abort();
+      if (options._rootAbortSignal.aborted) {
+        // If root abort signal is already aborted, abort the signal in the current context of execution.
+        rootSignalAbortHandler();
+      } else {
+        // Else, set a listener that aborts the current controller.
+        options._rootAbortSignal.addEventListener('abort', rootSignalAbortHandler);
+      }
+    }
+
     let onAbortHandler: () => void;
     const settleOnAbort = new Promise<null>((resolve, reject) => {
       if (options?.noThrowOnAbort) {
@@ -107,6 +119,7 @@ export class StateMachine {
       },
       () => {
         abortController.signal.removeEventListener('abort', onAbortHandler);
+        options?._rootAbortSignal?.removeEventListener('abort', rootSignalAbortHandler);
         clearTimeout(timeoutId);
       }
     );

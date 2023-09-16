@@ -18,23 +18,23 @@ class WaitStateAction extends BaseStateAction<WaitState> {
 
     if (options.waitTimeOverrideOption !== undefined) {
       // If the wait time override is set, sleep for the specified number of milliseconds
-      await sleep(options.waitTimeOverrideOption, options.abortSignal, options.rootAbortSignal);
+      await sleep(options.waitTimeOverrideOption, options.abortSignal);
       return this.buildExecutionResult(input);
     }
 
     if (state.Seconds) {
-      await sleep(state.Seconds * 1000, options.abortSignal, options.rootAbortSignal);
+      await sleep(state.Seconds * 1000, options.abortSignal);
     } else if (state.Timestamp) {
       const dateTimestamp = new Date(state.Timestamp);
       const currentTime = Date.now();
       const timeDiff = dateTimestamp.getTime() - currentTime;
 
-      await sleep(timeDiff, options.abortSignal, options.rootAbortSignal);
+      await sleep(timeDiff, options.abortSignal);
     } else if (state.SecondsPath) {
       const seconds = jsonPathQuery<number>(state.SecondsPath, input, context, {
         constraints: [IntegerConstraint.greaterThanOrEqual(0)],
       });
-      await sleep(seconds * 1000, options.abortSignal, options.rootAbortSignal);
+      await sleep(seconds * 1000, options.abortSignal);
     } else if (state.TimestampPath) {
       const timestamp = jsonPathQuery<string>(state.TimestampPath, input, context, {
         constraints: [RFC3339TimestampConstraint],
@@ -43,7 +43,7 @@ class WaitStateAction extends BaseStateAction<WaitState> {
       const currentTime = Date.now();
       const timeDiff = dateTimestamp.getTime() - currentTime;
 
-      await sleep(timeDiff, options.abortSignal, options.rootAbortSignal);
+      await sleep(timeDiff, options.abortSignal);
     }
 
     return this.buildExecutionResult(input);
