@@ -255,19 +255,30 @@ describe('State Machine', () => {
           PassState1: {
             Type: 'Pass',
             Result: 1,
-            Next: 'FailState',
+            Next: 'TaskState',
           },
-          FailState: {
-            Type: 'Fail',
-            Error: 'MachineFailure',
-            Cause: 'The state machine failed',
+          TaskState: {
+            Type: 'Task',
+            Resource: 'arn:aws:lambda:us-east-1:123456789012:function:AddNumbers',
+            Retry: [{ ErrorEquals: ['SyntaxError'], MaxAttempts: 1 }],
+            Catch: [{ ErrorEquals: ['SyntaxError'], Next: 'FailExecution' }],
+            End: true,
           },
+          FailExecution: { Type: 'Fail', Error: 'MachineFailure', Cause: 'The state machine failed' },
         },
       };
       const input = {};
 
       const stateMachine = new StateMachine(machineDefinition);
-      const execution = stateMachine.run(input);
+      const execution = stateMachine.run(input, {
+        overrides: {
+          taskResourceLocalHandlers: {
+            TaskState: () => {
+              throw new SyntaxError('Unknown token at position 12');
+            },
+          },
+        },
+      });
 
       const events: EventLog[] = [];
       for await (const event of execution.eventLogs) {
@@ -283,7 +294,63 @@ describe('State Machine', () => {
           timestamp: 1670198400000,
           state: { name: 'PassState1', type: 'Pass', input: {}, output: 1 },
         },
-        { type: 'StateEntered', timestamp: 1670198400000, state: { name: 'FailState', type: 'Fail', input: 1 } },
+        { type: 'StateEntered', timestamp: 1670198400000, state: { name: 'TaskState', type: 'Task', input: 1 } },
+        {
+          type: 'StateFailed',
+          timestamp: 1670198400000,
+          state: { name: 'TaskState', type: 'Task', input: 1 },
+          Error: 'SyntaxError',
+          Cause: 'Unknown token at position 12',
+        },
+        {
+          type: 'StateRetried',
+          timestamp: 1670198400000,
+          state: { name: 'TaskState', type: 'Task', input: 1 },
+          retry: { retrier: { ErrorEquals: ['SyntaxError'], MaxAttempts: 1 }, attempt: 1 },
+        },
+        {
+          type: 'StateFailed',
+          timestamp: 1670198400000,
+          state: { name: 'TaskState', type: 'Task', input: 1 },
+          Error: 'SyntaxError',
+          Cause: 'Unknown token at position 12',
+        },
+        {
+          type: 'StateCaught',
+          timestamp: 1670198400000,
+          state: { name: 'TaskState', type: 'Task', input: 1 },
+          catch: { catcher: { ErrorEquals: ['SyntaxError'], Next: 'FailExecution' } },
+        },
+        {
+          type: 'StateExited',
+          timestamp: 1670198400000,
+          state: {
+            name: 'TaskState',
+            type: 'Task',
+            input: 1,
+            output: { Error: 'SyntaxError', Cause: 'Unknown token at position 12' },
+          },
+        },
+        {
+          type: 'StateEntered',
+          timestamp: 1670198400000,
+          state: {
+            name: 'FailExecution',
+            type: 'Fail',
+            input: { Error: 'SyntaxError', Cause: 'Unknown token at position 12' },
+          },
+        },
+        {
+          type: 'StateFailed',
+          timestamp: 1670198400000,
+          state: {
+            name: 'FailExecution',
+            type: 'Fail',
+            input: { Error: 'SyntaxError', Cause: 'Unknown token at position 12' },
+          },
+          Error: 'MachineFailure',
+          Cause: 'The state machine failed',
+        },
         {
           type: 'ExecutionFailed',
           timestamp: 1670198400000,
