@@ -5,7 +5,7 @@ import type { Context } from '../../typings/Context';
 import { BaseStateAction } from './BaseStateAction';
 import { jsonPathQuery } from '../jsonPath/JsonPath';
 import { StatesNoChoiceMatchedError } from '../../error/predefined/StatesNoChoiceMatchedError';
-import { isRFC3339Date } from '../../util';
+import { isRFC3339Timestamp } from '../../util';
 import { StringConstraint } from '../jsonPath/constraints/StringConstraint';
 import { NumberConstraint } from '../jsonPath/constraints/NumberConstraint';
 import { BooleanConstraint } from '../jsonPath/constraints/BooleanConstraint';
@@ -292,7 +292,7 @@ class ChoiceStateAction extends BaseStateAction<ChoiceState> {
     if ('IsTimestamp' in choiceRule) {
       const varValue = jsonPathQuery<string>(choiceRule.Variable, input, context);
       const IsTimestampTrue = choiceRule.IsTimestamp;
-      return IsTimestampTrue && isRFC3339Date(varValue);
+      return IsTimestampTrue && isRFC3339Timestamp(varValue);
     }
 
     return false;
