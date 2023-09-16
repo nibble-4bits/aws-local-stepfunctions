@@ -4,7 +4,8 @@ import type {
   ExecutionStartedEvent,
   ExecutionSucceededEvent,
   ExecutionTerminatedEvent,
-  StateEvent,
+  StateEnteredEvent,
+  StateExitedEvent,
 } from '../src/typings/EventLogs';
 import { EventLogger } from '../src/stateMachine/EventLogger';
 import './_customMatchers';
@@ -126,7 +127,7 @@ describe('Event Logger', () => {
       test('should forward `StateEntered` event and add index', async () => {
         const eventLogger = new EventLogger();
         const generator = eventLogger.getEvents();
-        const event: StateEvent = {
+        const event: StateEnteredEvent = {
           type: 'StateEntered',
           timestamp: Date.now(),
           state: { name: 'SomeEvent', type: 'Succeed', input: {} },
@@ -148,7 +149,7 @@ describe('Event Logger', () => {
       test('should forward `StateExited` event and add index', async () => {
         const eventLogger = new EventLogger();
         const generator = eventLogger.getEvents();
-        const event: StateEvent = {
+        const event: StateExitedEvent = {
           type: 'StateExited',
           timestamp: Date.now(),
           state: { name: 'SomeEvent', type: 'Succeed', input: {}, output: {} },
