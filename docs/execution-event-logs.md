@@ -17,6 +17,9 @@
   - [`ParallelBranchFailed` event](#parallelbranchfailed-event)
   - [`StateEntered` event](#stateentered-event)
   - [`StateExited` event](#stateexited-event)
+  - [`StateFailed` event](#statefailed-event)
+  - [`StateRetried` event](#stateretried-event)
+  - [`StateCaught` event](#statecaught-event)
 - [Helper data types](#helper-data-types)
   - [`StateData`](#statedata)
 
@@ -80,7 +83,7 @@ The `ExecutionFailed` event is produced when the execution encounters an error a
 - `Error`: Name of the error that caused the failure.
 - `Cause`: This field can either be a string or an object:
   - `string`: Contains a description explaining why the execution failed.
-  - `object`: Contains details that provide information as to why the execution failed.
+  - `object`: Contains details that provide more information as to why the execution failed.
 
 #### Example
 
@@ -206,7 +209,7 @@ The `MapIterationFailed` event is produced when an iteration in a `Map` encounte
 - `Error`: Name of the error that caused the failure.
 - `Cause`: This field can either be a string or an object:
   - `string`: Contains a description explaining why the iteration failed.
-  - `object`: Contains details that provide information as to why the iteration failed.
+  - `object`: Contains details that provide more information as to why the iteration failed.
 
 #### Example
 
@@ -292,7 +295,7 @@ The `ParallelBranchFailed` event is produced when a branch in a `Parallel` state
 - `Error`: Name of the error that caused the failure.
 - `Cause`: This field can either be a string or an object:
   - `string`: Contains a description explaining why the branch failed.
-  - `object`: Contains details that provide information as to why the branch failed.
+  - `object`: Contains details that provide more information as to why the branch failed.
 
 #### Example
 
@@ -361,6 +364,99 @@ The `StateExited` event is produced when the execution transitions out of a stat
 }
 ```
 
+---
+
+### `StateFailed` event
+
+The `StateFailed` event is produced when the state that is currently being executed encounters an error and fails.
+
+#### Additional fields
+
+- `state`: An object of type [`StateData`](#statedata) containing data associated with the state that failed.
+- `Error`: Name of the error that caused the state to fail.
+- `Cause`: This field can either be a string or an object:
+  - `string`: Contains a description explaining why the state failed.
+  - `object`: Contains details that provide more information as to why the state failed.
+- `index?`: The index of the `Map` iteration in which this state failed. This property is only set if this state was executed within a `Map` state.
+
+#### Example
+
+```js
+{
+    type: 'StateFailed',
+    timestamp: 1234567890123,
+    state: {
+        name: 'ReadDataFile',
+        type: 'Task',
+        input: { filePath: '/home/user/data.csv' }
+    },
+    Error: 'ReadError',
+    Cause: 'Unable to read file "data.csv". The file is not properly formatted as CSV.'
+}
+```
+
+---
+
+### `StateRetried` event
+
+The `StateRetried` event is produced when a state fails and it's retried because it matched the error specified by a retrier in the `Retry` field.
+
+#### Additional fields
+
+- `state`: An object of type [`StateData`](#statedata) containing data associated with the state that is being retried.
+- `retry`: An object of type [`RetryData`](#retrydata) containing data associated with the retry attempt.
+- `index?`: The index of the `Map` iteration in which this state is being retried. This property is only set if this state is being executed within a `Map` state.
+
+#### Example
+
+```js
+{
+    type: 'StateRetried',
+    timestamp: 1234567890123,
+    state: {
+        name: 'ReadDataFile',
+        type: 'Task',
+        input: { filePath: '/home/user/data.csv' }
+    },
+    retry: {
+        retrier: { ErrorEquals: ['ReadError'] },
+        attempt: 2
+    }
+}
+```
+
+---
+
+### `StateCaught` event
+
+The `StateCaught` event is produced when a state fails and it's caught because it matched the error specified by a catcher in the `Catch` field.
+
+#### Additional fields
+
+- `state`: An object of type [`StateData`](#statedata) containing data associated with the state that was caught.
+- `catch`: An object of type [`CatchData`](#catchdata) containing data associated with the caught error.
+- `index?`: The index of the `Map` iteration in which this state was caught. This property is only set if this state was executed within a `Map` state.
+
+#### Example
+
+```js
+{
+    type: 'StateCaught',
+    timestamp: 1234567890123,
+    state: {
+        name: 'ReadDataFile',
+        type: 'Task',
+        input: { filePath: '/home/user/data.csv' }
+    },
+    catch: {
+        catcher: {
+            ErrorEquals: ['ReadError'],
+            Next: 'RecoveryState'
+        }
+    }
+}
+```
+
 ## Helper data types
 
 #### `StateData`
@@ -378,3 +474,38 @@ interface StateData {
 - `type`: Type of the state.
 - `input`: The input passed to the state.
 - `output`: The output produced by the state. Only set when event is of type `StateExited`.
+
+---
+
+#### `RetryData`
+
+```ts
+interface RetryData {
+  retrier: {
+    ErrorEquals: string[];
+    IntervalSeconds?: number;
+    MaxAttempts?: number;
+    BackoffRate?: number;
+  };
+  attempt: number;
+}
+```
+
+- `retrier`: The retrier object that caused the state to be retried.
+- `attempt`: Number of current attempt (`attempt: 1` being the first attempt).
+
+---
+
+#### `CatchData`
+
+```ts
+interface CatchData {
+  catcher: {
+    ErrorEquals: string[];
+    Next: string;
+    ResultPath?: string;
+  };
+}
+```
+
+- `catcher`: The catcher object that caused the state to be caught.
