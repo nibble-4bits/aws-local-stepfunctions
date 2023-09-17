@@ -104,7 +104,7 @@ The constructor takes the following parameters:
     - `checkPaths`: If set to `false`, won't validate JSONPaths.
     - `checkArn`: If set to `false`, won't validate ARN syntax in `Task` states.
     - `noValidate`: If set to `true`, will skip validation of the definition entirely.
-      > NOTE: Use this option at your own risk, there are no guarantees when passing an invalid/non-standard definition to the state machine. Running it might result in undefined behavior.
+      > NOTE: Use this option at your own risk, there are no guarantees when passing an invalid or non-standard definition to the state machine. Running it might result in undefined/unsupported behavior.
   - `awsConfig?`: An object that specifies the [AWS region and credentials](/docs/feature-support.md#providing-aws-credentials-and-region-to-execute-lambda-functions-specified-in-task-states) to use when invoking a Lambda function in a `Task` state. If not set, the AWS config will be resolved based on the [credentials provider chain](https://docs.aws.amazon.com/sdk-for-javascript/v3/developer-guide/setting-credentials-node.html) of the AWS SDK for JavaScript V3. You don't need to use this option if you have a [shared config/credentials file](https://docs.aws.amazon.com/sdkref/latest/guide/file-format.html) (for example, if you have the [AWS CLI](https://aws.amazon.com/cli/) installed) or if you use a local override for all of your `Task` states.
     - `region`: The AWS region where the Lambda functions are created.
     - `credentials`: An object that specifies which type of credentials to use.
@@ -383,8 +383,12 @@ Before attempting to run the state machine with the given inputs, the state mach
 
 - JSONPath strings are valid.
 - ARNs in the `Resource` field of `Task` states are valid.
+- There are no invalid fields.
+- All states in the definition can be reached.
 
-If any of these two checks fail, `local-sfn` will print the validation error and exit. To suppress this behavior, you can pass the `--no-jsonpath-validation` option, to suppress JSONPath validation; and the `--no-arn-validation` option, to suppress ARN validation.
+If any of these checks fail, `local-sfn` will print the validation error and exit. To partially suppress this behavior, you can pass the `--no-jsonpath-validation` option, to suppress JSONPath validation; and the `--no-arn-validation` option, to suppress ARN validation.
+
+Alternatively, if you want to completely disable all validations, you can pass the `--no-validation` option. Be aware that passing this option implies no guarantees if the provided definition is invalid or contains non-standard fields: running it might result in undefined/unsupported behavior, so use at your own risk.
 
 ### Exit codes
 

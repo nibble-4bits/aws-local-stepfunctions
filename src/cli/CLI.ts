@@ -79,6 +79,12 @@ Example calls:
       new Option('--no-jsonpath-validation', 'Disable validation of JSONPath strings in the state machine definition.')
     )
     .addOption(new Option('--no-arn-validation', 'Disable validation of ARNs in the state machine definition.'))
+    .addOption(
+      new Option(
+        '--no-validation',
+        'Disable validation of the state machine definition entirely. Use this option at your own risk, there are no guarantees when passing an invalid or non-standard definition to the state machine. Running it might result in undefined/unsupported behavior.'
+      )
+    )
     .argument(
       '[inputs...]',
       'Input data for the state machine, can be any valid JSON value. Each input represents a state machine execution.\n\nWhen reading from the standard input, if the first line can be parsed as a single JSON value, then each line will be considered as an input. Otherwise, the entire standard input will be considered as a single JSON input.',
