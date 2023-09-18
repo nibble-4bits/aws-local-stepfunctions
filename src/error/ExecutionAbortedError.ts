@@ -1,5 +1,5 @@
 /**
- * Represents the abortion of a state machine execution.
+ * Represents the abort of a state machine execution.
  */
 export class ExecutionAbortedError extends Error {
   constructor() {
