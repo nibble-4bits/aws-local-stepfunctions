@@ -25,6 +25,7 @@ This package lets you run AWS Step Functions state machines completely locally, 
 ## Table of contents
 
 - [Features](#features)
+- [Use cases](#use-cases)
 - [Installation](#installation)
 - [Importing](#importing)
   - [Node.js](#nodejs)
@@ -49,6 +50,16 @@ This package lets you run AWS Step Functions state machines completely locally, 
 ## Features
 
 To see the list of features defined in the specification that have full support, partial support, or no support, refer to [this document](/docs/feature-support.md).
+
+## Use cases
+
+Why would you want to use this package? Below is a non-exhaustive list of use cases for `aws-local-stepfunctions`:
+
+- Testing state machines changes locally before deploying them to AWS.
+- Testing the integration between a state machine and the Lambda functions associated with it in `Task` states.
+- Debugging the code of associated Lambda functions interactively using the [`Task` state resource override feature](/docs/feature-support.md#task-state-resource-override).
+- Debugging a state machine by using the [event logs feature](/docs/feature-support.md#execution-event-logs), to better understand the transitions between states and how data flows between them.
+- Running state machines in the browser (not possible with [AWS Step Functions Local](https://docs.aws.amazon.com/step-functions/latest/dg/sfn-local.html)).
 
 ## Installation
 
