@@ -47,16 +47,6 @@ describe('Utils', () => {
 
       await expect(sleepPromise).resolves.not.toThrow();
     });
-
-    test('should resolve promise when sleep is aborted using `rootAbortController` argument', async () => {
-      const abortController = new AbortController();
-      const rootAbortController = new AbortController();
-
-      const sleepPromise = sleep(1000, abortController.signal, rootAbortController.signal);
-      rootAbortController.abort();
-
-      await expect(sleepPromise).resolves.not.toThrow();
-    });
   });
 
   describe('isRFC3339Timestamp', () => {

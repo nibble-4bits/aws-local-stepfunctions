@@ -11,6 +11,7 @@ export type ParsedCommandOptions = {
   contextFile: Context;
   jsonpathValidation: boolean;
   arnValidation: boolean;
+  validation: boolean;
 };
 
 export enum ExitCodes {

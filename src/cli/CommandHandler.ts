@@ -11,6 +11,7 @@ async function commandAction(inputs: JSONValue[], options: ParsedCommandOptions,
       validationOptions: {
         checkPaths: options.jsonpathValidation,
         checkArn: options.arnValidation,
+        noValidate: !options.validation,
       },
     });
   } catch (error) {

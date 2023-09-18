@@ -25,6 +25,7 @@ This package lets you run AWS Step Functions state machines completely locally, 
 ## Table of contents
 
 - [Features](#features)
+- [Use cases](#use-cases)
 - [Installation](#installation)
 - [Importing](#importing)
   - [Node.js](#nodejs)
@@ -49,6 +50,16 @@ This package lets you run AWS Step Functions state machines completely locally, 
 ## Features
 
 To see the list of features defined in the specification that have full support, partial support, or no support, refer to [this document](/docs/feature-support.md).
+
+## Use cases
+
+Why would you want to use this package? Below is a non-exhaustive list of use cases for `aws-local-stepfunctions`:
+
+- Testing state machines changes locally before deploying them to AWS.
+- Testing the integration between a state machine and the Lambda functions associated with it in `Task` states.
+- Debugging the code of associated Lambda functions interactively using the [`Task` state resource override feature](/docs/feature-support.md#task-state-resource-override).
+- Debugging a state machine by using the [event logs feature](/docs/feature-support.md#execution-event-logs), to better understand the transitions between states and how data flows between them.
+- Running state machines in the browser (not possible with [AWS Step Functions Local](https://docs.aws.amazon.com/step-functions/latest/dg/sfn-local.html)).
 
 ## Installation
 
@@ -104,7 +115,7 @@ The constructor takes the following parameters:
     - `checkPaths`: If set to `false`, won't validate JSONPaths.
     - `checkArn`: If set to `false`, won't validate ARN syntax in `Task` states.
     - `noValidate`: If set to `true`, will skip validation of the definition entirely.
-      > NOTE: Use this option at your own risk, there are no guarantees when passing an invalid/non-standard definition to the state machine. Running it might result in undefined behavior.
+      > NOTE: Use this option at your own risk, there are no guarantees when passing an invalid or non-standard definition to the state machine. Running it might result in undefined/unsupported behavior.
   - `awsConfig?`: An object that specifies the [AWS region and credentials](/docs/feature-support.md#providing-aws-credentials-and-region-to-execute-lambda-functions-specified-in-task-states) to use when invoking a Lambda function in a `Task` state. If not set, the AWS config will be resolved based on the [credentials provider chain](https://docs.aws.amazon.com/sdk-for-javascript/v3/developer-guide/setting-credentials-node.html) of the AWS SDK for JavaScript V3. You don't need to use this option if you have a [shared config/credentials file](https://docs.aws.amazon.com/sdkref/latest/guide/file-format.html) (for example, if you have the [AWS CLI](https://aws.amazon.com/cli/) installed) or if you use a local override for all of your `Task` states.
     - `region`: The AWS region where the Lambda functions are created.
     - `credentials`: An object that specifies which type of credentials to use.
@@ -138,11 +149,7 @@ const stateMachine = new StateMachine(machineDefinition, {
 
 ### `StateMachine.run(input[, options])`
 
-Runs the state machine with the given `input` parameter and returns an object with the following properties:
-
-- `result`: A `Promise` that resolves with the result of the execution once it terminates.
-- `abort`: A function that takes no parameters and doesn't return any value. If called, [aborts the execution](/docs/feature-support.md#abort-a-running-execution) and throws an `ExecutionAbortedError`, unless the `noThrowOnAbort` option is set.
-- `eventLogs`: An `AsyncGenerator` that [produces a log of events](/docs/feature-support.md#execution-event-logs) as the execution runs. To learn more about the events, their type, and their format, see the [following document](/docs/execution-event-logs.md).
+Runs the state machine with the given `input`.
 
 Each execution is independent of all others, meaning that you can concurrently call this method as many times as needed, without worrying about race conditions.
 
@@ -155,6 +162,14 @@ Each execution is independent of all others, meaning that you can concurrently c
     - `waitTimeOverrides?`: An [object that overrides](/docs/feature-support.md#wait-state-duration-override) the wait duration of the specified `Wait` states. The specified override duration should be in milliseconds.
   - `noThrowOnAbort?`: If this option is set to `true`, aborting the execution will simply return `null` as result instead of throwing.
   - `context?`: An object that will be used as the [Context Object](https://docs.aws.amazon.com/step-functions/latest/dg/input-output-contextobject.html) for the execution. If not passed, the Context Object will default to an empty object. This option is useful to mock the Context Object in case your definition references it in a JSONPath.
+
+#### Return value
+
+Returns an object that has the following properties:
+
+- `result`: A `Promise` that resolves with the result of the execution, if it ends successfully.
+- `abort`: A function that takes no parameters and doesn't return any value. If called, [aborts the execution](/docs/feature-support.md#abort-a-running-execution) and throws an `ExecutionAbortedError`, unless the `noThrowOnAbort` option is set.
+- `eventLogs`: An `AsyncGenerator` that [produces a log of events](/docs/feature-support.md#execution-event-logs) as the execution runs. To learn more about the events, their type, and their format, see the [following document](/docs/execution-event-logs.md).
 
 #### Basic example:
 
@@ -383,8 +398,12 @@ Before attempting to run the state machine with the given inputs, the state mach
 
 - JSONPath strings are valid.
 - ARNs in the `Resource` field of `Task` states are valid.
+- There are no invalid fields.
+- All states in the definition can be reached.
 
-If any of these two checks fail, `local-sfn` will print the validation error and exit. To suppress this behavior, you can pass the `--no-jsonpath-validation` option, to suppress JSONPath validation; and the `--no-arn-validation` option, to suppress ARN validation.
+If any of these checks fail, `local-sfn` will print the validation error and exit. To partially suppress this behavior, you can pass the `--no-jsonpath-validation` option, to suppress JSONPath validation; and the `--no-arn-validation` option, to suppress ARN validation.
+
+Alternatively, if you want to completely disable all validations, you can pass the `--no-validation` option. Be aware that passing this option implies no guarantees if the provided definition is invalid or contains non-standard fields: running it might result in undefined/unsupported behavior, so use at your own risk.
 
 ### Exit codes
 

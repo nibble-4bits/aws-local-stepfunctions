@@ -2,7 +2,6 @@ import { defineConfig, Options } from 'tsup';
 
 function getCommonConfig(): Options {
   return {
-    outDir: 'build',
     splitting: false,
   };
 }
@@ -10,6 +9,7 @@ function getCommonConfig(): Options {
 function getPackageConfig(platform: 'node' | 'browser'): Options {
   return {
     ...getCommonConfig(),
+    outDir: 'build',
     name: platform,
     platform,
     entry: ['src/main.ts'],
@@ -23,6 +23,7 @@ function getPackageConfig(platform: 'node' | 'browser'): Options {
 function getCLIConfig(): Options {
   return {
     ...getCommonConfig(),
+    outDir: 'bin',
     name: 'cli',
     entry: ['src/cli/CLI.ts'],
     format: ['cjs'],
@@ -31,7 +32,7 @@ function getCLIConfig(): Options {
         name: 'rewrite-main-import',
         setup(build) {
           build.onResolve({ filter: /^\.\.\/main$/ }, () => {
-            return { path: './main.node.cjs', external: true };
+            return { path: '../build/main.node.cjs', external: true };
           });
         },
       },

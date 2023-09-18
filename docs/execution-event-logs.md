@@ -22,6 +22,8 @@
   - [`StateCaught` event](#statecaught-event)
 - [Helper data types](#helper-data-types)
   - [`StateData`](#statedata)
+  - [`RetryData`](#retrydata)
+  - [`CatchData`](#catchdata)
 
 ## Events
 

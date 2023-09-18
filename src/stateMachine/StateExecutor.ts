@@ -141,7 +141,7 @@ export class StateExecutor {
       if (shouldRetry) {
         const stateDefinition = this.stateDefinition as TaskState | MapState | ParallelState;
 
-        await sleep(waitTimeBeforeRetry!, options.abortSignal, options.runOptions?._rootAbortSignal);
+        await sleep(waitTimeBeforeRetry!, options.abortSignal);
 
         options.eventLogger.dispatchStateRetriedEvent(
           this.stateName,
@@ -404,7 +404,6 @@ export class StateExecutor {
     const executionResult = await waitStateAction.execute(input, context, {
       waitTimeOverrideOption,
       abortSignal: options.abortSignal,
-      rootAbortSignal: options.runOptions?._rootAbortSignal,
     });
 
     return executionResult;

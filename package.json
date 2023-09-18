@@ -22,7 +22,8 @@
   },
   "license": "MIT",
   "files": [
-    "build"
+    "build",
+    "bin"
   ],
   "type": "module",
   "types": "build/main.d.ts",
@@ -40,7 +41,7 @@
     "node": ">=16.0.0"
   },
   "bin": {
-    "local-sfn": "./build/CLI.cjs"
+    "local-sfn": "./bin/CLI.cjs"
   },
   "scripts": {
     "test": "jest",
