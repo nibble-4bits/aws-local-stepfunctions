@@ -138,11 +138,7 @@ const stateMachine = new StateMachine(machineDefinition, {
 
 ### `StateMachine.run(input[, options])`
 
-Runs the state machine with the given `input` parameter and returns an object with the following properties:
-
-- `result`: A `Promise` that resolves with the result of the execution once it terminates.
-- `abort`: A function that takes no parameters and doesn't return any value. If called, [aborts the execution](/docs/feature-support.md#abort-a-running-execution) and throws an `ExecutionAbortedError`, unless the `noThrowOnAbort` option is set.
-- `eventLogs`: An `AsyncGenerator` that [produces a log of events](/docs/feature-support.md#execution-event-logs) as the execution runs. To learn more about the events, their type, and their format, see the [following document](/docs/execution-event-logs.md).
+Runs the state machine with the given `input`.
 
 Each execution is independent of all others, meaning that you can concurrently call this method as many times as needed, without worrying about race conditions.
 
@@ -155,6 +151,14 @@ Each execution is independent of all others, meaning that you can concurrently c
     - `waitTimeOverrides?`: An [object that overrides](/docs/feature-support.md#wait-state-duration-override) the wait duration of the specified `Wait` states. The specified override duration should be in milliseconds.
   - `noThrowOnAbort?`: If this option is set to `true`, aborting the execution will simply return `null` as result instead of throwing.
   - `context?`: An object that will be used as the [Context Object](https://docs.aws.amazon.com/step-functions/latest/dg/input-output-contextobject.html) for the execution. If not passed, the Context Object will default to an empty object. This option is useful to mock the Context Object in case your definition references it in a JSONPath.
+
+#### Return value
+
+Returns an object that has the following properties:
+
+- `result`: A `Promise` that resolves with the result of the execution, if it ends successfully.
+- `abort`: A function that takes no parameters and doesn't return any value. If called, [aborts the execution](/docs/feature-support.md#abort-a-running-execution) and throws an `ExecutionAbortedError`, unless the `noThrowOnAbort` option is set.
+- `eventLogs`: An `AsyncGenerator` that [produces a log of events](/docs/feature-support.md#execution-event-logs) as the execution runs. To learn more about the events, their type, and their format, see the [following document](/docs/execution-event-logs.md).
 
 #### Basic example:
 
