@@ -21,6 +21,8 @@ interface BaseTaskState
     CatchableState {
   Type: 'Task';
   Resource: string;
+  TimeoutSeconds?: number;
+  TimeoutSecondsPath?: string;
 }
 
 export type TaskState = (IntermediateState | TerminalState) & BaseTaskState;
