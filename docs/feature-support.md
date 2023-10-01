@@ -38,6 +38,8 @@ The following features all come from the [Amazon States Language specification](
     - [x] `TimestampPath`
   - [x] Task
     - [x] `Resource` (only Lambda functions supported)
+    - [x] `TimeoutSeconds`
+    - [x] `TimeoutSecondsPath`
   - [x] Parallel
     - [x] `Branches`
   - [x] Map
@@ -106,9 +108,7 @@ The following features all come from the [Amazon States Language specification](
 
 - States
   - Task
-    - [ ] `TimeoutSeconds`
     - [ ] `HeartbeatSeconds`
-    - [ ] `TimeoutSecondsPath`
     - [ ] `HeartbeatSecondsPath`
     - [ ] `Credentials`
   - Map
