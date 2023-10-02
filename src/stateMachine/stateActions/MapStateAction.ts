@@ -59,8 +59,9 @@ class MapStateAction extends BaseStateAction<MapState> {
     };
 
     // Handle `Parameters` field if specified
-    if (state.Parameters) {
-      paramValue = processPayloadTemplate(state.Parameters, input, context);
+    if (state.Parameters || state.ItemSelector) {
+      const parameters = (state.ItemSelector ?? state.Parameters)!;
+      paramValue = processPayloadTemplate(parameters, input, context);
     }
 
     // Pass the current parameter value if defined, otherwise pass the current item being iterated
@@ -87,7 +88,8 @@ class MapStateAction extends BaseStateAction<MapState> {
       throw new StatesRuntimeError('Input of Map state must be an array or ItemsPath property must point to an array');
     }
 
-    const iteratorStateMachine = new StateMachine(state.Iterator, {
+    const iteratorDefinition = (state.ItemProcessor ?? state.Iterator)!;
+    const iteratorStateMachine = new StateMachine(iteratorDefinition, {
       ...options.stateMachineOptions,
       validationOptions: { noValidate: true },
     });
