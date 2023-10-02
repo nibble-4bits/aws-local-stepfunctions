@@ -88,6 +88,44 @@ describe('Map State', () => {
     ]);
   });
 
+  test('should execute action if using `ItemProcessor` field, which is equivalent to `Iterator`', async () => {
+    const definition: MapState = {
+      Type: 'Map',
+      ItemProcessor: {
+        StartAt: 'EntryIterationState',
+        States: {
+          EntryIterationState: {
+            Type: 'Succeed',
+          },
+        },
+      },
+      End: true,
+    };
+    const stateName = 'MapState';
+    const input = [
+      { num1: 5, num2: 3 },
+      { num1: 2, num2: 6 },
+      { num1: 7, num2: 4 },
+    ];
+    const context = {};
+    const options = {
+      stateMachineOptions: undefined,
+      runOptions: undefined,
+      eventLogger: new EventLogger(),
+      rawInput: {},
+    };
+
+    const mapStateAction = new MapStateAction(definition, stateName);
+    const { stateResult } = await mapStateAction.execute(input, context, options);
+
+    expect(stateResult).toHaveLength(3);
+    expect(stateResult).toEqual([
+      { num1: 5, num2: 3 },
+      { num1: 2, num2: 6 },
+      { num1: 7, num2: 4 },
+    ]);
+  });
+
   test('should process `Parameters` field if specified', async () => {
     const definition: MapState = {
       Type: 'Map',
@@ -101,6 +139,60 @@ describe('Map State', () => {
       },
       ItemsPath: '$.items',
       Parameters: {
+        'pair.$': '$$.Map.Item.Value',
+        'index.$': '$$.Map.Item.Index',
+      },
+      End: true,
+    };
+    const stateName = 'MapState';
+    const input = {
+      items: [
+        { num1: 5, num2: 3 },
+        { num1: 2, num2: 6 },
+        { num1: 7, num2: 4 },
+      ],
+    };
+    const context = {};
+    const options = {
+      stateMachineOptions: undefined,
+      runOptions: undefined,
+      eventLogger: new EventLogger(),
+      rawInput: {},
+    };
+
+    const mapStateAction = new MapStateAction(definition, stateName);
+    const { stateResult } = await mapStateAction.execute(input, context, options);
+
+    expect(stateResult).toHaveLength(3);
+    expect(stateResult).toEqual([
+      {
+        pair: { num1: 5, num2: 3 },
+        index: 0,
+      },
+      {
+        pair: { num1: 2, num2: 6 },
+        index: 1,
+      },
+      {
+        pair: { num1: 7, num2: 4 },
+        index: 2,
+      },
+    ]);
+  });
+
+  test('should process `ItemSelector` field if specified', async () => {
+    const definition: MapState = {
+      Type: 'Map',
+      Iterator: {
+        StartAt: 'EntryIterationState',
+        States: {
+          EntryIterationState: {
+            Type: 'Succeed',
+          },
+        },
+      },
+      ItemsPath: '$.items',
+      ItemSelector: {
         'pair.$': '$$.Map.Item.Value',
         'index.$': '$$.Map.Item.Index',
       },

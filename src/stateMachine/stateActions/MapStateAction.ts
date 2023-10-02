@@ -11,6 +11,7 @@ import { processPayloadTemplate } from '../InputOutputProcessing';
 import { StatesRuntimeError } from '../../error/predefined/StatesRuntimeError';
 import { ExecutionError } from '../../error/ExecutionError';
 import { ArrayConstraint } from '../jsonPath/constraints/ArrayConstraint';
+import { IntegerConstraint } from '../jsonPath/constraints/IntegerConstraint';
 import pLimit from 'p-limit';
 
 /**
@@ -59,8 +60,9 @@ class MapStateAction extends BaseStateAction<MapState> {
     };
 
     // Handle `Parameters` field if specified
-    if (state.Parameters) {
-      paramValue = processPayloadTemplate(state.Parameters, input, context);
+    if (state.Parameters || state.ItemSelector) {
+      const parameters = (state.ItemSelector ?? state.Parameters)!;
+      paramValue = processPayloadTemplate(parameters, input, context);
     }
 
     // Pass the current parameter value if defined, otherwise pass the current item being iterated
@@ -87,11 +89,21 @@ class MapStateAction extends BaseStateAction<MapState> {
       throw new StatesRuntimeError('Input of Map state must be an array or ItemsPath property must point to an array');
     }
 
-    const iteratorStateMachine = new StateMachine(state.Iterator, {
+    const iteratorDefinition = (state.ItemProcessor ?? state.Iterator)!;
+    const iteratorStateMachine = new StateMachine(iteratorDefinition, {
       ...options.stateMachineOptions,
       validationOptions: { noValidate: true },
     });
-    const limit = pLimit(state.MaxConcurrency || DEFAULT_MAX_CONCURRENCY);
+
+    let maxConcurrency = state.MaxConcurrency;
+    if (state.MaxConcurrencyPath) {
+      maxConcurrency = jsonPathQuery(state.MaxConcurrencyPath, input, context, {
+        constraints: [IntegerConstraint],
+        ignoreDefinedValueConstraint: true,
+      });
+    }
+
+    const limit = pLimit(maxConcurrency || DEFAULT_MAX_CONCURRENCY);
     const processedItemsPromise = items.map((item, i) =>
       limit(() => this.processItem(iteratorStateMachine, item, input, context, i, options))
     );

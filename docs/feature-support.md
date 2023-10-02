@@ -44,8 +44,12 @@ The following features all come from the [Amazon States Language specification](
     - [x] `Branches`
   - [x] Map
     - [x] `Iterator`
+    - [x] `ItemProcessor`
+    - [x] `Parameters`
+    - [x] `ItemSelector`
     - [x] `ItemsPath`
     - [x] `MaxConcurrency`
+    - [x] `MaxConcurrencyPath`
   - [x] Fail
     - [x] `Error`
     - [x] `Cause`
@@ -113,12 +117,9 @@ The following features all come from the [Amazon States Language specification](
     - [ ] `Credentials`
   - Map
     - [ ] Distributed mode
-    - [ ] `ItemProcessor`
     - [ ] `ItemReader`
-    - [ ] `ItemSelector`
     - [ ] `ItemBatcher`
     - [ ] `ResultWriter`
-    - [ ] `MaxConcurrencyPath`
     - [ ] `ToleratedFailurePercentage`
     - [ ] `ToleratedFailureCount`
 
