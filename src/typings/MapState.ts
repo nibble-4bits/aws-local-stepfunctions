@@ -26,6 +26,7 @@ interface BaseMapState
   ItemSelector?: PayloadTemplate;
   ItemsPath?: string;
   MaxConcurrency?: number;
+  MaxConcurrencyPath?: string;
 }
 
 export type MapState = (IntermediateState | TerminalState) & BaseMapState;

@@ -11,6 +11,7 @@ import { processPayloadTemplate } from '../InputOutputProcessing';
 import { StatesRuntimeError } from '../../error/predefined/StatesRuntimeError';
 import { ExecutionError } from '../../error/ExecutionError';
 import { ArrayConstraint } from '../jsonPath/constraints/ArrayConstraint';
+import { IntegerConstraint } from '../jsonPath/constraints/IntegerConstraint';
 import pLimit from 'p-limit';
 
 /**
@@ -93,7 +94,16 @@ class MapStateAction extends BaseStateAction<MapState> {
       ...options.stateMachineOptions,
       validationOptions: { noValidate: true },
     });
-    const limit = pLimit(state.MaxConcurrency || DEFAULT_MAX_CONCURRENCY);
+
+    let maxConcurrency = state.MaxConcurrency;
+    if (state.MaxConcurrencyPath) {
+      maxConcurrency = jsonPathQuery(state.MaxConcurrencyPath, input, context, {
+        constraints: [IntegerConstraint],
+        ignoreDefinedValueConstraint: true,
+      });
+    }
+
+    const limit = pLimit(maxConcurrency || DEFAULT_MAX_CONCURRENCY);
     const processedItemsPromise = items.map((item, i) =>
       limit(() => this.processItem(iteratorStateMachine, item, input, context, i, options))
     );
