@@ -3,6 +3,7 @@ export type Retrier = {
   IntervalSeconds?: number; // default 1
   MaxAttempts?: number; // default 3
   BackoffRate?: number; // default 2.0
+  MaxDelaySeconds?: number;
 };
 
 export interface RetryableState {

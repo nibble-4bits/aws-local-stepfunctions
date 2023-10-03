@@ -29,7 +29,7 @@ import { SucceedStateAction } from './stateActions/SucceedStateAction';
 import { TaskStateAction } from './stateActions/TaskStateAction';
 import { WaitStateAction } from './stateActions/WaitStateAction';
 import { StatesTimeoutError } from '../error/predefined/StatesTimeoutError';
-import { sleep } from '../util';
+import { clamp, sleep } from '../util';
 import cloneDeep from 'lodash/cloneDeep.js';
 
 /**
@@ -226,7 +226,8 @@ export class StateExecutor {
       const maxAttempts = retrier.MaxAttempts ?? DEFAULT_MAX_ATTEMPTS;
       const intervalSeconds = retrier.IntervalSeconds ?? DEFAULT_INTERVAL_SECONDS;
       const backoffRate = retrier.BackoffRate ?? DEFAULT_BACKOFF_RATE;
-      const waitTimeBeforeRetry = intervalSeconds * Math.pow(backoffRate, this.retrierAttempts[i]) * 1000;
+      const waitInterval = intervalSeconds * Math.pow(backoffRate, this.retrierAttempts[i]) * 1000;
+      const waitTimeBeforeRetry = clamp(waitInterval, 1, retrier.MaxDelaySeconds);
       const retryable = error.isRetryable ?? true;
 
       for (const retrierError of retrier.ErrorEquals) {
