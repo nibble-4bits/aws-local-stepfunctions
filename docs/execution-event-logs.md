@@ -488,6 +488,8 @@ interface RetryData {
     IntervalSeconds?: number;
     MaxAttempts?: number;
     BackoffRate?: number;
+    MaxDelaySeconds?: number;
+    JitterStrategy?: 'NONE' | 'FULL';
   };
   attempt: number;
 }
