@@ -29,7 +29,7 @@ import { SucceedStateAction } from './stateActions/SucceedStateAction';
 import { TaskStateAction } from './stateActions/TaskStateAction';
 import { WaitStateAction } from './stateActions/WaitStateAction';
 import { StatesTimeoutError } from '../error/predefined/StatesTimeoutError';
-import { sleep } from '../util';
+import { clamp, sleep, getRandomNumber } from '../util';
 import cloneDeep from 'lodash/cloneDeep.js';
 
 /**
@@ -46,6 +46,11 @@ const DEFAULT_INTERVAL_SECONDS = 1;
  * Default backoff rate for retry wait.
  */
 const DEFAULT_BACKOFF_RATE = 2.0;
+
+/**
+ * Default jitter strategy for retry.
+ */
+const DEFAULT_JITTER_STRATEGY = 'NONE';
 
 /**
  * The wildcard error. This matches all thrown errors.
@@ -223,11 +228,17 @@ export class StateExecutor {
 
     for (let i = 0; i < this.stateDefinition.Retry.length; i++) {
       const retrier = this.stateDefinition.Retry[i];
+      const jitterStrategy = retrier.JitterStrategy ?? DEFAULT_JITTER_STRATEGY;
       const maxAttempts = retrier.MaxAttempts ?? DEFAULT_MAX_ATTEMPTS;
       const intervalSeconds = retrier.IntervalSeconds ?? DEFAULT_INTERVAL_SECONDS;
       const backoffRate = retrier.BackoffRate ?? DEFAULT_BACKOFF_RATE;
-      const waitTimeBeforeRetry = intervalSeconds * Math.pow(backoffRate, this.retrierAttempts[i]) * 1000;
+      const waitInterval = intervalSeconds * Math.pow(backoffRate, this.retrierAttempts[i]);
       const retryable = error.isRetryable ?? true;
+
+      let waitTimeBeforeRetry = clamp(waitInterval, 1, retrier.MaxDelaySeconds) * 1000;
+      if (jitterStrategy === 'FULL') {
+        waitTimeBeforeRetry = getRandomNumber(0, waitTimeBeforeRetry);
+      }
 
       for (const retrierError of retrier.ErrorEquals) {
         const isErrorMatch = retrierError === error.name;

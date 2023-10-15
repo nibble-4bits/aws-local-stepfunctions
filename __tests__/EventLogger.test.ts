@@ -9,6 +9,9 @@ import type {
 } from '../src/typings/EventLogs';
 import { StatesRuntimeError } from '../src/error/predefined/StatesRuntimeError';
 import { EventLogger } from '../src/stateMachine/EventLogger';
+
+// NOTE: We need to import the custom matcher declarations, since VSCode doesn't recognize custom tsconfigs
+// See: https://github.com/microsoft/vscode/issues/12463
 import './_customMatchers';
 
 afterEach(() => {

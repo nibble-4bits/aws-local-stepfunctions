@@ -73,4 +73,10 @@ export function stringifyJSONValue(value: unknown) {
   return JSON.stringify(value);
 }
 
+export function clamp(value: number, min: number | undefined, max: number | undefined) {
+  if (min && value < min) return min;
+  if (max && value > max) return max;
+  return value;
+}
+
 export { getRandomNumber, sfc32, cyrb128 } from './random';
