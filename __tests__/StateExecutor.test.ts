@@ -3,6 +3,10 @@ import { StateExecutor } from '../src/stateMachine/StateExecutor';
 import { EventLogger } from '../src/stateMachine/EventLogger';
 import * as utilModule from '../src/util';
 
+// NOTE: We need to import the custom matcher declarations, since VSCode doesn't recognize custom tsconfigs
+// See: https://github.com/microsoft/vscode/issues/12463
+import './_customMatchers';
+
 afterEach(() => {
   jest.clearAllMocks();
 });
@@ -17,9 +21,11 @@ describe('State Executor', () => {
 
   describe('Retry behavior', () => {
     const defaultMaxRetries = 3;
+    const sleepFnMock = jest.fn();
 
     beforeEach(() => {
-      jest.spyOn(utilModule, 'sleep').mockImplementation(jest.fn());
+      sleepFnMock.mockClear();
+      jest.spyOn(utilModule, 'sleep').mockImplementation(sleepFnMock);
     });
 
     test('should retry state if `Retry` field is specified and thrown error is specified in retrier', async () => {
@@ -183,6 +189,95 @@ describe('State Executor', () => {
       });
 
       await expect(executorResult).rejects.toThrow();
+    });
+
+    test('should wait at most the number of seconds specified in `MaxDelaySeconds`', async () => {
+      const stateDefinition: TaskState = {
+        Type: 'Task',
+        Resource: 'mock-arn',
+        Retry: [
+          {
+            ErrorEquals: ['CustomError'],
+            IntervalSeconds: 3,
+            MaxDelaySeconds: 8,
+          },
+        ],
+        End: true,
+      };
+      const input = {};
+      const context = {};
+      const abortSignal = new AbortController().signal;
+      let retryCount = 0;
+
+      const stateExecutor = new StateExecutor('TaskState', stateDefinition);
+      const { stateResult } = await stateExecutor.execute(input, context, {
+        abortSignal,
+        eventLogger: new EventLogger(),
+        stateMachineOptions: undefined,
+        runOptions: {
+          overrides: {
+            taskResourceLocalHandlers: {
+              TaskState: async () => {
+                if (retryCount < defaultMaxRetries) {
+                  retryCount++;
+                  throw new CustomError('Task state failed');
+                }
+
+                return 1;
+              },
+            },
+          },
+        },
+      });
+
+      expect(stateResult).toBe(1);
+      expect(sleepFnMock).toHaveBeenNthCalledWith(1, 3000, abortSignal);
+      expect(sleepFnMock).toHaveBeenNthCalledWith(2, 6000, abortSignal);
+      expect(sleepFnMock).toHaveBeenNthCalledWith(3, 8000, abortSignal);
+    });
+
+    test('should wait a random amount of seconds if `JitterStrategy` is set to `FULL`', async () => {
+      const stateDefinition: TaskState = {
+        Type: 'Task',
+        Resource: 'mock-arn',
+        Retry: [
+          {
+            ErrorEquals: ['CustomError'],
+            JitterStrategy: 'FULL',
+          },
+        ],
+        End: true,
+      };
+      const input = {};
+      const context = {};
+      const abortSignal = new AbortController().signal;
+      let retryCount = 0;
+
+      const stateExecutor = new StateExecutor('TaskState', stateDefinition);
+      const { stateResult } = await stateExecutor.execute(input, context, {
+        abortSignal,
+        eventLogger: new EventLogger(),
+        stateMachineOptions: undefined,
+        runOptions: {
+          overrides: {
+            taskResourceLocalHandlers: {
+              TaskState: async () => {
+                if (retryCount < defaultMaxRetries) {
+                  retryCount++;
+                  throw new CustomError('Task state failed');
+                }
+
+                return 1;
+              },
+            },
+          },
+        },
+      });
+
+      expect(stateResult).toBe(1);
+      expect(sleepFnMock).toHaveBeenNthCalledWith(1, expect.numberBetween(0, 1000), abortSignal);
+      expect(sleepFnMock).toHaveBeenNthCalledWith(2, expect.numberBetween(0, 2000), abortSignal);
+      expect(sleepFnMock).toHaveBeenNthCalledWith(3, expect.numberBetween(0, 4000), abortSignal);
     });
 
     describe('Task state', () => {
