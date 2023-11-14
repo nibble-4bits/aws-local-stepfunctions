@@ -52,7 +52,9 @@ The following features all come from the [Amazon States Language specification](
     - [x] `MaxConcurrencyPath`
   - [x] Fail
     - [x] `Error`
+    - [x] `ErrorPath`
     - [x] `Cause`
+    - [x] `CausePath`
     - [x] Terminate execution with error
   - [x] Choice
     - Boolean expressions
@@ -106,7 +108,10 @@ The following features all come from the [Amazon States Language specification](
 - Errors
   - [x] Runtime errors
     - [x] Predefined error codes
-  - [x] Retry/Catch
+  - [x] Retry
+    - [x] `MaxDelaySeconds`
+    - [x] `JitterStrategy`
+  - [x] Catch
 
 ### Not supported
 
