@@ -98,7 +98,7 @@ class MapStateAction extends BaseStateAction<MapState> {
     let maxConcurrency = state.MaxConcurrency;
     if (state.MaxConcurrencyPath) {
       maxConcurrency = jsonPathQuery(state.MaxConcurrencyPath, input, context, {
-        constraints: [IntegerConstraint],
+        constraints: [IntegerConstraint.greaterThanOrEqual(0)],
         ignoreDefinedValueConstraint: true,
       });
     }
