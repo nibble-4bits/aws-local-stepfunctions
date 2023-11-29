@@ -1,3 +1,4 @@
+import type { JSONValue } from '../src/typings/JSONValue';
 import { StatesResultPathMatchFailureError } from '../src/error/predefined/StatesResultPathMatchFailureError';
 import {
   processInputPath,
@@ -268,6 +269,131 @@ describe('Input processing', () => {
       });
     });
 
+    test('should return `Parameters` array payload with values replaced according to path fields', () => {
+      const parameters: JSONValue = [
+        { field1: 50, 'field2.$': '$.movies[0].director' },
+        {
+          field3: false,
+          field4: {
+            'field5.$': '$.metadata',
+            field6: [1, 2, 3],
+          },
+        },
+      ];
+
+      const input = {
+        movies: [
+          {
+            director: 'Quentin Tarantino',
+            title: 'Reservoir Dogs',
+            year: 1992,
+          },
+          {
+            director: 'Brian De Palma',
+            title: 'Mission: Impossible',
+            year: 1996,
+          },
+        ],
+        metadata: {
+          lastUpdated: '2020-05-27T08:00:00Z',
+        },
+      };
+      const context = {};
+
+      const result = processPayloadTemplate(parameters, input, context);
+
+      expect(result).toEqual([
+        { field1: 50, field2: 'Quentin Tarantino' },
+        {
+          field3: false,
+          field4: {
+            field5: {
+              lastUpdated: '2020-05-27T08:00:00Z',
+            },
+            field6: [1, 2, 3],
+          },
+        },
+      ]);
+    });
+
+    test('should return `Parameters` numeric payload as is', () => {
+      const parameters = 3.141592;
+      const input = {
+        movies: [
+          {
+            director: 'Quentin Tarantino',
+            title: 'Reservoir Dogs',
+            year: 1992,
+          },
+          {
+            director: 'Brian De Palma',
+            title: 'Mission: Impossible',
+            year: 1996,
+          },
+        ],
+        metadata: {
+          lastUpdated: '2020-05-27T08:00:00Z',
+        },
+      };
+      const context = {};
+
+      const result = processPayloadTemplate(parameters, input, context);
+
+      expect(result).toEqual(3.141592);
+    });
+
+    test('should return `Parameters` string payload as is', () => {
+      const parameters = 'Hello, world!';
+      const input = {
+        movies: [
+          {
+            director: 'Quentin Tarantino',
+            title: 'Reservoir Dogs',
+            year: 1992,
+          },
+          {
+            director: 'Brian De Palma',
+            title: 'Mission: Impossible',
+            year: 1996,
+          },
+        ],
+        metadata: {
+          lastUpdated: '2020-05-27T08:00:00Z',
+        },
+      };
+      const context = {};
+
+      const result = processPayloadTemplate(parameters, input, context);
+
+      expect(result).toEqual('Hello, world!');
+    });
+
+    test('should return `Parameters` boolean payload as is', () => {
+      const parameters = true;
+      const input = {
+        movies: [
+          {
+            director: 'Quentin Tarantino',
+            title: 'Reservoir Dogs',
+            year: 1992,
+          },
+          {
+            director: 'Brian De Palma',
+            title: 'Mission: Impossible',
+            year: 1996,
+          },
+        ],
+        metadata: {
+          lastUpdated: '2020-05-27T08:00:00Z',
+        },
+      };
+      const context = {};
+
+      const result = processPayloadTemplate(parameters, input, context);
+
+      expect(result).toEqual(true);
+    });
+
     // TODO: Add test to assert field value is valid JSONPath when field name ends with `.$` suffix.
     // For instance: { 'path.$': 'movies' } would not be a valid JSONPath, as the value doesn't begin with `$.`
   });
@@ -441,6 +567,131 @@ describe('Output processing', () => {
           field6: [1, 2, 3],
         },
       });
+    });
+
+    test('should return `ResultSelector` array payload with values replaced according to path fields', () => {
+      const parameters: JSONValue = [
+        { field1: 50, 'field2.$': '$.movies[0].director' },
+        {
+          field3: false,
+          field4: {
+            'field5.$': '$.metadata',
+            field6: [1, 2, 3],
+          },
+        },
+      ];
+
+      const input = {
+        movies: [
+          {
+            director: 'Quentin Tarantino',
+            title: 'Reservoir Dogs',
+            year: 1992,
+          },
+          {
+            director: 'Brian De Palma',
+            title: 'Mission: Impossible',
+            year: 1996,
+          },
+        ],
+        metadata: {
+          lastUpdated: '2020-05-27T08:00:00Z',
+        },
+      };
+      const context = {};
+
+      const result = processPayloadTemplate(parameters, input, context);
+
+      expect(result).toEqual([
+        { field1: 50, field2: 'Quentin Tarantino' },
+        {
+          field3: false,
+          field4: {
+            field5: {
+              lastUpdated: '2020-05-27T08:00:00Z',
+            },
+            field6: [1, 2, 3],
+          },
+        },
+      ]);
+    });
+
+    test('should return `ResultSelector` numeric payload as is', () => {
+      const parameters = 3.141592;
+      const input = {
+        movies: [
+          {
+            director: 'Quentin Tarantino',
+            title: 'Reservoir Dogs',
+            year: 1992,
+          },
+          {
+            director: 'Brian De Palma',
+            title: 'Mission: Impossible',
+            year: 1996,
+          },
+        ],
+        metadata: {
+          lastUpdated: '2020-05-27T08:00:00Z',
+        },
+      };
+      const context = {};
+
+      const result = processPayloadTemplate(parameters, input, context);
+
+      expect(result).toEqual(3.141592);
+    });
+
+    test('should return `ResultSelector` string payload as is', () => {
+      const parameters = 'Hello, world!';
+      const input = {
+        movies: [
+          {
+            director: 'Quentin Tarantino',
+            title: 'Reservoir Dogs',
+            year: 1992,
+          },
+          {
+            director: 'Brian De Palma',
+            title: 'Mission: Impossible',
+            year: 1996,
+          },
+        ],
+        metadata: {
+          lastUpdated: '2020-05-27T08:00:00Z',
+        },
+      };
+      const context = {};
+
+      const result = processPayloadTemplate(parameters, input, context);
+
+      expect(result).toEqual('Hello, world!');
+    });
+
+    test('should return `ResultSelector` boolean payload as is', () => {
+      const parameters = true;
+      const input = {
+        movies: [
+          {
+            director: 'Quentin Tarantino',
+            title: 'Reservoir Dogs',
+            year: 1992,
+          },
+          {
+            director: 'Brian De Palma',
+            title: 'Mission: Impossible',
+            year: 1996,
+          },
+        ],
+        metadata: {
+          lastUpdated: '2020-05-27T08:00:00Z',
+        },
+      };
+      const context = {};
+
+      const result = processPayloadTemplate(parameters, input, context);
+
+      expect(result).toEqual(true);
     });
 
     // TODO: Add test to assert field value is valid JSONPath when field name ends with `.$` suffix.

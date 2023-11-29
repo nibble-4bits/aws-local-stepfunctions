@@ -1,17 +1,17 @@
-import type { JSONObject } from './JSONValue';
+import type { JSONArray, JSONObject, JSONValue } from './JSONValue';
 
-export type PayloadTemplate = JSONObject;
+export type PayloadTemplate = JSONObject | JSONArray;
 
 export interface CanHaveInputPath {
   InputPath?: string | null;
 }
 
 export interface CanHaveParameters {
-  Parameters?: PayloadTemplate;
+  Parameters?: JSONValue;
 }
 
 export interface CanHaveResultSelector {
-  ResultSelector?: PayloadTemplate;
+  ResultSelector?: JSONValue;
 }
 
 export interface CanHaveResultPath {

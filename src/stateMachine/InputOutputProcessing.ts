@@ -1,4 +1,3 @@
-import type { PayloadTemplate } from '../typings/InputOutputProcessing';
 import type { JSONValue } from '../typings/JSONValue';
 import type { Context } from '../typings/Context';
 import { isPlainObj } from '../util';
@@ -34,10 +33,25 @@ function processInputPath(path: string | null | undefined, input: JSONValue, con
  * @param context The context object to evaluate, if the path expression starts with `$$`.
  * @returns The processed payload template.
  */
-function processPayloadTemplate(payloadTemplate: PayloadTemplate, json: JSONValue, context: Context): PayloadTemplate {
+function processPayloadTemplate(payloadTemplate: JSONValue, json: JSONValue, context: Context): JSONValue {
+  if (typeof payloadTemplate !== 'object' || payloadTemplate === null) {
+    // Processing a primitive value is not described in the spec, but allowed by the AWS implementation
+    return payloadTemplate;
+  }
+
+  if (Array.isArray(payloadTemplate)) {
+    // Processing an array value is not described in the spec, but allowed by the AWS implementation
+    return payloadTemplate.map((value) => processPayloadTemplate(value, json, context));
+  }
+
   const resolvedProperties = Object.entries(payloadTemplate).map(([key, value]) => {
     let sanitizedKey = key;
     let resolvedValue = value;
+
+    // Recursively process child array
+    if (Array.isArray(value)) {
+      resolvedValue = value.map((innerValue) => processPayloadTemplate(innerValue, json, context));
+    }
 
     // Recursively process child object
     if (isPlainObj(value)) {
