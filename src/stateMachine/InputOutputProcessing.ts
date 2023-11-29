@@ -48,6 +48,11 @@ function processPayloadTemplate(payloadTemplate: JSONValue, json: JSONValue, con
     let sanitizedKey = key;
     let resolvedValue = value;
 
+    // Recursively process child array
+    if (Array.isArray(value)) {
+      resolvedValue = value.map((innerValue) => processPayloadTemplate(innerValue, json, context));
+    }
+
     // Recursively process child object
     if (isPlainObj(value)) {
       resolvedValue = processPayloadTemplate(value, json, context);
