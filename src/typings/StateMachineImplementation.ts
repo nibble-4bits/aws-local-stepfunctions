@@ -12,6 +12,10 @@ export type WaitStateTimeOverride = {
   [waitStateName: string]: number;
 };
 
+export type RetryIntervalOverrides = {
+  [retryableStateName: string]: number | number[];
+};
+
 interface Overrides {
   /**
    * Pass an object to this option to override a `Task` state to run a local function,
@@ -24,6 +28,12 @@ interface Overrides {
    * instead of pausing for the duration specified by the `Seconds`, `Timestamp`, `SecondsPath`, or `TimestampPath` fields.
    */
   waitTimeOverrides?: WaitStateTimeOverride;
+
+  /**
+   * Pass an object to this option to override the duration in milliseconds a retrier in a `Retry` field waits before retrying the state,
+   * instead of pausing for the duration calculated by the `IntervalSeconds`, `BackoffRate`, `MaxDelaySeconds`, and `JitterStrategy` fields.
+   */
+  retryIntervalOverrides?: RetryIntervalOverrides;
 }
 
 export interface ValidationOptions {
