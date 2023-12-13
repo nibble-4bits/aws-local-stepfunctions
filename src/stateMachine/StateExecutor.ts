@@ -1,7 +1,7 @@
 import type { AllStates } from '../typings/AllStates';
 import type { ActionResult } from '../typings/StateActions';
 import type { RetryResult, CatchResult, StateHandlers } from '../typings/StateExecutor';
-import type { ExecuteOptions } from '../typings/StateMachineImplementation';
+import type { ExecuteOptions, RetryIntervalOverrides } from '../typings/StateMachineImplementation';
 import type { ErrorOutput } from '../typings/ErrorHandling';
 import type { JSONValue } from '../typings/JSONValue';
 import type { TaskState } from '../typings/TaskState';
@@ -142,7 +142,10 @@ export class StateExecutor {
       );
 
       // Handle `Retry` logic
-      const { shouldRetry, waitTimeBeforeRetry, retrierIndex } = this.shouldRetry(error as RuntimeError);
+      const { shouldRetry, waitTimeBeforeRetry, retrierIndex } = this.shouldRetry(
+        error as RuntimeError,
+        options.runOptions?.overrides?.retryIntervalOverrides
+      );
       if (shouldRetry) {
         const stateDefinition = this.stateDefinition as TaskState | MapState | ParallelState;
 
@@ -221,22 +224,33 @@ export class StateExecutor {
   /**
    * Decide whether this state should be retried, according to the `Retry` field.
    */
-  private shouldRetry(error: RuntimeError): RetryResult {
+  private shouldRetry(error: RuntimeError, retryIntervalOverrides?: RetryIntervalOverrides): RetryResult {
     if (!('Retry' in this.stateDefinition)) {
       return { shouldRetry: false };
     }
 
     for (let i = 0; i < this.stateDefinition.Retry.length; i++) {
       const retrier = this.stateDefinition.Retry[i];
+
+      let intervalOverride = null;
+      if (retryIntervalOverrides?.[this.stateName] !== undefined) {
+        const override = retryIntervalOverrides[this.stateName];
+        if (typeof override === 'number') {
+          intervalOverride = override / 1000;
+        } else if (override[i] !== undefined && override[i] >= 0) {
+          intervalOverride = override[i] / 1000;
+        }
+      }
+
       const jitterStrategy = retrier.JitterStrategy ?? DEFAULT_JITTER_STRATEGY;
       const maxAttempts = retrier.MaxAttempts ?? DEFAULT_MAX_ATTEMPTS;
       const intervalSeconds = retrier.IntervalSeconds ?? DEFAULT_INTERVAL_SECONDS;
       const backoffRate = retrier.BackoffRate ?? DEFAULT_BACKOFF_RATE;
-      const waitInterval = intervalSeconds * Math.pow(backoffRate, this.retrierAttempts[i]);
+      const waitInterval = intervalOverride ?? intervalSeconds * Math.pow(backoffRate, this.retrierAttempts[i]);
       const retryable = error.isRetryable ?? true;
 
-      let waitTimeBeforeRetry = clamp(waitInterval, 1, retrier.MaxDelaySeconds) * 1000;
-      if (jitterStrategy === 'FULL') {
+      let waitTimeBeforeRetry = clamp(waitInterval, 0, retrier.MaxDelaySeconds) * 1000;
+      if (jitterStrategy === 'FULL' && intervalOverride === null) {
         waitTimeBeforeRetry = getRandomNumber(0, waitTimeBeforeRetry);
       }
 

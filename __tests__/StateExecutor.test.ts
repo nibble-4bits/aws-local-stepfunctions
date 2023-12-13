@@ -280,6 +280,120 @@ describe('State Executor', () => {
       expect(sleepFnMock).toHaveBeenNthCalledWith(3, expect.numberBetween(0, 4000), abortSignal);
     });
 
+    test('should wait for the specified amount of milliseconds if retry interval override option is set and is a single number', async () => {
+      const stateDefinition: TaskState = {
+        Type: 'Task',
+        Resource: 'mock-arn',
+        Retry: [
+          {
+            ErrorEquals: ['CustomError'],
+            IntervalSeconds: 3,
+            MaxDelaySeconds: 8,
+          },
+        ],
+        End: true,
+      };
+      const input = {};
+      const context = {};
+      const abortSignal = new AbortController().signal;
+      let retryCount = 0;
+
+      const stateExecutor = new StateExecutor('TaskState', stateDefinition);
+      const { stateResult } = await stateExecutor.execute(input, context, {
+        abortSignal,
+        eventLogger: new EventLogger(),
+        stateMachineOptions: undefined,
+        runOptions: {
+          overrides: {
+            taskResourceLocalHandlers: {
+              TaskState: async () => {
+                if (retryCount < defaultMaxRetries) {
+                  retryCount++;
+                  throw new CustomError('Task state failed');
+                }
+
+                return 1;
+              },
+            },
+            retryIntervalOverrides: {
+              TaskState: 100,
+            },
+          },
+        },
+      });
+
+      expect(stateResult).toBe(1);
+      expect(sleepFnMock).toHaveBeenNthCalledWith(1, 100, abortSignal);
+      expect(sleepFnMock).toHaveBeenNthCalledWith(2, 100, abortSignal);
+      expect(sleepFnMock).toHaveBeenNthCalledWith(3, 100, abortSignal);
+    });
+
+    test('should wait for the specified amount of milliseconds if retry interval override option is set and is an array', async () => {
+      const stateDefinition: TaskState = {
+        Type: 'Task',
+        Resource: 'mock-arn',
+        Retry: [
+          {
+            ErrorEquals: ['CustomError'],
+            IntervalSeconds: 3,
+            MaxDelaySeconds: 8,
+          },
+          {
+            ErrorEquals: ['SyntaxError'],
+            IntervalSeconds: 3,
+            MaxDelaySeconds: 8,
+          },
+          {
+            ErrorEquals: ['RangeError'],
+            IntervalSeconds: 3,
+            MaxDelaySeconds: 8,
+          },
+        ],
+        End: true,
+      };
+      const input = {};
+      const context = {};
+      const abortSignal = new AbortController().signal;
+      let retryCount = 0;
+
+      const stateExecutor = new StateExecutor('TaskState', stateDefinition);
+      const { stateResult } = await stateExecutor.execute(input, context, {
+        abortSignal,
+        eventLogger: new EventLogger(),
+        stateMachineOptions: undefined,
+        runOptions: {
+          overrides: {
+            taskResourceLocalHandlers: {
+              TaskState: async () => {
+                if (retryCount === 0) {
+                  retryCount++;
+                  throw new CustomError('Task state failed');
+                }
+                if (retryCount === 1) {
+                  retryCount++;
+                  throw new SyntaxError('Task state failed');
+                }
+                if (retryCount === 2) {
+                  retryCount++;
+                  throw new RangeError('Task state failed');
+                }
+
+                return 1;
+              },
+            },
+            retryIntervalOverrides: {
+              TaskState: [50, 125, 250],
+            },
+          },
+        },
+      });
+
+      expect(stateResult).toBe(1);
+      expect(sleepFnMock).toHaveBeenNthCalledWith(1, 50, abortSignal);
+      expect(sleepFnMock).toHaveBeenNthCalledWith(2, 125, abortSignal);
+      expect(sleepFnMock).toHaveBeenNthCalledWith(3, 250, abortSignal);
+    });
+
     describe('Task state', () => {
       test('should retry state if retrier specifies `States.TaskFailed` error name', async () => {
         const stateDefinition: TaskState = {
