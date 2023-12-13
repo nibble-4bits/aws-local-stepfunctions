@@ -8,6 +8,7 @@
 - [Non-spec features](#non-spec-features)
   - [Task resource override](#task-state-resource-override)
   - [Wait duration override](#wait-state-duration-override)
+  - [Retry interval override](#retry-field-interval-override)
   - [Abort a running execution](#abort-a-running-execution)
   - [AWS config for Lambda functions](#providing-aws-credentials-and-region-to-execute-lambda-functions-specified-in-task-states)
   - [Execution event logs](#execution-event-logs)
@@ -151,6 +152,19 @@ As defined by the spec, `Wait` states in `aws-local-stepfunction` will pause the
 Nonetheless, if you want to override the duration of the wait period of a `Wait` state, you can do so by specifying the `overrides.waitTimeOverrides` option of the [`StateMachine.run`](/README.md#statemachineruninput-options) method. This option expects an object that maps state names to numbers, where the number represents the amount of milliseconds that the overridden `Wait` state will pause the execution for. Note that you may pass `0` for the number value, which effectively means that the overridden `Wait` state will not pause the execution at all.
 
 An example usage of this feature can be found [here](/examples/wait-state-local-override.js).
+
+### `Retry` field interval override
+
+As defined by the spec, retriers in a `Retry` field will pause the execution for a certain amount of time before retrying the failed `Task`/`Parallel`/`Map` state, based on the `IntervalSeconds`, `BackoffRate`, `MaxDelaySeconds`, and `JitterStrategy` fields.
+
+If you wish to override the duration of this pause, you can do so by specifying the `overrides.retryIntervalOverrides` option of the [`StateMachine.run`](/README.md#statemachineruninput-options) method. This option expects an object that maps state names to numbers or arrays:
+
+- If you pass a number as value, this value represents the number of milliseconds that the overridden `Retry` field will pause the execution for. This applies to all retriers in the array.
+- If you pass an array as value, each value in the array should be a number and it represents how many milliseconds to pause the execution for the retrier at that index, i.e., the value at index 0 applies for the retrier at index 0, the value at index 1 applies for the retrier at index 1, and so forth. If don't want to override a retrier, simply set the value to `-1`, to indicate that the retrier at that index should not be overridden.
+
+In a similar fashion to the [`Wait` state duration override](#wait-state-duration-override), you can pass a duration of `0` to indicate that the overridden retrier should not pause the execution at all before retrying the failed state.
+
+An example usage of this feature can be found [here](/examples/retry-interval-local-override.js).
 
 ### Abort a running execution
 
