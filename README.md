@@ -162,7 +162,16 @@ Each execution is independent of all others, meaning that you can concurrently c
     - `waitTimeOverrides?`: An [object that overrides](/docs/feature-support.md#wait-state-duration-override) the wait duration of the specified `Wait` states. The specified override duration should be in milliseconds.
     - `retryIntervalOverrides?`: An [object that overrides](/docs/feature-support.md#retry-field-interval-override) the pause duration of the specified state's `Retry` field. The specified override duration should be a number in milliseconds; or an array of numbers, where each number represents milliseconds.
   - `noThrowOnAbort?`: If this option is set to `true`, aborting the execution will simply return `null` as result instead of throwing.
-  - `context?`: An object that will be used as the [Context Object](https://docs.aws.amazon.com/step-functions/latest/dg/input-output-contextobject.html) for the execution. If not passed, the Context Object will default to an empty object. This option is useful to mock the Context Object in case your definition references it in a JSONPath.
+  - `context?`: An object that will be used as the [Context Object](https://docs.aws.amazon.com/step-functions/latest/dg/input-output-contextobject.html) for the execution. If not passed, the Context Object will default to the following object:
+    ```js
+    {
+      "Execution": {
+        "Input": /* input passed to the execution */,
+        "StartTime": /* ISO 8601 timestamp of when the execution started */
+      }
+    }
+    ```
+    This option is useful to mock the fields of the Context Object in case your definition references it in a JSONPath.
 
 #### Return value
 
