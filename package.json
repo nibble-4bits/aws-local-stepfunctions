@@ -54,13 +54,13 @@
   "devDependencies": {
     "@tsconfig/node16-strictest": "^1.0.4",
     "@types/crypto-js": "^4.2.1",
-    "@types/jest": "^29.5.8",
-    "@types/lodash": "^4.14.201",
-    "@types/node": "^18.18.9",
+    "@types/jest": "^29.5.11",
+    "@types/lodash": "^4.14.202",
+    "@types/node": "^18.19.3",
     "@types/picomatch": "^2.3.3",
     "@typescript-eslint/eslint-plugin": "^5.62.0",
     "@typescript-eslint/parser": "^5.62.0",
-    "eslint": "^8.53.0",
+    "eslint": "^8.55.0",
     "eslint-config-prettier": "^8.10.0",
     "eslint-plugin-prettier": "^4.2.1",
     "prettier": "^2.8.8",
@@ -69,8 +69,8 @@
     "typescript": "^4.9.5"
   },
   "dependencies": {
-    "@aws-sdk/client-lambda": "^3.450.0",
-    "@aws-sdk/credential-providers": "^3.450.0",
+    "@aws-sdk/client-lambda": "^3.470.0",
+    "@aws-sdk/credential-providers": "^3.470.0",
     "asl-validator": "^3.8.2",
     "commander": "^11.1.0",
     "crypto-js": "^4.2.0",
