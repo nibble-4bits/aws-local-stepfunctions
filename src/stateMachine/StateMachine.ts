@@ -144,7 +144,14 @@ export class StateMachine {
   private async execute(input: JSONValue, options: ExecuteOptions, cleanupFn: () => void): Promise<JSONValue> {
     options.eventLogger.dispatchExecutionStartedEvent(input);
 
-    const context = options.runOptions?.context ?? {};
+    const context = {
+      ...options.runOptions?.context,
+      Execution: {
+        ...options.runOptions?.context?.Execution,
+        Input: input,
+        StartTime: new Date().toISOString(),
+      },
+    };
     let currState = this.definition.States[this.definition.StartAt];
     let currStateName = this.definition.StartAt;
     let currInput = cloneDeep(input);
