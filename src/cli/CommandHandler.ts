@@ -23,6 +23,7 @@ async function commandAction(inputs: JSONValue[], options: ParsedCommandOptions,
       overrides: {
         taskResourceLocalHandlers: options.overrideTask,
         waitTimeOverrides: options.overrideWait,
+        retryIntervalOverrides: options.overrideRetry,
       },
       context: options.context ?? options.contextFile,
     });

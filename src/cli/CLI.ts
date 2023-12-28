@@ -10,6 +10,7 @@ import {
   parseInputArguments,
   parseOverrideTaskOption,
   parseOverrideWaitOption,
+  parseOverrideRetryOption,
   parseContextOption,
   parseContextFileOption,
 } from './ArgumentParsers';
@@ -62,6 +63,12 @@ Example calls:
         '-w, --override-wait <mapping>',
         'Override a Wait state to pause for the specified amount of milliseconds, instead of pausing for the duration specified in the state definition. The mapping value has to be provided in the format [WaitStateToOverride]:[number].'
       ).argParser(parseOverrideWaitOption)
+    )
+    .addOption(
+      new Option(
+        '-r, --override-retry <mapping>',
+        "Override a 'Retry' field to pause for the specified amount of milliseconds, instead of pausing for the duration specified by the retry policy. The mapping value has to be provided in the format [NameOfStateWithRetryField]:[number]."
+      ).argParser(parseOverrideRetryOption)
     )
     .addOption(
       new Option(

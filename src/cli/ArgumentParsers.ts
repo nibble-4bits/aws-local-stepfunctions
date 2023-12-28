@@ -1,6 +1,10 @@
 import type { Command } from 'commander';
 import type { StateMachineDefinition } from '../typings/StateMachineDefinition';
-import type { TaskStateResourceLocalHandler, WaitStateTimeOverride } from '../typings/StateMachineImplementation';
+import type {
+  TaskStateResourceLocalHandler,
+  WaitStateTimeOverride,
+  RetryIntervalOverrides,
+} from '../typings/StateMachineImplementation';
 import type { JSONValue } from '../typings/JSONValue';
 import type { Context } from '../typings/Context';
 import { readFileSync } from 'fs';
@@ -85,6 +89,14 @@ function parseOverrideWaitOption(value: string, previous: WaitStateTimeOverride 
   return previous;
 }
 
+function parseOverrideRetryOption(value: string, previous: RetryIntervalOverrides = {}): RetryIntervalOverrides {
+  const [stateName, duration] = value.split(':');
+
+  previous[stateName] = Number(duration);
+
+  return previous;
+}
+
 function parseContextOption(command: Command, context: string) {
   const jsonOrError = tryJSONParse<Context>(context);
 
@@ -137,6 +149,7 @@ export {
   parseDefinitionFileOption,
   parseOverrideTaskOption,
   parseOverrideWaitOption,
+  parseOverrideRetryOption,
   parseInputArguments,
   parseContextOption,
   parseContextFileOption,
