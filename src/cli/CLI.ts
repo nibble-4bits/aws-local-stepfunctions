@@ -24,7 +24,7 @@ function makeProgram() {
     .name('local-sfn')
     .description(
       `Execute an Amazon States Language state machine with the given inputs.
-The result of each execution will be output in a new line and in the same order as its corresponding input.`
+The result of each execution will be printed in a new line and in the same order as its corresponding input.`
     )
     .helpOption('-h, --help', 'Print help for command and exit.')
     .configureHelp({ helpWidth: 80 })
