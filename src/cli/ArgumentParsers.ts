@@ -92,7 +92,13 @@ function parseOverrideWaitOption(value: string, previous: WaitStateTimeOverride 
 function parseOverrideRetryOption(value: string, previous: RetryIntervalOverrides = {}): RetryIntervalOverrides {
   const [stateName, duration] = value.split(':');
 
-  previous[stateName] = Number(duration);
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
+  if (!isNaN(duration)) {
+    previous[stateName] = Number(duration);
+  } else {
+    previous[stateName] = duration.split(',').map(Number);
+  }
 
   return previous;
 }
