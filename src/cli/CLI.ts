@@ -10,6 +10,7 @@ import {
   parseInputArguments,
   parseOverrideTaskOption,
   parseOverrideWaitOption,
+  parseOverrideRetryOption,
   parseContextOption,
   parseContextFileOption,
 } from './ArgumentParsers';
@@ -23,7 +24,7 @@ function makeProgram() {
     .name('local-sfn')
     .description(
       `Execute an Amazon States Language state machine with the given inputs.
-The result of each execution will be output in a new line and in the same order as its corresponding input.`
+The result of each execution will be printed in a new line and in the same order as its corresponding input.`
     )
     .helpOption('-h, --help', 'Print help for command and exit.')
     .configureHelp({ helpWidth: 80 })
@@ -62,6 +63,12 @@ Example calls:
         '-w, --override-wait <mapping>',
         'Override a Wait state to pause for the specified amount of milliseconds, instead of pausing for the duration specified in the state definition. The mapping value has to be provided in the format [WaitStateToOverride]:[number].'
       ).argParser(parseOverrideWaitOption)
+    )
+    .addOption(
+      new Option(
+        '-r, --override-retry <mapping>',
+        "Override a 'Retry' field to pause for the specified amount of milliseconds, instead of pausing for the duration specified by the retry policy. The mapping value has to be provided in the format [NameOfStateWithRetryField]:[number]."
+      ).argParser(parseOverrideRetryOption)
     )
     .addOption(
       new Option(

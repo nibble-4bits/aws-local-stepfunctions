@@ -41,6 +41,7 @@ This package lets you run AWS Step Functions state machines completely locally, 
   - [Overriding Task and Wait states](#overriding-task-and-wait-states)
     - [Task state override](#task-state-override)
     - [Wait state override](#wait-state-override)
+    - [Retry field pause override](#retry-field-pause-override)
   - [Passing a custom Context Object](#passing-a-custom-context-object)
   - [Disabling ASL validations](#disabling-asl-validations)
   - [Exit codes](#exit-codes)
@@ -361,6 +362,54 @@ local-sfn \
 ```
 
 This command would execute the state machine, and override `Wait` states `WaitResponse` and `PauseUntilSignal` to pause the execution for 1500 and 250 milliseconds, respectively. The `Delay` state wouldn't be paused at all, since the override value is set to 0.
+
+#### Retry field pause override
+
+To override the duration of the pause in the `Retry` field of a state, pass the `-r, --override-retry` option. This option takes as value the name of the state whose `Retry` field you want to override, and a number that represents the amount in milliseconds that you want to pause the execution for before retrying the state. The state name and the milliseconds amount must be separated by a colon `:`.
+
+For example, suppose the state machine definition contains a state called `TaskToRetry` that is defined as follows:
+
+```json
+{
+  "Type": "Task",
+  "Resource": "arn:aws:lambda:us-east-1:123456789012:function:HelloWorld",
+  "Retry": [
+    { "ErrorEquals": ["States.Timeout", "SyntaxError"] },
+    { "ErrorEquals": ["RangeError"] },
+    { "ErrorEquals": ["States.ALL"] }
+  ],
+  "End": true
+}
+```
+
+Then, the following command is run:
+
+```sh
+local-sfn -f state-machine.json -r TaskToRetry:100 '{ "num1": 1, "num2": 2 }'
+```
+
+This command would execute the state machine, and if the `TaskToRetry` state fails, the execution would be paused for 100 milliseconds before retrying the state again, disregarding the `IntervalSeconds`, `BackoffRate`, `MaxDelaySeconds`, and `JitterStrategy` fields that could've been specified in any of the `Retry` field retriers.
+
+Alternatively, you can also pass a list of comma-separated numbers as value, to override the duration of specific retriers, for instance:
+
+```sh
+local-sfn -f state-machine.json -r TaskToRetry:100,-1,20 '{ "num1": 1, "num2": 2 }'
+```
+
+The above command would pause the execution for 100 milliseconds if the state error is matched by the first retrier and it would pause for 20 milliseconds if the error matches the third retrier. Note that a -1 was passed for the second retrier. This means that the pause duration of the second retrier will not be overridden, instead, it will be calculated as usually with the `IntervalSeconds` and the other retrier fields, or use the default values if said fields are not specified.
+
+Furthermore, you can pass this option multiple times, to override the `Retry` fields in multiple states. For example:
+
+```sh
+local-sfn \
+  -f state-machine.json \
+  -r SendRequest:1500 \
+  -r ProcessData:250 \
+  -r MapResponses:0 \
+  '{ "num1": 1, "num2": 2 }'
+```
+
+This command would execute the state machine, and override the duration of the retry pause in states `SendRequest` and `ProcessData` to pause the execution for 1500 and 250 milliseconds, respectively. The retry in the `MapResponses` state wouldn't be paused at all, since the override value is set to 0.
 
 ### Passing a custom Context Object
 
