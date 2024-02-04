@@ -46,6 +46,7 @@
   "scripts": {
     "test": "jest",
     "build": "tsup && rm build/main.d.cts",
+    "build:watch": "tsup --watch",
     "prettier": "prettier --check \"src/**/*.ts\"",
     "prettier:fix": "prettier --write \"src/**/*.ts\"",
     "lint": "eslint \"src/**/*.ts\"",
