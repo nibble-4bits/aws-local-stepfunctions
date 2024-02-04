@@ -52,12 +52,10 @@
     "lint:fix": "eslint --fix \"src/**/*.ts\""
   },
   "devDependencies": {
-    "@tsconfig/node16-strictest": "^1.0.4",
     "@types/crypto-js": "^4.2.1",
     "@types/jest": "^29.5.11",
     "@types/lodash": "^4.14.202",
     "@types/node": "^18.19.3",
-    "@types/picomatch": "^2.3.3",
     "@typescript-eslint/eslint-plugin": "^6.20.0",
     "@typescript-eslint/parser": "^6.20.0",
     "eslint": "^8.56.0",
