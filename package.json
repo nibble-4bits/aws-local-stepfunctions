@@ -53,7 +53,6 @@
     "lint:fix": "eslint --fix \"src/**/*.ts\""
   },
   "devDependencies": {
-    "@types/crypto-js": "^4.2.1",
     "@types/jest": "^29.5.11",
     "@types/lodash": "^4.14.202",
     "@types/node": "^18.19.3",
@@ -72,7 +71,6 @@
     "@aws-sdk/credential-providers": "^3.481.0",
     "asl-validator": "^3.8.2",
     "commander": "^11.1.0",
-    "crypto-js": "^4.2.0",
     "jsonpath-plus": "^7.2.0",
     "lodash": "^4.17.21",
     "p-limit": "^3.1.0",
