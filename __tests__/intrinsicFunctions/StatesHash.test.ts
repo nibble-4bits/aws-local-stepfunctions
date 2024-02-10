@@ -75,7 +75,7 @@ describe('States.Hash intrinsic function', () => {
       expect(funcCallWrapper).toThrow(StatesRuntimeError);
     });
 
-    test('should throw error if passed hashing algorithm is not one of the supported algorithms', () => {
+    test('should throw error if passed hash algorithm is not one of the supported algorithms', () => {
       const func = new StatesHash();
       const input = {};
       const context = {};

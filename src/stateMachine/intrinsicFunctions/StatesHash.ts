@@ -1,5 +1,5 @@
 import type { IntrinsicFunctionDefinition } from '../../typings/IntrinsicFunctionsImplementation';
-import type { HashingAlgorithm } from '../../typings/IntrinsicFunctions';
+import type { HashAlgorithm } from '../../typings/IntrinsicFunctions';
 import type { JSONValue } from '../../typings/JSONValue';
 import { StatesRuntimeError } from '../../error/predefined/StatesRuntimeError';
 import { BaseIntrinsicFunction } from './BaseIntrinsicFunction';
@@ -25,18 +25,18 @@ class StatesHash extends BaseIntrinsicFunction {
     };
   }
 
-  protected execute(str: string, algorithm: HashingAlgorithm): JSONValue {
+  protected execute(str: string, algorithm: HashAlgorithm): JSONValue {
     if (str.length > 10000) {
       throw new StatesRuntimeError(
         `Intrinsic function ${this.funcDefinition.name} cannot hash a string with more than 10,000 characters`
       );
     }
 
-    const algorithms: HashingAlgorithm[] = ['MD5', 'SHA-1', 'SHA-256', 'SHA-384', 'SHA-512'];
+    const algorithms: HashAlgorithm[] = ['MD5', 'SHA-1', 'SHA-256', 'SHA-384', 'SHA-512'];
     const supportedAlgorithms = algorithms.join(', ');
     if (!algorithms.includes(algorithm)) {
       throw new StatesRuntimeError(
-        `Unsupported hashing algorithm provided to intrinsic function ${this.funcDefinition.name}. The supported algorithms are: ${supportedAlgorithms}`
+        `Unsupported hash algorithm provided to intrinsic function ${this.funcDefinition.name}. The supported algorithms are: ${supportedAlgorithms}`
       );
     }
 
