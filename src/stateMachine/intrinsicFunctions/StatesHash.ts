@@ -36,7 +36,7 @@ class StatesHash extends BaseIntrinsicFunction {
     const supportedAlgorithms = algorithms.join(', ');
     if (!algorithms.includes(algorithm)) {
       throw new StatesRuntimeError(
-        `Unsupported hash algorithm provided to intrinsic function ${this.funcDefinition.name}. The supported algorithms are: ${supportedAlgorithms}`
+        `Unsupported hash algorithm '${algorithm}' provided to intrinsic function ${this.funcDefinition.name}. The supported algorithms are: ${supportedAlgorithms}`
       );
     }
 
