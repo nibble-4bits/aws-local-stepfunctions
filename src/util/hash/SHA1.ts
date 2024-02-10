@@ -1,9 +1,9 @@
-import { BaseHash } from './BaseHash';
+import { BaseHashAlgorithm } from './BaseHash';
 
 /**
  * Implemented according to: https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.180-4.pdf
  */
-export class SHA1 extends BaseHash {
+export class SHA1 extends BaseHashAlgorithm {
   protected override padMessage(message: Uint8Array): ArrayBuffer {
     const msgLenMod64 = message.length % 64;
     let bytesToAdd = 64 - msgLenMod64;

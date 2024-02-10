@@ -1,9 +1,9 @@
-import { BaseHash } from './BaseHash';
+import { BaseHashAlgorithm } from './BaseHash';
 
 /**
  * Implemented according to: https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.180-4.pdf
  */
-export class SHA384 extends BaseHash {
+export class SHA384 extends BaseHashAlgorithm {
   // SHA-384 constants
   private static k = new BigUint64Array([
     0x428a2f98d728ae22n,

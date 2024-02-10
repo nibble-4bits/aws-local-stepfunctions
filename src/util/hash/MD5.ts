@@ -1,9 +1,9 @@
-import { BaseHash } from './BaseHash';
+import { BaseHashAlgorithm } from './BaseHash';
 
 /**
  * Implemented according to: https://datatracker.ietf.org/doc/html/rfc1321
  */
-export class MD5 extends BaseHash {
+export class MD5 extends BaseHashAlgorithm {
   protected override padMessage(message: Uint8Array): ArrayBuffer {
     const msgLenMod64 = message.length % 64;
     let bytesToAdd = 64 - msgLenMod64;

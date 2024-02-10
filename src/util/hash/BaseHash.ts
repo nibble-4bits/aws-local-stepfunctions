@@ -1,7 +1,7 @@
 // TypeScript's DOM library has to be referenced for `TextEncoder` to be recognized as a type
 /// <reference lib="dom" />
 
-export abstract class BaseHash {
+export abstract class BaseHashAlgorithm {
   private textEncoder: TextEncoder;
 
   constructor() {
