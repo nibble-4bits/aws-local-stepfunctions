@@ -3,11 +3,7 @@ import type { HashingAlgorithm } from '../../typings/IntrinsicFunctions';
 import type { JSONValue } from '../../typings/JSONValue';
 import { StatesRuntimeError } from '../../error/predefined/StatesRuntimeError';
 import { BaseIntrinsicFunction } from './BaseIntrinsicFunction';
-import md5 from 'crypto-js/md5.js';
-import sha1 from 'crypto-js/sha1.js';
-import sha256 from 'crypto-js/sha256.js';
-import sha384 from 'crypto-js/sha384.js';
-import sha512 from 'crypto-js/sha512.js';
+import { md5, sha1, sha256, sha384, sha512 } from '../../util/hash';
 
 class StatesHash extends BaseIntrinsicFunction {
   protected readonly funcDefinition: IntrinsicFunctionDefinition;
@@ -46,15 +42,15 @@ class StatesHash extends BaseIntrinsicFunction {
 
     switch (algorithm) {
       case 'MD5':
-        return md5(str).toString();
+        return md5.getDigest(str);
       case 'SHA-1':
-        return sha1(str).toString();
+        return sha1.getDigest(str);
       case 'SHA-256':
-        return sha256(str).toString();
+        return sha256.getDigest(str);
       case 'SHA-384':
-        return sha384(str).toString();
+        return sha384.getDigest(str);
       case 'SHA-512':
-        return sha512(str).toString();
+        return sha512.getDigest(str);
     }
   }
 }
