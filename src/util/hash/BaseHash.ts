@@ -1,7 +1,15 @@
+// TypeScript's DOM library has to be referenced for `TextEncoder` to be recognized as a type
+/// <reference lib="dom" />
+
 export abstract class BaseHash {
+  private textEncoder: TextEncoder;
+
+  constructor() {
+    this.textEncoder = new TextEncoder();
+  }
+
   getDigest(input: string): string {
-    const textEncoder = new TextEncoder();
-    const message = textEncoder.encode(input);
+    const message = this.textEncoder.encode(input);
 
     const paddedMessage = this.padMessage(message);
     const hash = this.computeHash(paddedMessage);
