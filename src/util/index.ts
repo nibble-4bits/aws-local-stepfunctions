@@ -1,7 +1,5 @@
 import type { JSONObject } from '../typings/JSONValue';
 
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore
 export const isBrowserEnvironment = typeof window !== 'undefined' && typeof window.document !== 'undefined';
 
 /**
