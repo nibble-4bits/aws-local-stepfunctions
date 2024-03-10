@@ -10,8 +10,6 @@ import { StringConstraint } from '../jsonPath/constraints/StringConstraint';
 import { NumberConstraint } from '../jsonPath/constraints/NumberConstraint';
 import { BooleanConstraint } from '../jsonPath/constraints/BooleanConstraint';
 import { RFC3339TimestampConstraint } from '../jsonPath/constraints/RFC3339TimestampConstraint';
-// @ts-expect-error See: https://github.com/axtgr/wildcard-match/issues/12
-// package.json of wildcard-match module needs a "types" field inside "exports", because we're using "bundler" module resolution
 import wcmatch from 'wildcard-match';
 
 class ChoiceStateAction extends BaseStateAction<ChoiceState> {
