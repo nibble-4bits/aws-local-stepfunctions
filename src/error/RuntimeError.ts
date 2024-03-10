@@ -1,9 +1,7 @@
-import { ErrorWithCause } from './ErrorWithCause';
-
 /**
  * Base class for all internal errors that can be thrown during the state machine execution.
  */
-export abstract class RuntimeError extends ErrorWithCause {
+export abstract class RuntimeError extends Error {
   /**
    * Whether this runtime error can be matched in a `Retry` field
    */

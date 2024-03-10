@@ -2,5 +2,6 @@
   "editor.formatOnSave": true,
   "eslint.validate": ["typescript"],
   "eslint.alwaysShowStatus": true,
-  "files.eol": "auto"
+  "files.eol": "auto",
+  "typescript.tsdk": "node_modules/typescript/lib"
 }
