@@ -121,7 +121,7 @@ export class StateExecutor {
         nextState,
         isEndState,
       } = await this.stateHandlers[this.stateDefinition.Type](
-        // @ts-expect-error Indexing `this.stateActions` by non-literal value produces a `never` type for the `this.stateDefinition` parameter of the handler being called
+        // @ts-expect-error Indexing `this.stateHandlers` by non-literal value produces a `never` type for the `this.stateDefinition` parameter of the handler being called
         this.stateDefinition,
         rawInput,
         processedInput,
