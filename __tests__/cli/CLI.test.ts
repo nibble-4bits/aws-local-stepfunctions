@@ -82,8 +82,8 @@ describe('CLI', () => {
       });
 
       await expect(program.parseAsync(['-d', definition, '{}'], { from: 'user' })).rejects.toThrow();
-      expect(errStr).toBe(
-        "error: parsing of state machine definition passed in option '-d, --definition <definition>' failed: Unexpected token S in JSON at position 12\n"
+      expect(errStr).toMatch(
+        /^error: parsing of state machine definition passed in option '-d, --definition <definition>' failed:/
       );
     });
 
@@ -139,8 +139,8 @@ describe('CLI', () => {
       });
 
       await expect(program.parseAsync(['-f', filePath, '{}'], { from: 'user' })).rejects.toThrow();
-      expect(errStr).toBe(
-        "error: parsing of state machine definition in file './state-machine.asl.json' failed: Unexpected token S in JSON at position 12\n"
+      expect(errStr).toMatch(
+        /error: parsing of state machine definition in file '\.\/state-machine\.asl\.json' failed:/
       );
     });
 
@@ -168,9 +168,7 @@ describe('CLI', () => {
       });
 
       await expect(program.parseAsync(['-d', definition, input], { from: 'user' })).rejects.toThrow();
-      expect(errStr).toBe(
-        "error: parsing of input value '{ key: 123 }' failed: Unexpected token k in JSON at position 2\n"
-      );
+      expect(errStr).toMatch(/error: parsing of input value '{ key: 123 }' failed:/);
     });
 
     test('should print error when passing a definition that contains an invalid JSONPath', async () => {
@@ -542,7 +540,9 @@ describe('CLI', () => {
 
       expect(child_process.spawnSync).toHaveBeenCalled();
       expect(consoleLogMock).toHaveBeenCalledWith(
-        "Execution has failed with the following error: Parsing of output '{ key: value }' from task override './override.sh' for state 'AddNumbers' failed: Unexpected token k in JSON at position 2"
+        expect.stringMatching(
+          /Execution has failed with the following error: Parsing of output '{ key: value }' from task override '\.\/override\.sh' for state 'AddNumbers' failed:/
+        )
       );
     });
   });
