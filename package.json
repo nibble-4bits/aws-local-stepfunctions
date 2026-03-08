@@ -32,9 +32,9 @@
   "browser": "build/main.browser.esm.js",
   "exports": {
     "types": "./build/main.d.ts",
+    "browser": "./build/main.browser.esm.js",
     "import": "./build/main.node.esm.js",
     "require": "./build/main.node.cjs",
-    "browser": "./build/main.browser.esm.js",
     "default": "./build/main.browser.esm.js"
   },
   "engines": {
