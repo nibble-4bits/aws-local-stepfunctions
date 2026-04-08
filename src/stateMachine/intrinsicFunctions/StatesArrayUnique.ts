@@ -1,8 +1,7 @@
 import type { IntrinsicFunctionDefinition } from '../../typings/IntrinsicFunctionsImplementation';
 import type { JSONValue } from '../../typings/JSONValue';
 import { BaseIntrinsicFunction } from './BaseIntrinsicFunction';
-import isEqual from 'lodash/isEqual.js';
-import uniqWith from 'lodash/uniqWith.js';
+import { isEqualJSON } from '../../util';
 
 class StatesArrayUnique extends BaseIntrinsicFunction {
   protected readonly funcDefinition: IntrinsicFunctionDefinition;
@@ -22,7 +21,7 @@ class StatesArrayUnique extends BaseIntrinsicFunction {
   }
 
   protected execute(array: JSONValue[]): JSONValue {
-    return uniqWith(array, isEqual);
+    return array.filter((val, i) => array.findIndex((other) => isEqualJSON(val, other)) === i);
   }
 }
 

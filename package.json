@@ -54,8 +54,7 @@
   },
   "devDependencies": {
     "@types/jest": "^29.5.14",
-    "@types/lodash": "^4.17.13",
-    "@types/node": "^18.19.64",
+    "@types/node": "^18.19.130",
     "@typescript-eslint/eslint-plugin": "^6.21.0",
     "@typescript-eslint/parser": "^6.21.0",
     "eslint": "^8.57.1",
@@ -71,8 +70,7 @@
     "@aws-sdk/credential-providers": "^3.693.0",
     "asl-validator": "^3.9.0",
     "commander": "^11.1.0",
-    "jsonpath-plus": "^10.2.0",
-    "lodash": "^4.17.21",
+    "jsonpath-plus": "^10.4.0",
     "p-limit": "^3.1.0",
     "wildcard-match": "^5.1.3"
   }

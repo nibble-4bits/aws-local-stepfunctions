@@ -8,8 +8,8 @@ import { ExecutionTimeoutError } from '../error/ExecutionTimeoutError';
 import { ExecutionError } from '../error/ExecutionError';
 import { StateExecutor } from './StateExecutor';
 import { EventLogger } from './EventLogger';
+import { cloneJSON } from '../util';
 import aslValidator from 'asl-validator';
-import cloneDeep from 'lodash/cloneDeep.js';
 
 export class StateMachine {
   /**
@@ -154,7 +154,7 @@ export class StateMachine {
     };
     let currState = this.definition.States[this.definition.StartAt];
     let currStateName = this.definition.StartAt;
-    let currInput = cloneDeep(input);
+    let currInput = cloneJSON(input);
     let currResult: JSONValue = null;
     let nextState = '';
     let isEndState = false;
