@@ -55,7 +55,7 @@
   "devDependencies": {
     "@eslint/js": "^8.57.1",
     "@types/jest": "^29.5.14",
-    "@types/node": "^18.19.130",
+    "@types/node": "^22.19.17",
     "eslint": "^8.57.1",
     "eslint-config-prettier": "^9.1.2",
     "eslint-plugin-prettier": "^5.5.5",
