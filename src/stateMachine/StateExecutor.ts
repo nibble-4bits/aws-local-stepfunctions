@@ -29,8 +29,7 @@ import { SucceedStateAction } from './stateActions/SucceedStateAction';
 import { TaskStateAction } from './stateActions/TaskStateAction';
 import { WaitStateAction } from './stateActions/WaitStateAction';
 import { StatesTimeoutError } from '../error/predefined/StatesTimeoutError';
-import { clamp, sleep, getRandomNumber } from '../util';
-import cloneDeep from 'lodash/cloneDeep.js';
+import { clamp, sleep, getRandomNumber, cloneJSON } from '../util';
 
 /**
  * Default max number of attempts to retry each retrier.
@@ -111,7 +110,7 @@ export class StateExecutor {
    * Execute the current state.
    */
   async execute(input: JSONValue, context: Context, options: ExecuteOptions): Promise<ActionResult> {
-    const rawInput = cloneDeep(input);
+    const rawInput = cloneJSON(input);
 
     try {
       const processedInput = this.processInput(input, context);

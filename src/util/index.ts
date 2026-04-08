@@ -1,4 +1,4 @@
-import type { JSONObject } from '../typings/JSONValue';
+import type { JSONObject, JSONValue } from '../typings/JSONValue';
 
 export const isBrowserEnvironment = typeof window !== 'undefined' && typeof window.document !== 'undefined';
 
@@ -77,6 +77,98 @@ export function clamp(value: number, min: number | undefined, max: number | unde
   if (min && value < min) return min;
   if (max && value > max) return max;
   return value;
+}
+
+/**
+ * Recursively deep-clones a JSON value, producing a new value with no shared references.
+ */
+export function cloneJSON(value: JSONValue): JSONValue {
+  if (value === null || typeof value !== 'object') return value;
+  if (Array.isArray(value)) return value.map(cloneJSON);
+  return Object.fromEntries(Object.entries(value).map(([k, v]) => [k, cloneJSON(v)]));
+}
+
+/**
+ * Recursively compares two JSON values for deep equality.
+ * Comparison is independent of key order for objects.
+ */
+export function isEqualJSON(a: JSONValue, b: JSONValue): boolean {
+  if (a === b) return true;
+  if (a === null || b === null) return false;
+  if (typeof a !== 'object' || typeof b !== 'object') return false;
+  if (Array.isArray(a) !== Array.isArray(b)) return false;
+  if (Array.isArray(a) && Array.isArray(b)) {
+    if (a.length !== b.length) return false;
+    return a.every((v, i) => isEqualJSON(v, b[i]));
+  }
+  const aObj = a as JSONObject;
+  const bObj = b as JSONObject;
+  const aKeys = Object.keys(aObj);
+  const bKeys = Object.keys(bObj);
+  if (aKeys.length !== bKeys.length) return false;
+  return aKeys.every((k) => Object.prototype.hasOwnProperty.call(bObj, k) && isEqualJSON(aObj[k], bObj[k]));
+}
+
+/**
+ * Sets a value at a path in a JSON object, returning a new object without mutating the original.
+ * Handles dot notation (foo.bar), bracket notation (foo['bar'], foo["bar"]), and array indices (foo[0]).
+ */
+export function setJSONPath(obj: JSONObject, path: string, value: JSONValue): JSONObject {
+  function parseSegments(p: string): (string | number)[] {
+    const segments: (string | number)[] = [];
+    let current = '';
+    let i = 0;
+    while (i < p.length) {
+      const ch = p[i];
+      if (ch === '.') {
+        if (current.length > 0) {
+          segments.push(current);
+          current = '';
+        }
+        i++;
+      } else if (ch === '[') {
+        if (current.length > 0) {
+          segments.push(current);
+          current = '';
+        }
+        i++; // skip '['
+        const quote = p[i];
+        if (quote === '"' || quote === "'") {
+          i++; // skip opening quote
+          while (i < p.length && p[i] !== quote) current += p[i++];
+          i++; // skip closing quote
+          segments.push(current);
+        } else {
+          while (i < p.length && p[i] !== ']') current += p[i++];
+          segments.push(parseInt(current, 10));
+        }
+        current = '';
+        i++; // skip ']'
+      } else {
+        current += ch;
+        i++;
+      }
+    }
+    if (current.length > 0) segments.push(current);
+    return segments;
+  }
+
+  function setAtSegments(target: JSONValue, segments: (string | number)[]): JSONValue {
+    if (segments.length === 0) return value;
+    const [head, ...tail] = segments;
+    if (typeof head === 'number') {
+      const arr: JSONValue[] = Array.isArray(target) ? [...(target as JSONValue[])] : [];
+      arr[head] = setAtSegments(arr[head] !== undefined ? arr[head] : null, tail);
+      return arr;
+    }
+    const o: JSONObject =
+      typeof target === 'object' && target !== null && !Array.isArray(target) ? { ...(target as JSONObject) } : {};
+    const existing = (o as Record<string, JSONValue>)[head];
+    o[head] = setAtSegments(existing !== undefined ? existing : null, tail);
+    return o;
+  }
+
+  return setAtSegments(obj, parseSegments(path)) as JSONObject;
 }
 
 export { getRandomNumber, sfc32, cyrb128 } from './random';

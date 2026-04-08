@@ -1,7 +1,7 @@
 import type { IntrinsicFunctionDefinition } from '../../typings/IntrinsicFunctionsImplementation';
 import type { JSONValue } from '../../typings/JSONValue';
 import { BaseIntrinsicFunction } from './BaseIntrinsicFunction';
-import isEqual from 'lodash/isEqual.js';
+import { isEqualJSON } from '../../util';
 
 class StatesArrayContains extends BaseIntrinsicFunction {
   protected readonly funcDefinition: IntrinsicFunctionDefinition;
@@ -24,7 +24,7 @@ class StatesArrayContains extends BaseIntrinsicFunction {
   }
 
   protected execute(array: JSONValue[], searchVal: JSONValue): JSONValue {
-    return array.findIndex((val) => isEqual(val, searchVal)) > -1;
+    return array.findIndex((val) => isEqualJSON(val, searchVal)) > -1;
   }
 }
 

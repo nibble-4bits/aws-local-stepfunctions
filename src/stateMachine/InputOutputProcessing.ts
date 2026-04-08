@@ -1,11 +1,9 @@
 import type { JSONValue } from '../typings/JSONValue';
 import type { Context } from '../typings/Context';
-import { isPlainObj } from '../util';
+import { isPlainObj, setJSONPath } from '../util';
 import { jsonPathQuery } from './jsonPath/JsonPath';
 import { StatesResultPathMatchFailureError } from '../error/predefined/StatesResultPathMatchFailureError';
 import { evaluateIntrinsicFunction } from './IntrinsicFunctionEvaluation';
-import cloneDeep from 'lodash/cloneDeep.js';
-import set from 'lodash/set.js';
 
 /**
  * Process the current input according to the path defined in the `InputPath` field, if specified in the current state.
@@ -98,8 +96,7 @@ function processResultPath(path: string | null | undefined, rawInput: JSONValue,
   const sanitizedPath = path.replace('$.', '');
 
   if (isPlainObj(rawInput)) {
-    const clonedRawInput = cloneDeep(rawInput);
-    return set(clonedRawInput, sanitizedPath, result);
+    return setJSONPath(rawInput, sanitizedPath, result);
   }
 
   throw new StatesResultPathMatchFailureError();
