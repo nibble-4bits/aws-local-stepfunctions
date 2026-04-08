@@ -53,17 +53,18 @@
     "lint:fix": "eslint --fix \"src/**/*.ts\""
   },
   "devDependencies": {
+    "@eslint/js": "^8.57.1",
     "@types/jest": "^29.5.14",
     "@types/node": "^18.19.130",
-    "@typescript-eslint/eslint-plugin": "^8.58.1",
-    "@typescript-eslint/parser": "^8.58.1",
     "eslint": "^8.57.1",
     "eslint-config-prettier": "^9.1.2",
     "eslint-plugin-prettier": "^5.5.5",
+    "globals": "^17.4.0",
     "prettier": "^3.8.1",
     "ts-jest": "^29.4.9",
     "tsup": "^8.5.1",
-    "typescript": "^5.9.3"
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.58.1"
   },
   "dependencies": {
     "@aws-sdk/client-lambda": "^3.1027.0",

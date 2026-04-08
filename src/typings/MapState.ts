@@ -12,7 +12,8 @@ import type { StateMachineDefinition } from './StateMachineDefinition';
 import type { TerminalState } from './TerminalState';
 
 interface BaseMapState
-  extends BaseState,
+  extends
+    BaseState,
     CanHaveInputPath,
     CanHaveResultSelector,
     CanHaveResultPath,

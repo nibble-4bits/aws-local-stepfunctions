@@ -12,7 +12,8 @@ import type { StateMachineDefinition } from './StateMachineDefinition';
 import type { TerminalState } from './TerminalState';
 
 interface BaseParallelState
-  extends BaseState,
+  extends
+    BaseState,
     CanHaveInputPath,
     CanHaveParameters,
     CanHaveResultSelector,
