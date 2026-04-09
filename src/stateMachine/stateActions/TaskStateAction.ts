@@ -8,64 +8,51 @@ import { LambdaClient } from '../../aws/LambdaClient';
 import { jsonPathQuery } from '../jsonPath/JsonPath';
 import { IntegerConstraint } from '../jsonPath/constraints/IntegerConstraint';
 
-class TaskStateAction extends BaseStateAction<TaskState> {
-  private timeoutAbortController: AbortController;
+/**
+ * Default timeout for Task state according to spec
+ */
+const DEFAULT_TIMEOUT_SECONDS = 60;
 
+class TaskStateAction extends BaseStateAction<TaskState> {
   constructor(stateDefinition: TaskState, stateName: string) {
     super(stateDefinition, stateName);
-    this.timeoutAbortController = new AbortController();
   }
 
-  private createTimeoutPromise(input: JSONValue, context: Context): Promise<never> | undefined {
+  private getTimeoutMs(input: JSONValue, context: Context): number {
     const state = this.stateDefinition;
 
-    if (!state.TimeoutSeconds && !state.TimeoutSecondsPath) return;
+    let timeout: number = DEFAULT_TIMEOUT_SECONDS;
 
-    let timeout: number;
     if (state.TimeoutSeconds) {
       timeout = state.TimeoutSeconds;
     } else if (state.TimeoutSecondsPath) {
-      timeout = jsonPathQuery<number>(state.TimeoutSecondsPath, input, context, {
+      timeout = jsonPathQuery<number>(state.TimeoutSecondsPath!, input, context, {
         constraints: [IntegerConstraint.greaterThanOrEqual(1)],
       });
     }
 
-    return new Promise<never>((_, reject) => {
-      const handleTimeoutAbort = () => clearTimeout(timeoutId);
-
-      const timeoutId = setTimeout(() => {
-        this.timeoutAbortController.signal.removeEventListener('abort', handleTimeoutAbort);
-        reject(new StatesTimeoutError());
-      }, timeout * 1000);
-
-      this.timeoutAbortController.signal.addEventListener('abort', handleTimeoutAbort, { once: true });
-    });
+    return timeout * 1000;
   }
 
   override async execute(input: JSONValue, context: Context, options: TaskStateActionOptions): Promise<ActionResult> {
     const state = this.stateDefinition;
-    const racingPromises = [];
-    const timeoutPromise = this.createTimeoutPromise(input, context);
 
-    if (options.overrideFn) {
-      // If local override for task resource is defined, use that
-      const resultPromise = options.overrideFn(input);
-      racingPromises.push(resultPromise);
-    } else {
-      // Else, call Lambda in AWS using SDK
-      const lambdaClient = new LambdaClient(options.awsConfig);
-      const resultPromise = lambdaClient.invokeFunction(state.Resource, input);
-      racingPromises.push(resultPromise);
+    const taskPromise = options.overrideFn
+      ? // If local override for task resource is defined, use that
+        options.overrideFn(input)
+      : // Else, call Lambda in AWS using SDK
+        new LambdaClient(options.awsConfig).invokeFunction(state.Resource, input);
+
+    const timeoutMs = this.getTimeoutMs(input, context);
+
+    const { promise: timeoutPromise, reject: rejectTimeout } = Promise.withResolvers<never>();
+    const timeoutId = setTimeout(() => rejectTimeout(new StatesTimeoutError()), timeoutMs);
+    try {
+      const result = await Promise.race([taskPromise, timeoutPromise]);
+      return this.buildExecutionResult(result);
+    } finally {
+      clearTimeout(timeoutId);
     }
-
-    if (timeoutPromise) {
-      racingPromises.push(timeoutPromise);
-    }
-
-    const result = await Promise.race(racingPromises);
-    this.timeoutAbortController.abort();
-
-    return this.buildExecutionResult(result);
   }
 }
 
