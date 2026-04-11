@@ -66,17 +66,11 @@ export class StateMachine {
     const abortController = new AbortController();
     const eventLogger = new EventLogger();
 
-    let rootSignalAbortHandler: () => void;
-    if (options?._rootAbortSignal) {
-      rootSignalAbortHandler = () => abortController.abort();
-      if (options._rootAbortSignal.aborted) {
-        // If root abort signal is already aborted, abort the signal in the current context of execution.
-        rootSignalAbortHandler();
-      } else {
-        // Else, set a listener that aborts the current controller.
-        options._rootAbortSignal.addEventListener('abort', rootSignalAbortHandler);
-      }
-    }
+    // Combine the local abort controller signal with the root abort signal (if any).
+    // The combined signal aborts when either source aborts, and handles the already-aborted case automatically.
+    const abortSignal = options?._rootAbortSignal
+      ? AbortSignal.any([abortController.signal, options._rootAbortSignal])
+      : abortController.signal;
 
     let onAbortHandler: () => void;
     const settleOnAbort = new Promise<null>((resolve, reject) => {
@@ -91,7 +85,7 @@ export class StateMachine {
           reject(new ExecutionAbortedError());
         };
       }
-      abortController.signal.addEventListener('abort', onAbortHandler);
+      abortSignal.addEventListener('abort', onAbortHandler);
     });
 
     let rejectOnTimeout: Promise<null> | undefined;
@@ -99,9 +93,7 @@ export class StateMachine {
     if (this.definition.TimeoutSeconds !== undefined) {
       rejectOnTimeout = new Promise<null>((_, reject) => {
         timeoutId = setTimeout(() => {
-          // Handle timeout by removing the abort handler from the abort signal listener
-          abortController.signal.removeEventListener('abort', onAbortHandler);
-          // Then we simply reuse the abort controller to abort the execution on timeout
+          abortSignal.removeEventListener('abort', onAbortHandler);
           abortController.abort();
           eventLogger.dispatchExecutionTimeoutEvent();
           reject(new ExecutionTimeoutError());
@@ -113,13 +105,12 @@ export class StateMachine {
       input,
       {
         stateMachineOptions: this.stateMachineOptions,
-        runOptions: { ...options, _rootAbortSignal: options?._rootAbortSignal ?? abortController.signal },
-        abortSignal: abortController.signal,
+        runOptions: { ...options, _rootAbortSignal: abortSignal },
+        abortSignal,
         eventLogger,
       },
       () => {
-        abortController.signal.removeEventListener('abort', onAbortHandler);
-        options?._rootAbortSignal?.removeEventListener('abort', rootSignalAbortHandler);
+        abortSignal.removeEventListener('abort', onAbortHandler);
         clearTimeout(timeoutId);
       }
     );

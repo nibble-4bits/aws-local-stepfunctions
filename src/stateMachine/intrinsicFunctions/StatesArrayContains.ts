@@ -24,7 +24,7 @@ class StatesArrayContains extends BaseIntrinsicFunction {
   }
 
   protected execute(array: JSONValue[], searchVal: JSONValue): JSONValue {
-    return array.findIndex((val) => isEqualJSON(val, searchVal)) > -1;
+    return array.some((val) => isEqualJSON(val, searchVal));
   }
 }
 

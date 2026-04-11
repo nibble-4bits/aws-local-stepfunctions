@@ -30,7 +30,7 @@ export class EventLogger {
         await this.waitForNewEvent();
       }
 
-      let event = null;
+      let event: EventLog | undefined;
       while ((event = this.eventQueue.shift())) {
         yield event;
       }

@@ -11,7 +11,8 @@ import type { IntermediateState } from './IntermediateState';
 import type { TerminalState } from './TerminalState';
 
 interface BaseTaskState
-  extends BaseState,
+  extends
+    BaseState,
     CanHaveInputPath,
     CanHaveParameters,
     CanHaveResultSelector,
