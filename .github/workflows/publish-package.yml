@@ -20,6 +20,10 @@ jobs:
         with:
           node-version: '22'
           registry-url: 'https://registry.npmjs.org'
+      - name: Upgrade npm
+        run: | # 11.5.1+ is required for OIDC trusted publishing (tokenless authentication)
+          curl -fsSL "https://registry.npmjs.org/npm/-/npm-11.5.1.tgz" | tar -xz -C /tmp
+          node /tmp/package/bin/npm-cli.js install -g npm@^11.5.1
       - name: Install dependencies
         run: npm ci
       - name: Run tests
