@@ -60,15 +60,15 @@
     "eslint-config-prettier": "^9.1.2",
     "eslint-plugin-prettier": "^5.5.5",
     "globals": "^17.4.0",
-    "prettier": "^3.8.1",
+    "prettier": "^3.8.2",
     "ts-jest": "^29.4.9",
     "tsup": "^8.5.1",
     "typescript": "^5.9.3",
     "typescript-eslint": "^8.58.1"
   },
   "dependencies": {
-    "@aws-sdk/client-lambda": "^3.1027.0",
-    "@aws-sdk/credential-providers": "^3.1027.0",
+    "@aws-sdk/client-lambda": "^3.1029.0",
+    "@aws-sdk/credential-providers": "^3.1029.0",
     "asl-validator": "^3.15.1",
     "commander": "^11.1.0",
     "jsonpath-plus": "^10.4.0",
